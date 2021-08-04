@@ -22,12 +22,14 @@
   "homepage": "https://github.com/originjs/vite-plugin-federation#readme",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "format": "npx prettier -w ."
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.1",
     "jest": "^27.0.4",
+    "prettier": "^2.3.2",
     "ts-jest": "^27.0.3",
     "typescript": "^4.3.2",
     "rollup": "^2.55.1"
