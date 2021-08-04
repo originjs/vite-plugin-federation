@@ -1,0 +1,16 @@
+{
+  "name": "basic-host-remote",
+  "private": true,
+  "workspaces": [
+    "rollup-host",
+    "rollup-remote",
+    "webpack-host"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build"
+  },
+  "license": "MulanPSL2",
+  "devDependencies": {
+    "rimraf": "^3.0.2"
+  }
+}
