@@ -9,7 +9,7 @@ export default function federation(options: VitePluginFederationOptions) {
     const provideExposes = options.exposes as string[];
     let moduleMap = '';
     for (const key in provideExposes) {
-        moduleMap += `\n"${key}":()=>{return import('${modulePrefix + '${' + provideExposes[key] + '}'})}`
+        moduleMap += `\n"${key}":()=>{return import('${modulePrefix + '${' + provideExposes[key] + '}'}')}`
     }
     const code =
         `let moduleMap = {${moduleMap}}
