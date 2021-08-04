@@ -1,22 +1,18 @@
 import * as path from 'path';
+import {InputOptions, OutputBundle, OutputChunk, OutputOptions} from "rollup";
 
 const remoteEntryHelperId = 'rollup-plugin-federation/remoteEntry';
-const moduleMapMarker = '__ROLLUP_FEDERATION_MODULE_MAP__';
+const modulePrefix = '__ROLLUP_FEDERATION_MODULE_PREFIX__'
+const replaceMap = new Map()
 
-function getModuleMap(exposes, chunk) {
-    for (let key in exposes) {
-        const exposeFile = path.resolve(exposes[key]);
-        if (chunk.facadeModuleId.indexOf(exposeFile) === 0) {
-            return `"${key}": () => {  return import('http://localhost:8081/${chunk.fileName}').then(({ default: apply }) => (()=> (apply())))},\n`
-        }
+export default function federation(options: VitePluginFederationOptions) {
+    const provideExposes = options.exposes as string[];
+    let moduleMap = '';
+    for (const key in provideExposes) {
+        moduleMap += `\n"${key}":()=>{return import('${modulePrefix + '${' + provideExposes[key] + '}'})}`
     }
-    return '';
-}
-
-export default function federation(options) {
-    const provideExposes = options.exposes || {};
     const code =
-        `${moduleMapMarker}
+        `let moduleMap = {${moduleMap}}
 export const get =(module, getScope) => {
     return moduleMap[module]();
 };
@@ -27,19 +23,23 @@ export const init =(shareScope, initScope) => {
     return {
         name: 'federation',
 
-        options(_options) {
+        options(_options: InputOptions) {
             // Split expose & shared module to separate chunks
             _options.preserveEntrySignatures = 'strict';
             if (typeof _options.input === 'string') {
                 _options.input = [_options.input];
             }
             Object.keys(provideExposes).forEach((id) => {
-                _options.input.push(provideExposes[id]);
+                if (Array.isArray(_options.input)) {
+                    // @ts-ignore
+                    _options.input.push(provideExposes[id]);
+                }
             });
             return _options;
         },
 
-        buildStart(_options) {
+        buildStart(_options: InputOptions) {
+            // @ts-ignore
             this.emitFile({
                 fileName: options.filename,
                 type: 'chunk',
@@ -48,13 +48,13 @@ export const init =(shareScope, initScope) => {
             })
         },
 
-        resolveId(source, importer) {
+        resolveId(source: string, importer: string) {
             if (source === remoteEntryHelperId)
                 return source
             return null;
         },
 
-        load(id) {
+        load(id: string) {
             if (id === remoteEntryHelperId) {
                 return {
                     code,
@@ -64,21 +64,25 @@ export const init =(shareScope, initScope) => {
             return null
         },
 
-        generateBundle(_options, bundle) {
-            let modules = '';
-            let remoteEntry;
+        generateBundle(_options: OutputOptions, bundle: OutputBundle) {
+            let remoteChunk: OutputChunk;
             for (const file in bundle) {
                 const chunk = bundle[file];
                 if (chunk.type === 'chunk' && chunk.isEntry) {
-                    modules += getModuleMap(provideExposes, chunk);
-                }
-                if (chunk.fileName === options.filename) {
-                    remoteEntry = chunk;
+                    for (const key in provideExposes) {
+                        let provideExpose: string = provideExposes[key];
+                        if (chunk.facadeModuleId!.indexOf(path.resolve(provideExpose)) >= 0) {
+                            replaceMap.set(modulePrefix + '${' + provideExpose + '}', `http://localhost:8081/${chunk.fileName}`)
+                        }
+                        if (options.filename === chunk.fileName) {
+                            remoteChunk = chunk;
+                        }
+                    }
                 }
             }
-            console.log(modules)
-            remoteEntry.code = remoteEntry.code.replace(moduleMapMarker,
-                `let moduleMap={ ${modules} }`);
+            replaceMap.forEach((value, key) => {
+                remoteChunk.code = (remoteChunk.code as string).replace(key, value);
+            })
         }
     }
 }
