@@ -1,12 +1,6 @@
-const DOMGlobals = ['window', 'document']
-const NodeGlobals = ['module', 'require']
-
+// eslint-disable-next-line no-undef
 module.exports = {
-  extends: [
-    'eslint:recommended',
-    'plugin:node/recommended',
-    'plugin:@typescript-eslint/recommended'
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     sourceType: 'module'
@@ -18,8 +12,6 @@ module.exports = {
       // catches unused variables but not args.
       { varsIgnorePattern: '.*', args: 'none' }
     ],
-    // most of the codebase are expected to be env agnostic
-    'no-restricted-globals': ['error', ...DOMGlobals, ...NodeGlobals],
     // since we target ES2015 for baseline support, we need to forbid object
     // rest spread usage (both assign and destructure)
     'no-restricted-syntax': [

@@ -11,7 +11,7 @@ export default function federation(options: VitePluginFederationOptions) {
   const exposesMap = new Map()
   for (const key in provideExposes) {
     if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
-      let moduleName = `${modulePrefix + '${' + provideExposes[key] + '}'}`
+      const moduleName = `${modulePrefix + '${' + provideExposes[key] + '}'}`
       moduleNames.push(moduleName)
       exposesMap.set(key, provideExposes[key])
       moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
@@ -34,10 +34,9 @@ export const init =(shareScope, initScope) => {
       if (typeof _options.input === 'string') {
         _options.input = [_options.input]
       }
-      Object.keys(provideExposes).forEach((id) => {
+      exposesMap.forEach((value) => {
         if (Array.isArray(_options.input)) {
-          // @ts-ignore
-          _options.input.push(provideExposes[id])
+          _options.input.push(value)
         }
       })
       // suppress import warning
@@ -49,12 +48,11 @@ export const init =(shareScope, initScope) => {
     },
 
     buildStart(_options: InputOptions) {
-      // @ts-ignore
       this.emitFile({
         fileName: options.filename,
         type: 'chunk',
         id: remoteEntryHelperId,
-        preserveSignature: 'strict',
+        preserveSignature: 'strict'
       })
     },
 
@@ -67,7 +65,7 @@ export const init =(shareScope, initScope) => {
       if (id === remoteEntryHelperId) {
         return {
           code,
-          moduleSideEffects: 'no-treeshake',
+          moduleSideEffects: 'no-treeshake'
         }
       }
       return null
@@ -81,7 +79,10 @@ export const init =(shareScope, initScope) => {
           if (chunk.type === 'chunk' && chunk.isEntry) {
             exposesMap.forEach((value) => {
               if (chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0) {
-                replaceMap.set(modulePrefix + '${' + value + '}', `http://localhost:8081/${chunk.fileName}`)
+                replaceMap.set(
+                  modulePrefix + '${' + value + '}',
+                  `http://localhost:8081/${chunk.fileName}`
+                )
               }
               if (options.filename === chunk.fileName) {
                 remoteChunk = chunk
@@ -93,6 +94,6 @@ export const init =(shareScope, initScope) => {
       replaceMap.forEach((value, key) => {
         remoteChunk.code = (remoteChunk.code as string).replace(key, value)
       })
-    },
+    }
   }
 }
