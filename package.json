@@ -30,11 +30,10 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.12.1",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.0",
     "eslint": "^7.32.0",
-    "eslint-config-alloy": "^4.2.0",
+    "eslint-plugin-node": "^11.1.0",
     "husky": "^7.0.1",
     "jest": "^27.0.4",
     "lint-staged": "^11.1.1",
