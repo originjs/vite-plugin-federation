@@ -6,8 +6,8 @@ module.exports = {
   tabWidth: 2,
   // use spaces instead of indentations
   useTabs: false,
-  // semicolon at the end of the line
-  semi: true,
+  // semicolon dont at the end of the line
+  semi: false,
   // use single quotes
   singleQuote: true,
   // object's key is quoted only when necessary
