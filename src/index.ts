@@ -1,7 +1,9 @@
 import * as path from 'path'
-import { InputOptions, OutputBundle, OutputChunk, OutputOptions } from 'rollup'
+import { OutputChunk, Plugin } from 'rollup'
 
-export default function federation(options: VitePluginFederationOptions) {
+export default function federation(
+  options: VitePluginFederationOptions
+): Plugin {
   const remoteEntryHelperId = 'rollup-plugin-federation/remoteEntry'
   const modulePrefix = '__ROLLUP_FEDERATION_MODULE_PREFIX__'
   const replaceMap = new Map()
@@ -28,7 +30,7 @@ export const init =(shareScope, initScope) => {
   return {
     name: 'federation',
 
-    options(_options: InputOptions) {
+    options(_options) {
       // Split expose & shared module to separate chunks
       _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
@@ -47,7 +49,7 @@ export const init =(shareScope, initScope) => {
       return _options
     },
 
-    buildStart(_options: InputOptions) {
+    buildStart() {
       this.emitFile({
         fileName: options.filename,
         type: 'chunk',
@@ -56,12 +58,12 @@ export const init =(shareScope, initScope) => {
       })
     },
 
-    resolveId(source: string, importer: string) {
+    resolveId(source) {
       if (source === remoteEntryHelperId) return source
       return null
     },
 
-    load(id: string) {
+    load(id) {
       if (id === remoteEntryHelperId) {
         return {
           code,
@@ -71,7 +73,7 @@ export const init =(shareScope, initScope) => {
       return null
     },
 
-    generateBundle(_options: OutputOptions, bundle: OutputBundle) {
+    generateBundle(_options, bundle) {
       let remoteChunk: OutputChunk
       for (const file in bundle) {
         if (Object.prototype.hasOwnProperty.call(bundle, file)) {
