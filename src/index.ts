@@ -8,10 +8,14 @@ export default function federation(options: VitePluginFederationOptions) {
   const moduleNames: string[] = []
   const provideExposes = options.exposes as string[]
   let moduleMap = ''
+  const exposesMap = new Map()
   for (const key in provideExposes) {
-    let moduleName = `${modulePrefix + '${' + provideExposes[key] + '}'}`
-    moduleNames.push(moduleName)
-    moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
+    if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
+      let moduleName = `${modulePrefix + '${' + provideExposes[key] + '}'}`
+      moduleNames.push(moduleName)
+      exposesMap.set(key, provideExposes[key])
+      moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
+    }
   }
   const code = `let moduleMap = {${moduleMap}}
 export const get =(module, getScope) => {
@@ -30,7 +34,7 @@ export const init =(shareScope, initScope) => {
       if (typeof _options.input === 'string') {
         _options.input = [_options.input]
       }
-      Object.keys(provideExposes).forEach(id => {
+      Object.keys(provideExposes).forEach((id) => {
         if (Array.isArray(_options.input)) {
           // @ts-ignore
           _options.input.push(provideExposes[id])
@@ -40,7 +44,7 @@ export const init =(shareScope, initScope) => {
       if (_options.external && !Array.isArray(_options.external)) {
         _options.external = [_options.external as string]
       }
-      moduleNames.forEach(item => (_options.external as string[]).push(item))
+      moduleNames.forEach((item) => (_options.external as string[]).push(item))
       return _options
     },
 
@@ -50,7 +54,7 @@ export const init =(shareScope, initScope) => {
         fileName: options.filename,
         type: 'chunk',
         id: remoteEntryHelperId,
-        preserveSignature: 'strict'
+        preserveSignature: 'strict',
       })
     },
 
@@ -63,7 +67,7 @@ export const init =(shareScope, initScope) => {
       if (id === remoteEntryHelperId) {
         return {
           code,
-          moduleSideEffects: 'no-treeshake'
+          moduleSideEffects: 'no-treeshake',
         }
       }
       return null
@@ -72,27 +76,23 @@ export const init =(shareScope, initScope) => {
     generateBundle(_options: OutputOptions, bundle: OutputBundle) {
       let remoteChunk: OutputChunk
       for (const file in bundle) {
-        const chunk = bundle[file]
-        if (chunk.type === 'chunk' && chunk.isEntry) {
-          for (const key in provideExposes) {
-            let provideExpose: string = provideExposes[key]
-            if (
-              chunk.facadeModuleId!.indexOf(path.resolve(provideExpose)) >= 0
-            ) {
-              replaceMap.set(
-                modulePrefix + '${' + provideExpose + '}',
-                `http://localhost:8081/${chunk.fileName}`
-              )
-            }
-            if (options.filename === chunk.fileName) {
-              remoteChunk = chunk
-            }
+        if (Object.prototype.hasOwnProperty.call(bundle, file)) {
+          const chunk = bundle[file]
+          if (chunk.type === 'chunk' && chunk.isEntry) {
+            exposesMap.forEach((value) => {
+              if (chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0) {
+                replaceMap.set(modulePrefix + '${' + value + '}', `http://localhost:8081/${chunk.fileName}`)
+              }
+              if (options.filename === chunk.fileName) {
+                remoteChunk = chunk
+              }
+            })
           }
         }
       }
       replaceMap.forEach((value, key) => {
         remoteChunk.code = (remoteChunk.code as string).replace(key, value)
       })
-    }
+    },
   }
 }

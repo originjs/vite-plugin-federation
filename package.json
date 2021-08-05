@@ -23,15 +23,31 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "format": "npx prettier -w ."
+    "eslint:check": "eslint src --ext .ts ",
+    "eslint:fix": "eslint --fix",
+    "prettier:format": "yarn prettier -w .",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.1",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
+    "eslint": "^7.32.0",
+    "eslint-config-alloy": "^4.2.0",
+    "husky": "^7.0.1",
     "jest": "^27.0.4",
+    "lint-staged": "^11.1.1",
     "prettier": "^2.3.2",
+    "rollup": "^2.55.1",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.2",
-    "rollup": "^2.55.1"
+    "typescript": "^4.3.5"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,js}": [
+      "eslint --cache --fix",
+      "eslint",
+      "prettier --write"
+    ]
   }
 }
