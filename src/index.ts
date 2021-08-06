@@ -11,13 +11,14 @@ export default function federation(
   const modulePrefix = '__ROLLUP_FEDERATION_MODULE_PREFIX__'
   const replaceMap = new Map()
   const moduleNames: string[] = []
-  const provideExposes = options.exposes as string[]
+  const provideExposes = options.exposes || {}
   let moduleMap = ''
   const exposesMap = new Map()
   for (const key in provideExposes) {
     if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
       const moduleName = `${modulePrefix + '${' + provideExposes[key] + '}'}`
       moduleNames.push(moduleName)
+      moduleNames.push(key)
       exposesMap.set(key, provideExposes[key])
       moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
     }
@@ -91,8 +92,9 @@ export default {
           _options.input.push(value)
         }
       })
-      // suppress import warning
-      if (_options.external && !Array.isArray(_options.external)) {
+      // use external to suppress import warning
+      _options.external = _options.external || []
+      if (!Array.isArray(_options.external)) {
         _options.external = [_options.external as string]
       }
       moduleNames.forEach((item) => (_options.external as string[]).push(item))
@@ -100,12 +102,15 @@ export default {
     },
 
     buildStart() {
-      this.emitFile({
-        fileName: options.filename,
-        type: 'chunk',
-        id: remoteEntryHelperId,
-        preserveSignature: 'strict'
-      })
+      // if it dont exposes anything,unnecessary to emitFile
+      if (Object.keys(provideExposes).length) {
+        this.emitFile({
+          fileName: options.filename,
+          type: 'chunk',
+          id: remoteEntryHelperId,
+          preserveSignature: 'strict'
+        })
+      }
     },
 
     resolveId(...args) {
@@ -122,7 +127,7 @@ export default {
 
     load(...args) {
       const [id] = args
-      if (id === remoteEntryHelperId) {
+      if (id === remoteEntryHelperId && Object.keys(provideExposes).length) {
         return {
           code,
           moduleSideEffects: 'no-treeshake'
