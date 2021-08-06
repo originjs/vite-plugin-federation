@@ -16,7 +16,7 @@
     "@babel/core": "^7.14.8",
     "@babel/preset-env": "7.14.8",
     "@babel/preset-react": "^7.14.5",
-    "@originjs/vite-plugin-federation": "file:../../../",
+    "@originjs/vite-plugin-federation": "link:../../../",
     "@rollup/plugin-commonjs": "13.0.2",
     "@rollup/plugin-node-resolve": "8.4.0",
     "npm-run-all": "4.1.5",
