@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+
+  <title>Rollup Host</title>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.js"></script>
+
+<script type="systemjs-importmap">
+      {
+        "imports": {
+          "react": "https://unpkg.com/react@16.14/umd/react.production.min.js",
+          "react-dom": "https://unpkg.com/react-dom@16.14/umd/react-dom.production.min.js",
+          "rwebpackremote": "http://localhost:8081/remoteEntry.js",
+          "main": "./dist/index.js"
+        }
+      }
+    </script>
+
+<script type="systemjs-module" src="import:main"></script>
+</body>
+</html>
