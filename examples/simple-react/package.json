@@ -1,0 +1,13 @@
+{
+  "name": "simple-react",
+  "private": true,
+  "workspaces": [
+    "host",
+    "remote"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "rimraf": "^3.0.2"
+  }
+}
+

@@ -2884,7 +2884,7 @@ prelude-ls@~1.1.2:
 
 prettier@^2.3.2:
   version "2.3.2"
-  resolved "https://registry.npmjs.org/prettier/-/prettier-2.3.2.tgz#ef280a05ec253712e486233db5c6f23441e7342d"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.3.2.tgz#ef280a05ec253712e486233db5c6f23441e7342d"
   integrity sha512-lnJzDfJ66zkMy58OL5/NY5zp70S7Nz6KqcKkXYzn2tMVrNxvbqaBpg7H3qHaLxCJ5lNMsGuM8+ohS7cZrthdLQ==
 
 pretty-format@^26.0.0, pretty-format@^26.6.2:
@@ -3007,7 +3007,7 @@ rimraf@^3.0.0, rimraf@^3.0.2:
 
 rollup@^2.55.1:
   version "2.56.0"
-  resolved "https://registry.npmjs.org/rollup/-/rollup-2.56.0.tgz#daa832955d2b58f1ed52a3c4c85b7d1adaf076d0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.56.0.tgz#daa832955d2b58f1ed52a3c4c85b7d1adaf076d0"
   integrity sha512-weEafgbjbHCnrtJPNyCrhYnjP62AkF04P0BcV/1mofy1+gytWln4VVB1OK462cq2EAyWzRDpTMheSP/o+quoiA==
   optionalDependencies:
     fsevents "~2.3.2"

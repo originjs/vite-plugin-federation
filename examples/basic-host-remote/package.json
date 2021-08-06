@@ -3,8 +3,7 @@
   "private": true,
   "workspaces": [
     "rollup-host",
-    "rollup-remote",
-    "webpack-host"
+    "rollup-remote"
   ],
   "scripts": {
     "build": "yarn workspaces run build"
