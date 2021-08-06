@@ -8,5 +8,5 @@ function addElement(root) {
     document.getElementById(root).appendChild(newDiv);
 }
 
-lazyLoad();
+lazyLoad().then(item=>item.default());
 addElement("root");

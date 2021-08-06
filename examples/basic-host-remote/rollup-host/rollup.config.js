@@ -1,4 +1,4 @@
-import federation from "@module-federation/rollup-federation";
+import federation from "@originjs/vite-plugin-federation";
 
 import pkg from "./package.json";
 

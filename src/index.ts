@@ -1,5 +1,8 @@
 import * as path from 'path'
-import { OutputChunk, Plugin } from 'rollup'
+import { OutputChunk, Plugin, AcornNode } from 'rollup'
+import virtual from '@rollup/plugin-virtual'
+import { walk } from 'estree-walker'
+import MagicString from 'magic-string'
 
 export default function federation(
   options: VitePluginFederationOptions
@@ -26,6 +29,53 @@ export const get =(module, getScope) => {
 export const init =(shareScope, initScope) => {
     console.log('init')
 };`
+
+  const providedRemotes = (options.remotes || {}) as { [index: string]: string }
+  const remotes: { id: string; config: string }[] = []
+  Object.keys(providedRemotes).forEach((id) => {
+    remotes.push(Object.assign({}, { id, config: providedRemotes[id] }))
+  })
+
+  const virtualMod = virtual({
+    __federation__: `
+const remotesMap = {
+  ${remotes
+    .map(
+      (remote) =>
+        `${JSON.stringify(remote.id)}: () => import(${JSON.stringify(
+          remote.config
+        )})`
+    )
+    .join(',\n  ')}
+};
+
+const processModule = (mod) => {
+  if (mod && mod.__useDefault) {
+    return mod.default;
+  }
+
+  return mod;
+}
+
+const shareScope = {
+  
+};
+
+const initMap = {};
+
+export default {
+  ensure: async (remoteId) => {
+    const remote = await remotesMap[remoteId]();
+
+    if (!initMap[remoteId]) {
+      remote.init(shareScope);
+      initMap[remoteId] = true;
+    }
+
+    return remote;
+  }
+};`
+  })
 
   return {
     name: 'federation',
@@ -58,17 +108,29 @@ export const init =(shareScope, initScope) => {
       })
     },
 
-    resolveId(source) {
-      if (source === remoteEntryHelperId) return source
+    resolveId(...args) {
+      const [source] = args
+      if (source === remoteEntryHelperId) {
+        return source
+      }
+      const v = virtualMod.resolveId.call(this, ...args)
+      if (v) {
+        return v
+      }
       return null
     },
 
-    load(id) {
+    load(...args) {
+      const [id] = args
       if (id === remoteEntryHelperId) {
         return {
           code,
           moduleSideEffects: 'no-treeshake'
         }
+      }
+      const v = virtualMod.load.call(this, ...args)
+      if (v) {
+        return v
       }
       return null
     },
@@ -96,6 +158,53 @@ export const init =(shareScope, initScope) => {
       replaceMap.forEach((value, key) => {
         remoteChunk.code = (remoteChunk.code as string).replace(key, value)
       })
+    },
+    transform(code: string) {
+      let ast: AcornNode | null = null
+      try {
+        ast = this.parse(code)
+      } catch (err) {
+        console.error(err)
+      }
+      if (!ast) {
+        return null
+      }
+
+      const magicString = new MagicString(code)
+      let requiresRuntime = false
+      walk(ast, {
+        enter(node: any) {
+          if (node.type === 'ImportExpression') {
+            if (node.source && node.source.value) {
+              const moduleId = node.source.value
+              const remote = remotes.find((r) => moduleId.startsWith(r.id))
+
+              if (remote) {
+                requiresRuntime = true
+                const modName = `.${moduleId.slice(remote.id.length)}`
+
+                magicString.overwrite(
+                  node.start,
+                  node.end,
+                  `__federation__.ensure(${JSON.stringify(
+                    remote.id
+                  )}).then((remote) => remote.get(${JSON.stringify(modName)}))`
+                )
+              }
+            }
+          }
+        }
+      })
+
+      if (requiresRuntime) {
+        magicString.prepend(`import __federation__ from '__federation__';\n\n`)
+      }
+
+      return {
+        code: magicString.toString(),
+        // map: sourceMap ? magicString.generateMap({ hires: true }) : null,
+        map: null
+      }
     }
   }
 }
