@@ -2,16 +2,16 @@ import babel from 'rollup-plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import injectProcessEnv from 'rollup-plugin-inject-process-env'
-import federation from '@module-federation/rollup-federation'
+import federation from '@originjs/vite-plugin-federation'
 import pkg from './package.json'
 
 export default {
   input: 'src/index.js',
   preserveEntrySignatures: false,
   plugins: [
-    injectProcessEnv({
-      NODE_ENV: 'production'
-    }),
+    // injectProcessEnv({
+    //   NODE_ENV: 'production'
+    // }),
     resolve({
       browser: true,
       transformMixedEsModules: true,
