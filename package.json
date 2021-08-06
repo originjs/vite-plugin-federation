@@ -28,13 +28,17 @@
     "prettier:format": "yarn prettier -w ."
   },
   "devDependencies": {
+    "@rollup/plugin-virtual": "^2.0.3",
+    "@types/estree": "^0.0.50",
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.0",
     "eslint": "^7.32.0",
     "eslint-plugin-node": "^11.1.0",
+    "estree-walker": "^1.0.1",
     "jest": "^27.0.4",
     "lint-staged": "^11.1.1",
+    "magic-string": "^0.25.7",
     "prettier": "^2.3.2",
     "rollup": "^2.55.1",
     "ts-jest": "^27.0.3",
