@@ -3,6 +3,7 @@ import { OutputChunk, Plugin, AcornNode } from 'rollup'
 import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
+import { sharedAssign } from './util/objectUtil'
 
 export default function federation(
   options: VitePluginFederationOptions
@@ -12,6 +13,7 @@ export default function federation(
   const replaceMap = new Map()
   const moduleNames: string[] = []
   const provideExposes = options.exposes || {}
+  const shared = sharedAssign(options.shared || [])
   let moduleMap = ''
   const exposesMap = new Map()
   for (const key in provideExposes) {
@@ -98,6 +100,12 @@ export default {
         _options.external = [_options.external as string]
       }
       moduleNames.forEach((item) => (_options.external as string[]).push(item))
+      // remove from external what is both in shared and external
+      if (shared.size) {
+        _options.external = _options.external.filter((item) => {
+          return !shared.has(item as string)
+        })
+      }
       return _options
     },
 
@@ -210,6 +218,19 @@ export default {
         // map: sourceMap ? magicString.generateMap({ hires: true }) : null,
         map: null
       }
+    },
+    outputOptions(options) {
+      // add shared content into manualChunk
+      if (shared.size) {
+        options.manualChunks = options.manualChunks || {}
+        shared.forEach((value, key) => {
+          if (options.manualChunks) {
+            //TODO need to support more type
+            options.manualChunks[key] = [key]
+          }
+        })
+      }
+      return options
     }
   }
 }
