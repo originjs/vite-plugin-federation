@@ -2,6 +2,7 @@
  * The following code is adapted from https://github.com/webpack/webpack/types.d.ts
  * MIT License https://github.com/webpack/webpack/LICENSE
  */
+export default function federation(options: VitePluginFederationOptions): Plugin;
 
 declare interface VitePluginFederationOptions {
   /**
@@ -28,26 +29,26 @@ declare interface VitePluginFederationOptions {
    * The external type of the remote containers.
    */
   remoteType?:
-    | 'var'
-    | 'module'
-    | 'assign'
-    | 'this'
-    | 'window'
-    | 'self'
-    | 'global'
-    | 'commonjs'
-    | 'commonjs2'
-    | 'commonjs-module'
-    | 'amd'
-    | 'amd-require'
-    | 'umd'
-    | 'umd2'
-    | 'jsonp'
-    | 'system'
-    | 'promise'
-    | 'import'
-    | 'script'
-    | 'node-commonjs'
+  | 'var'
+  | 'module'
+  | 'assign'
+  | 'this'
+  | 'window'
+  | 'self'
+  | 'global'
+  | 'commonjs'
+  | 'commonjs2'
+  | 'commonjs-module'
+  | 'amd'
+  | 'amd-require'
+  | 'umd'
+  | 'umd2'
+  | 'jsonp'
+  | 'system'
+  | 'promise'
+  | 'import'
+  | 'script'
+  | 'node-commonjs'
 
   /**
    * Container locations and request scopes from which modules should be resolved and loaded at runtime. When provided, property name is used as request scope, otherwise request scope is automatically inferred from container location.
@@ -100,31 +101,31 @@ declare interface ExposesConfig {
 declare interface LibraryOptions {
   /**
    * Add a comment in the UMD wrapper.
-   * 在 UMD 包装器中添加注释。
+   *
    */
   auxiliaryComment?: string | LibraryCustomUmdCommentObject
 
   /**
    * Specify which export should be exposed as library.
-   * 指定作为模块公开的导出库
+   *
    */
   export?: string | string[]
 
   /**
    * The name of the library (some types allow unnamed libraries too).
-   * 库名/允许未命名
+   *
    */
   name?: string | string[] | LibraryCustomUmdObject
 
   /**
    * Type of library (types included by default are 'var', 'module', 'assign', 'assign-properties', 'this', 'window', 'self', 'global', 'commonjs', 'commonjs2', 'commonjs-module', 'amd', 'amd-require', 'umd', 'umd2', 'jsonp', 'system', but others might be added by plugins).
-   * 库类型，与远程库的打包类型匹配
+   *
    */
   type: string
 
   /**
    * If `output.libraryTarget` is set to umd and `output.library` is set, setting this to true will name the AMD module.
-   * 如果‘ output.libraryTarget’设置为 umd，‘ output.library’设置为 true，则模块将按 AMD 被命名。
+   *
    */
   umdNamedDefine?: boolean
 }

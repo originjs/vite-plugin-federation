@@ -4,6 +4,7 @@ import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { sharedAssign } from './util/objectUtil'
+import { VitePluginFederationOptions } from '../types'
 
 export default function federation(
   options: VitePluginFederationOptions
@@ -33,7 +34,7 @@ export const init =(shareScope, initScope) => {
     console.log('init')
 };`
 
-  const providedRemotes = (options.remotes || {}) as { [index: string]: string }
+  const providedRemotes = options.remotes || {}
   const remotes: { id: string; config: string }[] = []
   Object.keys(providedRemotes).forEach((id) => {
     remotes.push(Object.assign({}, { id, config: providedRemotes[id] }))
@@ -110,7 +111,7 @@ export default {
     },
 
     buildStart() {
-      // if it dont exposes anything,unnecessary to emitFile
+      // if we don't expose any modules, there is no need to emit file
       if (Object.keys(provideExposes).length) {
         this.emitFile({
           fileName: options.filename,
@@ -172,6 +173,7 @@ export default {
         remoteChunk.code = (remoteChunk.code as string).replace(key, value)
       })
     },
+
     transform(code: string) {
       let ast: AcornNode | null = null
       try {

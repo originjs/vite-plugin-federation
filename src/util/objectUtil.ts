@@ -1,3 +1,5 @@
+import { SharedObject, SharedConfig } from '../../types'
+
 export function sharedAssign(
   shared: (string | SharedObject)[] | SharedObject
 ): Map<string, Map<string, string>> {

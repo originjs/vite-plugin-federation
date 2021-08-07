@@ -9,14 +9,15 @@ export default defineConfig({
   // },
   plugins: [
     vue(),
-    // federation({
-    //   name: "home",
-    //   filename: "remoteEntry.js",
-    //   exposes: {
-    //     "./Content": "./src/components/Content.vue",
-    //     "./Button": "./src/components/Button.js",
-    //   },
-    // })
+    federation({
+      name: "home",
+      filename: "remoteEntry.js",
+      
+      exposes: {
+        "./Content": "./src/components/Content.vue",
+        "./Button": "./src/components/Button.js",
+      },
+    })
   ],
   build: {
     minify: false,

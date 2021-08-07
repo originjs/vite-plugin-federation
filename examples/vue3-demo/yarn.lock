@@ -20,8 +20,9 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@originjs/vite-plugin-federation@file:../..":
-  version "0.0.1"
+"@originjs/vite-plugin-federation@link:../..":
+  version "0.0.0"
+  uid ""
 
 "@types/estree@^0.0.48":
   version "0.0.48"
@@ -153,6 +154,11 @@ esbuild@^0.12.8:
   version "0.12.18"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.12.18.tgz#e5db16372188c2b4d395f7f55fdade27f6a119fa"
   integrity sha512-arWhBQSy+oiBAp8VRRCFvAU+3jyf0gGacABLO3haMHboXCDjzq4WUqyQklst2XRuFS8MXgap+9uvODqj9Iygpg==
+
+estree-walker@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/estree-walker/-/estree-walker-1.0.1.tgz#31bc5d612c96b704106b477e6dd5d8aa138cb700"
+  integrity sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==
 
 estree-walker@^2.0.1:
   version "2.0.2"
