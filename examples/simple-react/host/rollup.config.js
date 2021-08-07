@@ -1,9 +1,9 @@
-import babel from 'rollup-plugin-babel'
+import babel from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
-import injectProcessEnv from 'rollup-plugin-inject-process-env'
 import federation from '@originjs/vite-plugin-federation'
 import pkg from './package.json'
+import replace from '@rollup/plugin-replace'
 
 export default {
   input: 'src/index.js',
@@ -12,19 +12,13 @@ export default {
     // injectProcessEnv({
     //   NODE_ENV: 'production'
     // }),
-    resolve({
-      browser: true,
-      transformMixedEsModules: true,
-      modulesOnly: true,
-      dedupe: ['react', 'react-dom'],
-      extensions: ['.mjs', '.js', '.jsx', '.json'],
-      preferBuiltins: false
-    }),
-    commonjs({
-      transformMixedEsModules: true,
-      include: ['node_modules/*']
-    }),
+    resolve(),
     babel(),
+    commonjs(),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      preventAssignment: true
+    }),
     federation({
       remotes: {
         remote_app: 'http://localhost:8081/remoteEntry.js'
@@ -41,5 +35,6 @@ export default {
       }
     })
   ],
-  output: [{ format: 'system', dir: pkg.main }]
+  output: [{ format: 'system', dir: pkg.main }],
+  external: ['react', 'react-dom']
 }
