@@ -1,8 +1,16 @@
 {
-  "include": ["src"],
-  "exclude": ["**/*.spec.ts"],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "examples",
+    "test"
+  ],
   "compilerOptions": {
-    "target": "ES2019",
+    "outDir": "dist",
+    "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
     "strict": true,
