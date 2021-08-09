@@ -6,8 +6,6 @@ import MagicString from 'magic-string'
 import { sharedAssign } from './util/objectUtil'
 import { VitePluginFederationOptions } from '../types'
 
-const remoteEntryHelperId = 'rollup-plugin-federation/remoteEntry'
-
 function getModuleMarker(value: string): string {
   return `__ROLLUP_FEDERATION_MODULE_PREFIX__${value}`
 }
@@ -33,13 +31,6 @@ export default function federation(
       moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
     }
   }
-  const code = `let moduleMap = {${moduleMap}}
-export const get =(module, getScope) => {
-    return moduleMap[module]();
-};
-export const init =(shareScope, initScope) => {
-    console.log('init')
-};`
 
   const providedRemotes = options.remotes || {}
   const remotes: { id: string; config: string }[] = []
@@ -48,6 +39,7 @@ export const init =(shareScope, initScope) => {
   })
 
   const virtualMod = virtual({
+    // code generated for host
     __federation__: `
 const remotesMap = {
   ${remotes
@@ -85,7 +77,15 @@ export default {
 
     return remote;
   }
-};`
+};`,
+    // code generated for remote
+    __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
+    export const get =(module, getScope) => {
+        return moduleMap[module]();
+    };
+    export const init =(shareScope, initScope) => {
+        console.log('init')
+    };`
   })
 
   return {
@@ -123,17 +123,13 @@ export default {
         this.emitFile({
           fileName: options.filename,
           type: 'chunk',
-          id: remoteEntryHelperId,
+          id: '__remoteEntryHelper__',
           preserveSignature: 'strict'
         })
       }
     },
 
     resolveId(...args) {
-      const [source] = args
-      if (source === remoteEntryHelperId) {
-        return source
-      }
       const v = virtualMod.resolveId.call(this, ...args)
       if (v) {
         return v
@@ -142,13 +138,6 @@ export default {
     },
 
     load(...args) {
-      const [id] = args
-      if (id === remoteEntryHelperId && Object.keys(provideExposes).length) {
-        return {
-          code,
-          moduleSideEffects: 'no-treeshake'
-        }
-      }
       const v = virtualMod.load.call(this, ...args)
       if (v) {
         return v
