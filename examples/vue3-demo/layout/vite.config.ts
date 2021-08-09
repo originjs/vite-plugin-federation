@@ -6,21 +6,16 @@ import federation from "@originjs/vite-plugin-federation";
 export default defineConfig({
   plugins: [
     vue(),
-    // federation({
-    //   name: "layout",
-    //   filename: "remoteEntry.js",
-    //   remotes: {
-    //     home: "home@http://localhost:3002/remoteEntry.js",
-    //   },
-    //   exposes: {},
-    // })
+    federation({
+      name: "layout",
+      filename: "remoteEntry.js",
+      remotes: {
+        home: "http://localhost:3002/remoteEntry.js",
+      },
+      exposes: {},
+    })
   ],
   build: {
-    minify: false,
-    rollupOptions: {
-      output: {
-        manualChunks: { vue: ['vue'] }
-      }
-    }
+    minify: false
   }
 });

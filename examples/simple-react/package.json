@@ -6,6 +6,9 @@
     "remote"
   ],
   "license": "MIT",
+  "scripts": {
+    "build": "yarn workspaces run build"
+  },
   "devDependencies": {
     "rimraf": "^3.0.2"
   }

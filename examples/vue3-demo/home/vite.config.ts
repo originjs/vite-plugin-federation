@@ -12,7 +12,6 @@ export default defineConfig({
     federation({
       name: "home",
       filename: "remoteEntry.js",
-      
       exposes: {
         "./Content": "./src/components/Content.vue",
         "./Button": "./src/components/Button.js",

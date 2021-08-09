@@ -6,23 +6,30 @@ import MagicString from 'magic-string'
 import { sharedAssign } from './util/objectUtil'
 import { VitePluginFederationOptions } from '../types'
 
+const remoteEntryHelperId = 'rollup-plugin-federation/remoteEntry'
+
+function getModuleMarker(value: string): string {
+  return `__ROLLUP_FEDERATION_MODULE_PREFIX__${value}`
+}
+
 export default function federation(
   options: VitePluginFederationOptions
 ): Plugin {
-  const remoteEntryHelperId = 'rollup-plugin-federation/remoteEntry'
-  const modulePrefix = '__ROLLUP_FEDERATION_MODULE_PREFIX__'
-  const replaceMap = new Map()
-  const moduleNames: string[] = []
   const provideExposes = options.exposes || {}
   const shared = sharedAssign(options.shared || [])
   let moduleMap = ''
+  const replaceMap = new Map()
+  const externals: string[] = []
   const exposesMap = new Map()
   for (const key in provideExposes) {
     if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
-      const moduleName = `${modulePrefix + '${' + provideExposes[key] + '}'}`
-      moduleNames.push(moduleName)
-      moduleNames.push(key)
-      exposesMap.set(key, provideExposes[key])
+      const moduleName = getModuleMarker(key)
+      externals.push(moduleName)
+      externals.push(key)
+      const exposeFilepath = path
+        .resolve(provideExposes[key])
+        .replace(/\\/g, '/')
+      exposesMap.set(key, exposeFilepath)
       moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
     }
   }
@@ -100,9 +107,9 @@ export default {
       if (!Array.isArray(_options.external)) {
         _options.external = [_options.external as string]
       }
-      moduleNames.forEach((item) => (_options.external as string[]).push(item))
+      _options.external = _options.external.concat(externals)
       // remove from external what is both in shared and external
-      if (shared.size) {
+      if (shared.size > 0) {
         _options.external = _options.external.filter((item) => {
           return !shared.has(item as string)
         })
@@ -155,17 +162,22 @@ export default {
         if (Object.prototype.hasOwnProperty.call(bundle, file)) {
           const chunk = bundle[file]
           if (chunk.type === 'chunk' && chunk.isEntry) {
-            exposesMap.forEach((value) => {
-              if (chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0) {
-                replaceMap.set(
-                  modulePrefix + '${' + value + '}',
-                  `http://localhost:8081/${chunk.fileName}`
-                )
-              }
-              if (options.filename === chunk.fileName) {
-                remoteChunk = chunk
-              }
-            })
+            // save remoteEntry.js chunk
+            if (options.filename === chunk.fileName) {
+              remoteChunk = chunk
+            }
+            // expose marker to real url path
+            if (chunk.facadeModuleId) {
+              const facadeModuleId = chunk.facadeModuleId.replace(/\\/g, '/')
+              exposesMap.forEach((value, key) => {
+                if (facadeModuleId.indexOf(value) >= 0) {
+                  replaceMap.set(
+                    getModuleMarker(key),
+                    `http://localhost:8081/${chunk.fileName}`
+                  )
+                }
+              })
+            }
           }
         }
       }
