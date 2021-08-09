@@ -27,7 +27,7 @@
   "homepage": "https://github.com/originjs/vite-plugin-federation#readme",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc",
+    "build": "rollup -c",
     "test": "jest",
     "eslint:check": "eslint src --ext .ts ",
     "eslint:fix": "eslint --fix",

@@ -5,7 +5,10 @@ import pkg from './package.json';
 
 export default {
     input: 'src/index.ts',
-    plugins: [resolve(), typescript()],
+    plugins: [
+        resolve(),
+        typescript({ include: './src/**/*.ts', module: 'esnext' })
+    ],
     external: ['path'],
     output: [
         { format: 'cjs', file: pkg.main, exports: 'auto' },
