@@ -22,7 +22,7 @@ export default {
       filename: 'remoteEntry.js',
       exposes: {
         './Button': 'src/button',
-        './Header': 'src/header'
+        // './Header': 'src/header'
       },
       shared: [
         {
@@ -39,8 +39,15 @@ export default {
     })
   ],
   output: {
-    format: 'system',
-    dir: pkg.main
+    format: 'esm',
+    dir: pkg.main,
+    // manualChunks:{
+    //   'react':['react'],
+    //   'react-dom':['react-dom']
+    // }
+    // minifyInternalExports:false
   },
-  external: ['react', 'react-dom']
+  external: ['react', 'react-dom'],
+
+  // treeshake:false,
 }
