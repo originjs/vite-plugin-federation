@@ -15,6 +15,8 @@ function getModuleMarker(value: string, type?: string): string {
 export default function federation(
   options: VitePluginFederationOptions
 ): Plugin {
+  const SHARED = 'shared'
+  const VARIABLE = 'variable'
   const moduleNames: string[] = []
   const provideExposes = options.exposes || {}
   const externals: string[] = []
@@ -23,7 +25,7 @@ export default function federation(
   const exposesMap = new Map()
   for (const key in provideExposes) {
     if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
-      const moduleName = getModuleMarker(`\${${key}}`, 'shared')
+      const moduleName = getModuleMarker(`\${${key}}`, SHARED)
       externals.push(moduleName)
       externals.push(key)
       const exposeFilepath = path
@@ -34,7 +36,7 @@ export default function federation(
     }
   }
   shared.forEach((value, key) => {
-    moduleNames.push(getModuleMarker(`\${${key}}`, 'shared'))
+    moduleNames.push(getModuleMarker(`\${${key}}`, SHARED))
   })
 
   const providedRemotes = options.remotes || {}
@@ -68,7 +70,7 @@ const processModule = (mod) => {
 const shareScope = {
 ${sharedScopeCode(
   shared,
-  moduleNames.filter((item) => item.startsWith(getModuleMarker('', 'shared')))
+  moduleNames.filter((item) => item.startsWith(getModuleMarker('', SHARED)))
 ).join(',')} 
 };
 
@@ -93,7 +95,7 @@ export default {
     };
     export const init =(shareScope, initScope) => {
         let global = window || node;
-        global.provider = shareScope
+        global.__ROLLUP_FEDERATION_VARIABLE_PREFIX__shared= shareScope
     };`
   })
 
@@ -181,7 +183,7 @@ export default {
               //  shared path replace
               if (shared.has(chunk.name)) {
                 replaceMap.set(
-                  getModuleMarker(`\${${chunk.name}}`, 'shared'),
+                  getModuleMarker(`\${${chunk.name}}`, SHARED),
                   `/${_options.dir}/${chunk.fileName}`
                 )
                 chunkMap.set(chunk.fileName, chunk.name)
@@ -195,36 +197,42 @@ export default {
           item.code = item.code.replace(key, value)
         })
       })
-      provinceChunk.forEach((chunk) => {
-        const nodes: any[] = []
-        const astCode = this.parse(chunk.code)
-        const magicString = new MagicString(chunk.code)
-        const as: any[] = []
-        let importCount = 0
-        const sourceImportMap = new Map()
-        walk(astCode, {
-          enter(node: any) {
-            if (node.type === 'ImportDeclaration') {
-              const key = path.basename(node.source.value)
-              if (chunkMap.has(key)) {
-                sourceImportMap.set(chunkMap.get(key), {
-                  source: node.source.value,
-                  space: node.specifiers
-                })
-                node.specifiers.forEach((imp) => {
-                  as.push({
-                    name: imp.imported.name,
-                    import: chunkMap.get(key),
-                    local: imp.local.name
+      if (provinceChunk.length) {
+        const GLOBAL_VARIABLE = getModuleMarker('global', VARIABLE)
+        const SHARED_VARIABLE = getModuleMarker(SHARED, VARIABLE)
+        const CACHE_VARIABLE = getModuleMarker('cache', VARIABLE)
+        const MODULES_VARIABLE = getModuleMarker('modules', VARIABLE)
+        const MODULES_MAP_VARIABLE = getModuleMarker('modulesMap', VARIABLE)
+        provinceChunk.forEach((chunk) => {
+          const nodes: any[] = []
+          const astCode = this.parse(chunk.code)
+          const magicString = new MagicString(chunk.code)
+          const as: any[] = []
+          let importCount = 0
+          const sourceImportMap = new Map()
+          walk(astCode, {
+            enter(node: any) {
+              if (node.type === 'ImportDeclaration') {
+                const key = path.basename(node.source.value)
+                if (chunkMap.has(key)) {
+                  sourceImportMap.set(chunkMap.get(key), {
+                    source: node.source.value,
+                    space: node.specifiers
                   })
-                })
-                magicString.overwrite(node.start, node.end, '')
+                  node.specifiers.forEach((imp) => {
+                    as.push({
+                      name: imp.imported.name,
+                      import: chunkMap.get(key),
+                      local: imp.local.name
+                    })
+                  })
+                  magicString.overwrite(node.start, node.end, '')
+                }
+                nodes.push(node)
               }
-              nodes.push(node)
             }
-          }
-        })
-        const code = ` 
+          })
+          const code = ` 
                 
                 ${[...sourceImportMap.values()]
                   .map((item) => {
@@ -235,48 +243,51 @@ export default {
                     return str
                   })
                   .join('')}
-                ${importCount++ > 0 ? '' : 'let global = window || node;'}
-                                const cache = {}
-                                const modules= ${JSON.stringify([
-                                  ...chunkMap.values()
-                                ])}
-                                const modulesMap = {${[
-                                  ...sourceImportMap.keys()
-                                ]
-                                  .map((item) => {
-                                    return `${JSON.stringify(
-                                      item
-                                    )}:${JSON.stringify(
-                                      sourceImportMap.get(item).source
-                                    )}`
-                                  })
-                                  .join(',')}}
+                ${
+                  importCount++ > 0
+                    ? ''
+                    : `let ${GLOBAL_VARIABLE}= window || node;`
+                }
+                                const ${CACHE_VARIABLE}= {}
+                                const ${MODULES_VARIABLE}= ${JSON.stringify([
+            ...chunkMap.values()
+          ])}
+                                const ${MODULES_MAP_VARIABLE}= {${[
+            ...sourceImportMap.keys()
+          ]
+            .map((item) => {
+              return `${JSON.stringify(item)}:${JSON.stringify(
+                sourceImportMap.get(item).source
+              )}`
+            })
+            .join(',')}}
                 
                                 
-                                for (let i = 0; i < modules.length; i++) {
-                                    if(global?.provider && global.provider[modules[i]]){
-                                        cache[modules[i]]=  await global.provider[modules[i]].get();
+                                for (let i = 0; i < ${MODULES_VARIABLE}.length; i++) {
+                                    if(${GLOBAL_VARIABLE}?.${SHARED_VARIABLE}&& ${GLOBAL_VARIABLE}.${SHARED_VARIABLE}[${MODULES_VARIABLE}[i]]){
+                                        ${CACHE_VARIABLE}[${MODULES_VARIABLE}[i]]=  await ${GLOBAL_VARIABLE}.${SHARED_VARIABLE}[${MODULES_VARIABLE}[i]].get();
                                 }else {
-                                    cache[modules[i]]=await import(modulesMap[modules[i]])
+                                    ${CACHE_VARIABLE}[${MODULES_VARIABLE}[i]]=await import(${MODULES_MAP_VARIABLE}[${MODULES_VARIABLE}[i]])
                                 }
                                 
                                 }
                            ${as
                              .map((item) => {
-                               return `${item.local} = cache['${item.import}']['${item.name}']`
+                               return `${item.local} = ${CACHE_VARIABLE}['${item.import}']['${item.name}']`
                              })
                              .join(';')}     
              
               `
-        // magicString.overwrite(nodes[nodes.length - 1].start, nodes[nodes.length - 1].end, code);
-        const lastImport = nodes[nodes.length - 1]
-        // if(chunkMap.has(path.basename(lastImport.source.value))){
-        //     magicString.overwrite(lastImport.start , lastImport.end , code);
-        // }else {
-        magicString.appendRight(lastImport.end, code)
-        // }
-        chunk.code = magicString.toString()
-      })
+          // magicString.overwrite(nodes[nodes.length - 1].start, nodes[nodes.length - 1].end, code);
+          const lastImport = nodes[nodes.length - 1]
+          // if(chunkMap.has(path.basename(lastImport.source.value))){
+          //     magicString.overwrite(lastImport.start , lastImport.end , code);
+          // }else {
+          magicString.appendRight(lastImport.end, code)
+          // }
+          chunk.code = magicString.toString()
+        })
+      }
     },
 
     transform(code: string) {
