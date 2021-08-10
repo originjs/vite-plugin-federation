@@ -12,7 +12,7 @@ export default defineConfig({
       remotes: {
         home: "http://localhost:3002/remoteEntry.js",
       },
-      exposes: {},
+      shared:["vue"]
     })
   ],
   build: {

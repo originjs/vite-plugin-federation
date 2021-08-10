@@ -1,17 +1,17 @@
-import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
+import resolve from '@rollup/plugin-node-resolve'
+import typescript from '@rollup/plugin-typescript'
 
-import pkg from './package.json';
+import pkg from './package.json'
 
 export default {
-    input: 'src/index.ts',
-    plugins: [
-        resolve(),
-        typescript({ include: './src/**/*.ts', module: 'esnext' })
-    ],
-    external: ['path'],
-    output: [
-        { format: 'cjs', file: pkg.main, exports: 'auto' },
-        { format: 'esm', file: pkg.module }
-    ]
-};
+  input: 'src/index.ts',
+  plugins: [
+    resolve(),
+    typescript({ include: './src/**/*.ts', module: 'esnext' })
+  ],
+  external: ['path'],
+  output: [
+    { format: 'cjs', file: pkg.main, exports: 'auto' },
+    { format: 'esm', file: pkg.module }
+  ]
+}

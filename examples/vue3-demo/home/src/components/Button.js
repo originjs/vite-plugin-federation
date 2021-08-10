@@ -7,7 +7,7 @@ const button = {
       {
         id: "btn-primary",
       },
-      "Hello World"
+      "Hello Remote Button"
     );
   },
 };

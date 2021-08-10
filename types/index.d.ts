@@ -2,7 +2,7 @@
  * The following code is adapted from https://github.com/webpack/webpack/types.d.ts
  * MIT License https://github.com/webpack/webpack/LICENSE
  */
-export default function federation(options: VitePluginFederationOptions): Plugin;
+export default function federation(options: VitePluginFederationOptions): Plugin
 
 declare interface VitePluginFederationOptions {
   /**
@@ -29,26 +29,26 @@ declare interface VitePluginFederationOptions {
    * The external type of the remote containers.
    */
   remoteType?:
-  | 'var'
-  | 'module'
-  | 'assign'
-  | 'this'
-  | 'window'
-  | 'self'
-  | 'global'
-  | 'commonjs'
-  | 'commonjs2'
-  | 'commonjs-module'
-  | 'amd'
-  | 'amd-require'
-  | 'umd'
-  | 'umd2'
-  | 'jsonp'
-  | 'system'
-  | 'promise'
-  | 'import'
-  | 'script'
-  | 'node-commonjs'
+    | 'var'
+    | 'module'
+    | 'assign'
+    | 'this'
+    | 'window'
+    | 'self'
+    | 'global'
+    | 'commonjs'
+    | 'commonjs2'
+    | 'commonjs-module'
+    | 'amd'
+    | 'amd-require'
+    | 'umd'
+    | 'umd2'
+    | 'jsonp'
+    | 'system'
+    | 'promise'
+    | 'import'
+    | 'script'
+    | 'node-commonjs'
 
   /**
    * Container locations and request scopes from which modules should be resolved and loaded at runtime. When provided, property name is used as request scope, otherwise request scope is automatically inferred from container location.

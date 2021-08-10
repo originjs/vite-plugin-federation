@@ -1,13 +1,6 @@
 {
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "examples",
-    "test"
-  ],
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "examples", "test"],
   "compilerOptions": {
     "outDir": "dist",
     "target": "esnext",

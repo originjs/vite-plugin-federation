@@ -16,14 +16,10 @@ export default defineConfig({
         "./Content": "./src/components/Content.vue",
         "./Button": "./src/components/Button.js",
       },
+      shared:["vue"]
     })
   ],
   build: {
-    minify: false,
-    rollupOptions: {
-      output: {
-        manualChunks: { vue: ['vue'] }
-      }
-    }
+    minify: false
   }
 });

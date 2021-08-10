@@ -29,9 +29,9 @@
     "prebuild": "rimraf dist",
     "build": "rollup -c",
     "test": "jest",
-    "eslint:check": "eslint src --ext .ts ",
-    "eslint:fix": "eslint --fix",
-    "prettier:format": "yarn prettier -w ."
+    "lint": "eslint src --ext .ts ",
+    "lint:fix": "eslint --fix",
+    "format": "yarn prettier -w ."
   },
   "dependencies": {
     "estree-walker": "^1.0.1",
