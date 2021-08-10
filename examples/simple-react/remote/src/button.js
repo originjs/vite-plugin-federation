@@ -1,5 +1,7 @@
 import React from 'react'
+import dom from 'react-dom'
 
+console.log(dom)
 const style = {
   background: '#a3e077',
   color: '#FFFFFF',
