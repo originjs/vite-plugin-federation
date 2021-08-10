@@ -23,6 +23,7 @@ export default function federation(
   const shared = sharedAssign(options.shared || [])
   let moduleMap = ''
   const exposesMap = new Map()
+  // exposes module
   for (const key in provideExposes) {
     if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
       const moduleName = getModuleMarker(`\${${key}}`, SHARED)
@@ -35,8 +36,11 @@ export default function federation(
       moduleMap += `\n"${key}":()=>{return import('${exposeFilepath}')},`
     }
   }
+  // shared module
   shared.forEach((value, key) => {
-    moduleNames.push(getModuleMarker(`\${${key}}`, SHARED))
+    const sharedModuleName = getModuleMarker(`\${${key}}`, SHARED)
+    externals.push(sharedModuleName)
+    moduleNames.push(sharedModuleName)
   })
 
   const providedRemotes = options.remotes || {}
