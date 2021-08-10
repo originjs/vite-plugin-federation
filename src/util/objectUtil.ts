@@ -31,3 +31,24 @@ export function sharedAssign(
 
   return assign
 }
+
+export function sharedScopeCode(
+  shared: Map<string, Map<string, any>>,
+  modules: string[]
+): string[] {
+  const res: string[] = []
+  if (shared.size) {
+    shared.forEach((value, key) => {
+      let str = ''
+      value.forEach((innerValue, innerkey) => {
+        str += `${innerkey}:${JSON.stringify(innerValue)}, \n`
+      })
+      const searchElement = `__ROLLUP_SHARED_MODULE_PREFIX__\${${key}}`
+      if (modules.indexOf(searchElement) >= 0) {
+        str += `get: ()=> import('${searchElement}')`
+      }
+      res.push(`'${key}':{${str}}`)
+    })
+  }
+  return res
+}

@@ -3,7 +3,7 @@ import { OutputChunk, Plugin, AcornNode } from 'rollup'
 import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { sharedAssign } from './util/objectUtil'
+import { sharedAssign, sharedScopeCode } from './util/objectUtil'
 import { VitePluginFederationOptions } from '../types'
 
 function getModuleMarker(value: string): string {
@@ -13,11 +13,14 @@ function getModuleMarker(value: string): string {
 export default function federation(
   options: VitePluginFederationOptions
 ): Plugin {
+  const remoteEntryHelperId = 'rollup-plugin-federation/remoteEntry'
+  const modulePrefix = '__ROLLUP_FEDERATION_MODULE_PREFIX__'
+  const sharedPrefix = '__ROLLUP_SHARED_MODULE_PREFIX__'
+  const moduleNames: string[] = []
   const provideExposes = options.exposes || {}
+  const externals: string[] = []
   const shared = sharedAssign(options.shared || [])
   let moduleMap = ''
-  const replaceMap = new Map()
-  const externals: string[] = []
   const exposesMap = new Map()
   for (const key in provideExposes) {
     if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
@@ -31,6 +34,17 @@ export default function federation(
       moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
     }
   }
+  shared.forEach((value, key) => {
+    moduleNames.push(`${sharedPrefix}\${${key}}`)
+  })
+  const code = `let moduleMap = {${moduleMap}}
+export const get =(module, getScope) => {
+    return moduleMap[module]();
+};
+export const init =(shareScope, initScope) => {
+      let global = window || node;
+      global.provider = shareScope;
+};`
 
   const providedRemotes = options.remotes || {}
   const remotes: { id: string; config: string }[] = []
@@ -61,7 +75,10 @@ const processModule = (mod) => {
 }
 
 const shareScope = {
-  
+${sharedScopeCode(
+  shared,
+  moduleNames.filter((item) => item.startsWith(sharedPrefix))
+).join(',')} 
 };
 
 const initMap = {};
@@ -145,8 +162,11 @@ export default {
       return null
     },
 
-    generateBundle(_options, bundle) {
-      let remoteChunk: OutputChunk
+    generateBundle: function (_options, bundle) {
+      const entryChunk: OutputChunk[] = []
+      const provinceChunk: OutputChunk[] = []
+      const replaceMap = new Map()
+      const chunkMap = new Map()
       for (const file in bundle) {
         if (Object.prototype.hasOwnProperty.call(bundle, file)) {
           const chunk = bundle[file]
@@ -167,11 +187,120 @@ export default {
                 }
               })
             }
+        const chunk = bundle[file]
+        if (chunk.type === 'chunk') {
+          if (chunk.isEntry) {
+            exposesMap.forEach((value) => {
+              if (chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0) {
+                replaceMap.set(
+                  modulePrefix + '${' + value + '}',
+                  `http://localhost:8081/${chunk.fileName}`
+                )
+                provinceChunk.push(chunk)
+              }
+              // if (options.filename === chunk.fileName) {
+              //     remoteChunk = chunk
+              // }
+            })
+            entryChunk.push(chunk)
+          } else {
+            //  shared path replace
+            if (shared.has(chunk.name)) {
+              replaceMap.set(
+                `${sharedPrefix}\${${chunk.name}}`,
+                `/${_options.dir}/${chunk.fileName}`
+              )
+              chunkMap.set(chunk.fileName, chunk.name)
+            }
           }
         }
       }
-      replaceMap.forEach((value, key) => {
-        remoteChunk.code = (remoteChunk.code as string).replace(key, value)
+      entryChunk.forEach((item) => {
+        replaceMap.forEach((value, key) => {
+          item.code = item.code.replace(key, value)
+        })
+      })
+      provinceChunk.forEach((chunk) => {
+        const nodes: any[] = []
+        const astCode = this.parse(chunk.code)
+        const magicString = new MagicString(chunk.code)
+        const as: any[] = []
+        let importCount = 0
+        const sourceImportMap = new Map()
+        walk(astCode, {
+          enter(node: any) {
+            if (node.type === 'ImportDeclaration') {
+              const key = path.basename(node.source.value)
+              if (chunkMap.has(key)) {
+                sourceImportMap.set(chunkMap.get(key), {
+                  source: node.source.value,
+                  space: node.specifiers
+                })
+                node.specifiers.forEach((imp) => {
+                  as.push({
+                    name: imp.imported.name,
+                    import: chunkMap.get(key),
+                    local: imp.local.name
+                  })
+                })
+                magicString.overwrite(node.start, node.end, '')
+              }
+              nodes.push(node)
+            }
+          }
+        })
+        const code = ` 
+                
+                ${[...sourceImportMap.values()]
+                  .map((item) => {
+                    let str = ''
+                    item.space.forEach((spec) => {
+                      str += `let ${spec.local.name}= null;`
+                    })
+                    return str
+                  })
+                  .join('')}
+                ${importCount++ > 0 ? '' : 'let global = window || node;'}
+                                const cache = {}
+                                const modules= ${JSON.stringify([
+                                  ...chunkMap.values()
+                                ])}
+                                const modulesMap = {${[
+                                  ...sourceImportMap.keys()
+                                ]
+                                  .map((item) => {
+                                    return `${JSON.stringify(
+                                      item
+                                    )}:${JSON.stringify(
+                                      sourceImportMap.get(item).source
+                                    )}`
+                                  })
+                                  .join(',')}}
+                
+                                
+                                for (let i = 0; i < modules.length; i++) {
+                                    if(global?.provider && global.provider[modules[i]]){
+                                        cache[modules[i]]=  await global.provider[modules[i]].get();
+                                }else {
+                                    cache[modules[i]]=await import(modulesMap[modules[i]])
+                                }
+                                
+                                }
+                           ${as
+                             .map((item) => {
+                               return `${item.local} = cache['${item.import}']['${item.name}']`
+                             })
+                             .join(';')}     
+             
+              `
+        // magicString.overwrite(nodes[nodes.length - 1].start, nodes[nodes.length - 1].end, code);
+        const lastImport = nodes[nodes.length - 1]
+        // if(chunkMap.has(path.basename(lastImport.source.value))){
+        //     magicString.overwrite(lastImport.start , lastImport.end , code);
+        // }else {
+        magicString.appendRight(lastImport.end, code)
+        // }
+        chunk.code = magicString.toString()
       })
     },
 
