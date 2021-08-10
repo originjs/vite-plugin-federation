@@ -6,16 +6,15 @@ import MagicString from 'magic-string'
 import { sharedAssign, sharedScopeCode } from './util/objectUtil'
 import { VitePluginFederationOptions } from '../types'
 
-function getModuleMarker(value: string): string {
-  return `__ROLLUP_FEDERATION_MODULE_PREFIX__${value}`
+function getModuleMarker(value: string, type?: string): string {
+  return type
+    ? `__ROLLUP_FEDERATION_${type.toUpperCase()}_PREFIX__${value}`
+    : `__ROLLUP_FEDERATION_MODULE_PREFIX__${value}`
 }
 
 export default function federation(
   options: VitePluginFederationOptions
 ): Plugin {
-  const remoteEntryHelperId = 'rollup-plugin-federation/remoteEntry'
-  const modulePrefix = '__ROLLUP_FEDERATION_MODULE_PREFIX__'
-  const sharedPrefix = '__ROLLUP_SHARED_MODULE_PREFIX__'
   const moduleNames: string[] = []
   const provideExposes = options.exposes || {}
   const externals: string[] = []
@@ -24,27 +23,19 @@ export default function federation(
   const exposesMap = new Map()
   for (const key in provideExposes) {
     if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
-      const moduleName = getModuleMarker(key)
+      const moduleName = getModuleMarker(`\${${key}}`, 'shared')
       externals.push(moduleName)
       externals.push(key)
       const exposeFilepath = path
         .resolve(provideExposes[key])
         .replace(/\\/g, '/')
       exposesMap.set(key, exposeFilepath)
-      moduleMap += `\n"${key}":()=>{return import('${moduleName}')},`
+      moduleMap += `\n"${key}":()=>{return import('${exposeFilepath}')},`
     }
   }
   shared.forEach((value, key) => {
-    moduleNames.push(`${sharedPrefix}\${${key}}`)
+    moduleNames.push(getModuleMarker(`\${${key}}`, 'shared'))
   })
-  const code = `let moduleMap = {${moduleMap}}
-export const get =(module, getScope) => {
-    return moduleMap[module]();
-};
-export const init =(shareScope, initScope) => {
-      let global = window || node;
-      global.provider = shareScope;
-};`
 
   const providedRemotes = options.remotes || {}
   const remotes: { id: string; config: string }[] = []
@@ -77,7 +68,7 @@ const processModule = (mod) => {
 const shareScope = {
 ${sharedScopeCode(
   shared,
-  moduleNames.filter((item) => item.startsWith(sharedPrefix))
+  moduleNames.filter((item) => item.startsWith(getModuleMarker('', 'shared')))
 ).join(',')} 
 };
 
@@ -101,7 +92,8 @@ export default {
         return moduleMap[module]();
     };
     export const init =(shareScope, initScope) => {
-        console.log('init')
+        let global = window || node;
+        global.provider = shareScope
     };`
   })
 
@@ -170,47 +162,30 @@ export default {
       for (const file in bundle) {
         if (Object.prototype.hasOwnProperty.call(bundle, file)) {
           const chunk = bundle[file]
-          if (chunk.type === 'chunk' && chunk.isEntry) {
-            // save remoteEntry.js chunk
-            if (options.filename === chunk.fileName) {
-              remoteChunk = chunk
-            }
-            // expose marker to real url path
-            if (chunk.facadeModuleId) {
-              const facadeModuleId = chunk.facadeModuleId.replace(/\\/g, '/')
-              exposesMap.forEach((value, key) => {
-                if (facadeModuleId.indexOf(value) >= 0) {
+          if (chunk.type === 'chunk') {
+            if (chunk.isEntry) {
+              exposesMap.forEach((value) => {
+                if (chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0) {
                   replaceMap.set(
-                    getModuleMarker(key),
+                    getModuleMarker(`\${${value}}`),
                     `http://localhost:8081/${chunk.fileName}`
                   )
+                  provinceChunk.push(chunk)
                 }
+                // if (options.filename === chunk.fileName) {
+                //     remoteChunk = chunk
+                // }
               })
-            }
-        const chunk = bundle[file]
-        if (chunk.type === 'chunk') {
-          if (chunk.isEntry) {
-            exposesMap.forEach((value) => {
-              if (chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0) {
+              entryChunk.push(chunk)
+            } else {
+              //  shared path replace
+              if (shared.has(chunk.name)) {
                 replaceMap.set(
-                  modulePrefix + '${' + value + '}',
-                  `http://localhost:8081/${chunk.fileName}`
+                  getModuleMarker(`\${${chunk.name}}`, 'shared'),
+                  `/${_options.dir}/${chunk.fileName}`
                 )
-                provinceChunk.push(chunk)
+                chunkMap.set(chunk.fileName, chunk.name)
               }
-              // if (options.filename === chunk.fileName) {
-              //     remoteChunk = chunk
-              // }
-            })
-            entryChunk.push(chunk)
-          } else {
-            //  shared path replace
-            if (shared.has(chunk.name)) {
-              replaceMap.set(
-                `${sharedPrefix}\${${chunk.name}}`,
-                `/${_options.dir}/${chunk.fileName}`
-              )
-              chunkMap.set(chunk.fileName, chunk.name)
             }
           }
         }

@@ -43,7 +43,7 @@ export function sharedScopeCode(
       value.forEach((innerValue, innerkey) => {
         str += `${innerkey}:${JSON.stringify(innerValue)}, \n`
       })
-      const searchElement = `__ROLLUP_SHARED_MODULE_PREFIX__\${${key}}`
+      const searchElement = `__ROLLUP_FEDERATION_SHARED_PREFIX__\${${key}}`
       if (modules.indexOf(searchElement) >= 0) {
         str += `get: ()=> import('${searchElement}')`
       }
