@@ -7,16 +7,13 @@ import { sharedAssign, sharedScopeCode } from './util/objectUtil'
 import { VitePluginFederationOptions } from '../types'
 
 function getModuleMarker(value: string, type?: string): string {
-  return type
-    ? `__ROLLUP_FEDERATION_${type.toUpperCase()}_PREFIX__${value}`
-    : `__ROLLUP_FEDERATION_MODULE_PREFIX__${value}`
+  return type ? `__rf_${type}__${value}` : `__rf_placeholder__${value}`
 }
 
 export default function federation(
   options: VitePluginFederationOptions
 ): Plugin {
   const SHARED = 'shared'
-  const VARIABLE = 'variable'
   const moduleNames: string[] = []
   const provideExposes = options.exposes || {}
   const externals: string[] = []
@@ -99,13 +96,12 @@ export default {
     };
     export const init =(shareScope, initScope) => {
         let global = window || node;
-        global.__ROLLUP_FEDERATION_VARIABLE_PREFIX__shared= shareScope
+        global.${getModuleMarker('shared', 'var')}= shareScope
     };`
   })
 
   return {
     name: 'federation',
-
     options(_options) {
       // Split expose & shared module to separate chunks
       _options.preserveEntrySignatures = 'strict'
@@ -162,9 +158,9 @@ export default {
 
     generateBundle: function (_options, bundle) {
       const entryChunk: OutputChunk[] = []
-      const provinceChunk: OutputChunk[] = []
+      const exposesChunk: OutputChunk[] = []
       const replaceMap = new Map()
-      const chunkMap = new Map()
+      const sharedChunkMap = new Map()
       for (const file in bundle) {
         if (Object.prototype.hasOwnProperty.call(bundle, file)) {
           const chunk = bundle[file]
@@ -176,7 +172,7 @@ export default {
                     getModuleMarker(`\${${value}}`),
                     `http://localhost:8081/${chunk.fileName}`
                   )
-                  provinceChunk.push(chunk)
+                  exposesChunk.push(chunk)
                 }
                 // if (options.filename === chunk.fileName) {
                 //     remoteChunk = chunk
@@ -190,105 +186,80 @@ export default {
                   getModuleMarker(`\${${chunk.name}}`, SHARED),
                   `/${_options.dir}/${chunk.fileName}`
                 )
-                chunkMap.set(chunk.fileName, chunk.name)
+                sharedChunkMap.set(chunk.fileName, chunk.name)
               }
             }
           }
         }
       }
+      // placeholder replace
       entryChunk.forEach((item) => {
         replaceMap.forEach((value, key) => {
           item.code = item.code.replace(key, value)
         })
       })
-      if (provinceChunk.length) {
-        const GLOBAL_VARIABLE = getModuleMarker('global', VARIABLE)
-        const SHARED_VARIABLE = getModuleMarker(SHARED, VARIABLE)
-        const CACHE_VARIABLE = getModuleMarker('cache', VARIABLE)
-        const MODULES_VARIABLE = getModuleMarker('modules', VARIABLE)
-        const MODULES_MAP_VARIABLE = getModuleMarker('modulesMap', VARIABLE)
-        provinceChunk.forEach((chunk) => {
-          const nodes: any[] = []
-          const astCode = this.parse(chunk.code)
+      // collect import info
+      if (exposesChunk.length) {
+        const FN_IMPORT = getModuleMarker('import', 'fn')
+        const VAR_GLOBAL = getModuleMarker('global', 'var')
+        const VAR_MODULE_MAP = getModuleMarker('moduleMap', 'var')
+        const VAR_SHARED = getModuleMarker('shared', 'var')
+        exposesChunk.forEach((chunk) => {
+          let lastImport: any = null
+          const ast = this.parse(chunk.code)
+          const importMap = new Map()
           const magicString = new MagicString(chunk.code)
-          const as: any[] = []
-          let importCount = 0
-          const sourceImportMap = new Map()
-          walk(astCode, {
+          walk(ast, {
             enter(node: any) {
               if (node.type === 'ImportDeclaration') {
                 const key = path.basename(node.source.value)
-                if (chunkMap.has(key)) {
-                  sourceImportMap.set(chunkMap.get(key), {
+                if (sharedChunkMap.has(key)) {
+                  importMap.set(sharedChunkMap.get(key), {
                     source: node.source.value,
-                    space: node.specifiers
+                    specifiers: node.specifiers
                   })
-                  node.specifiers.forEach((imp) => {
-                    as.push({
-                      name: imp.imported.name,
-                      import: chunkMap.get(key),
-                      local: imp.local.name
-                    })
-                  })
+                  //  replace import with empty
                   magicString.overwrite(node.start, node.end, '')
                 }
-                nodes.push(node)
+                // record the last import to insert dynamic import code
+                lastImport = node
               }
             }
           })
-          const code = ` 
-                
-                ${[...sourceImportMap.values()]
-                  .map((item) => {
-                    let str = ''
-                    item.space.forEach((spec) => {
-                      str += `let ${spec.local.name}= null;`
-                    })
-                    return str
-                  })
-                  .join('')}
-                ${
-                  importCount++ > 0
-                    ? ''
-                    : `let ${GLOBAL_VARIABLE}= window || node;`
-                }
-                                const ${CACHE_VARIABLE}= {}
-                                const ${MODULES_VARIABLE}= ${JSON.stringify([
-            ...chunkMap.values()
-          ])}
-                                const ${MODULES_MAP_VARIABLE}= {${[
-            ...sourceImportMap.keys()
-          ]
+          //  generate variable declare
+          const PLACEHOLDER_VAR = [...importMap.keys()]
             .map((item) => {
-              return `${JSON.stringify(item)}:${JSON.stringify(
-                sourceImportMap.get(item).source
-              )}`
+              let str = ''
+              importMap.get(item).specifiers?.forEach((space) => {
+                str += `let ${space.local.name} = (await ${FN_IMPORT}('${item}'))['${space.imported.name}'] \n`
+              })
+              return str
             })
-            .join(',')}}
-                
-                                
-                                for (let i = 0; i < ${MODULES_VARIABLE}.length; i++) {
-                                    if(${GLOBAL_VARIABLE}?.${SHARED_VARIABLE}&& ${GLOBAL_VARIABLE}.${SHARED_VARIABLE}[${MODULES_VARIABLE}[i]]){
-                                        ${CACHE_VARIABLE}[${MODULES_VARIABLE}[i]]=  await ${GLOBAL_VARIABLE}.${SHARED_VARIABLE}[${MODULES_VARIABLE}[i]].get();
-                                }else {
-                                    ${CACHE_VARIABLE}[${MODULES_VARIABLE}[i]]=await import(${MODULES_MAP_VARIABLE}[${MODULES_VARIABLE}[i]])
-                                }
-                                
-                                }
-                           ${as
-                             .map((item) => {
-                               return `${item.local} = ${CACHE_VARIABLE}['${item.import}']['${item.name}']`
-                             })
-                             .join(';')}     
-             
-              `
-          // magicString.overwrite(nodes[nodes.length - 1].start, nodes[nodes.length - 1].end, code);
-          const lastImport = nodes[nodes.length - 1]
-          // if(chunkMap.has(path.basename(lastImport.source.value))){
-          //     magicString.overwrite(lastImport.start , lastImport.end , code);
-          // }else {
-          magicString.appendRight(lastImport.end, code)
-          // }
+            .join('')
+
+          //    generate variable moduleMap declare
+          const PLACEHOLDER_MODULE_MAP = `{${[...importMap.keys()]
+            .map((item) => {
+              return `'${item}':'${importMap.get(item).source}'`
+            })
+            .join(',')}}`
+          // all insert code
+          const dynamicCode = `\n
+                    ${PLACEHOLDER_VAR}
+                    async function ${FN_IMPORT} (name) {
+                        let ${VAR_GLOBAL} = window || node;
+                        const ${VAR_MODULE_MAP} = ${PLACEHOLDER_MODULE_MAP}
+                        if (${VAR_GLOBAL}?.${VAR_SHARED} && ${VAR_GLOBAL}.${VAR_SHARED}[name]) {
+                            return await ${VAR_GLOBAL}.${VAR_SHARED}[name].get();
+                        } else {
+                            return await import(${VAR_MODULE_MAP}[name])
+                        }
+                    }`
+
+          if (lastImport) {
+            //  append code after lastImport
+            magicString.appendRight(lastImport.end, dynamicCode)
+          }
           chunk.code = magicString.toString()
         })
       }
