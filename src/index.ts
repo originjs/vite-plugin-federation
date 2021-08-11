@@ -186,7 +186,7 @@ export default {
                   getModuleMarker(`\${${chunk.name}}`, SHARED),
                   `/${_options.dir}/${chunk.fileName}`
                 )
-                sharedChunkMap.set(chunk.fileName, chunk.name)
+                sharedChunkMap.set(path.basename(chunk.fileName), chunk.name)
               }
             }
           }
@@ -249,12 +249,15 @@ export default {
                     async function ${FN_IMPORT} (name) {
                         let ${VAR_GLOBAL} = window || node;
                         const ${VAR_MODULE_MAP} = ${PLACEHOLDER_MODULE_MAP}
-                        if (${VAR_GLOBAL}?.${VAR_SHARED} && ${VAR_GLOBAL}.${VAR_SHARED}[name]) {
-                            return await ${VAR_GLOBAL}.${VAR_SHARED}[name].get();
-                        } else {
-                            return await import(${VAR_MODULE_MAP}[name])
-                        }
-                    }`
+                        if (${VAR_GLOBAL}.${VAR_SHARED}?.[name]) {
+							if (!${VAR_GLOBAL}.${VAR_SHARED}[name].lib) {
+								${VAR_GLOBAL}.${VAR_SHARED}[name].lib = await (${VAR_GLOBAL}.${VAR_SHARED}[name].get())
+							}
+							return ${VAR_GLOBAL}.${VAR_SHARED}[name].lib;
+						} else {
+							return import(${VAR_MODULE_MAP}[name])
+						}
+                      }`
 
           if (lastImport) {
             //  append code after lastImport
