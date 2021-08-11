@@ -7,9 +7,7 @@ import { sharedAssign, sharedScopeCode } from './util/objectUtil'
 import { VitePluginFederationOptions } from '../types'
 
 function getModuleMarker(value: string, type?: string): string {
-  return type
-    ? `__ROLLUP_FEDERATION_${type.toUpperCase()}_PREFIX__${value}`
-    : `__ROLLUP_FEDERATION_MODULE_PREFIX__${value}`
+  return type ? `__rf_${type}__${value}` : `__rf_placeholder__${value}`
 }
 
 export default function federation(
@@ -105,7 +103,6 @@ export default {
 
   return {
     name: 'federation',
-
     options(_options) {
       // Split expose & shared module to separate chunks
       _options.preserveEntrySignatures = 'strict'
