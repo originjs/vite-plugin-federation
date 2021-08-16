@@ -22,7 +22,7 @@ export default {
       filename: 'remoteEntry.js',
       exposes: {
         './Button': 'src/button',
-        // './Header': 'src/header'
+        './Button1': 'src/button1'
       },
       shared: [
         {

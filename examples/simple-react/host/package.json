@@ -4,8 +4,11 @@
   "main": "dist",
   "license": "MIT",
   "scripts": {
+    "start": "run-p prebuild watch serve",
+    "prebuild": "rimraf dist",
+    "watch": "rollup -c -w",
     "build": "rollup -c",
-    "serve": "serve -d . -p 8000"
+    "serve": "serve -d . -p 3001"
   },
   "dependencies": {
     "cross-env": "^7.0.3",

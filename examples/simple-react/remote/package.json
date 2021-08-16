@@ -3,6 +3,18 @@
   "version": "1.0.0",
   "main": "dist",
   "license": "MIT",
+  "scripts": {
+    "start": "run-p prebuild watch serve",
+    "prebuild": "rimraf dist",
+    "watch": "rollup -c -w",
+    "build": "rollup -c",
+    "serve": "http-server ./dist -p 3002 --cors='*'"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "react": "16.13.1",
+    "react-dom": "16.13.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.14.8",
     "@babel/preset-env": "7.14.8",
@@ -15,15 +27,5 @@
     "@originjs/vite-plugin-federation": "link:../../../",
     "@rollup/plugin-replace": "^3.0.0",
     "@rollup/plugin-babel": "^5.3.0"
-  },
-  "scripts": {
-    "build": "rollup -c",
-    "serve": "http-server ./dist -p 8081 --cors='*'"
-  },
-  "dependencies": {
-    "cross-env": "^7.0.3",
-    "react": "16.13.1",
-    "react-dom": "16.13.1"
   }
-
 }
