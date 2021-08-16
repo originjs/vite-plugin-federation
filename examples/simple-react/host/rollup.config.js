@@ -20,7 +20,7 @@ export default {
         }),
         federation({
             remotes: {
-                remote_app: 'http://localhost:8081/remoteEntry.js'
+                remote_app: 'http://localhost:3002/remoteEntry.js'
             },
             shared: {
                 react: {

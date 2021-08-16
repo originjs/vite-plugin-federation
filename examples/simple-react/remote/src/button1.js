@@ -14,10 +14,10 @@ export default class BindEvent extends React.Component{
       }
   }
   render(){
-      return <button style={style} onClick={this.buttonHandler}> Rollup Remote React Button </button>
+      return <button style={style} onClick={this.button1Handler}> Rollup Remote React Button1 </button>
   }
-  buttonHandler(){
+  button1Handler(){
     console.log(import.meta)
-      alert('button event')
+      alert('button1 event')
   }
 }
