@@ -167,7 +167,11 @@ export default {
           if (chunk.type === 'chunk') {
             if (chunk.isEntry) {
               exposesMap.forEach((value) => {
-                if (chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0) {
+                // Filter out duplicated exposes chunk
+                if (
+                  chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0 &&
+                  exposesChunk.indexOf(chunk) == -1
+                ) {
                   replaceMap.set(
                     getModuleMarker(`\${${value}}`),
                     `http://localhost:8081/${chunk.fileName}`
