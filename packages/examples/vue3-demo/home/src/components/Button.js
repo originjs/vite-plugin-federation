@@ -5,7 +5,7 @@ const button = {
     return h(
       "button",
       {
-        id: "btn-primary",
+        id: "btn-remote",
       },
       "Hello Remote Button"
     );

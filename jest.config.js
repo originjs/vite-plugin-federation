@@ -5,7 +5,7 @@
 
 module.exports = {
   preset: 'ts-jest',
-  testMatch: ['<rootDir>/test/**/*spec.[jt]s?(x)'],
+  testMatch: ['<rootDir>/packages/lib/**/*spec.[jt]s?(x)'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
   clearMocks: true
 }

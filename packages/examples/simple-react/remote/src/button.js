@@ -6,18 +6,18 @@ const style = {
   padding: 12
 }
 
-export default class BindEvent extends React.Component{
-  constructor(){
-      super()
-      this.state={
-          
-      }
+export default class BindEvent extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+
+    }
   }
-  render(){
-      return <button style={style} onClick={this.buttonHandler}> Rollup Remote React Button </button>
+  render() {
+    return <button class='remote-btn' style={style} onClick={this.buttonHandler}>Rollup Remote React Button</button>
   }
-  buttonHandler(){
+  buttonHandler() {
     console.log(import.meta)
-      alert('button event')
+    alert('button event')
   }
 }

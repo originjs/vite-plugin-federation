@@ -10,7 +10,7 @@ export default defineConfig({
       name: "layout",
       filename: "remoteEntry.js",
       remotes: {
-        home: "http://localhost:3002/remoteEntry.js",
+        home: "http://localhost:5001/remoteEntry.js",
       },
       shared:["vue"]
     })

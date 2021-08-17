@@ -8,7 +8,7 @@ test('should have no 404s', () => {
 
 test('remote button', async () => {
   expect(
-    await page.textContent('.remote-btn')
-  ).toBe('Button from remote')
+    await page.textContent('#btn-remote')
+  ).toBe('Hello Remote Button')
 })
 

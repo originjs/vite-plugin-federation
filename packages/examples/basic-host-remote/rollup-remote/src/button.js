@@ -7,6 +7,7 @@ export default function addButton(root){
         console.log(import.meta)
         alert(this.value);
     };
+    eleBtn.className = 'remote-btn'
     eleBtn.value='I am button from remote';
 
     document.getElementById(root).appendChild(eleBtn);

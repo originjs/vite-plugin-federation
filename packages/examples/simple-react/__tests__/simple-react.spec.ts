@@ -9,6 +9,6 @@ test('should have no 404s', () => {
 test('remote button', async () => {
   expect(
     await page.textContent('.remote-btn')
-  ).toBe('Button from remote')
+  ).toBe('Rollup Remote React Button')
 })
 

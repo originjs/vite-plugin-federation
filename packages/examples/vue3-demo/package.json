@@ -7,10 +7,14 @@
     "layout"
   ],
   "scripts": {
-    "build": "yarn workspaces run build"
+    "build": "lerna run build",
+    "serve": "lerna run serve --parallel",
+    "stop": "kill-port --port 5000,5001"
   },
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "link:../../lib"
+    "@originjs/vite-plugin-federation": "link:../../lib",
+    "kill-port": "^1.6.1",
+    "lerna": "^4.0.0"
   },
   "license": "MulanPSL2"
 }
