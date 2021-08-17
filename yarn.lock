@@ -2527,6 +2527,11 @@
     "@vue/compiler-dom" "3.2.3"
     "@vue/shared" "3.2.3"
 
+"@vue/devtools-api@^6.0.0-beta.11":
+  version "6.0.0-beta.15"
+  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0-beta.15.tgz#ad7cb384e062f165bcf9c83732125bffbc2ad83d"
+  integrity sha512-quBx4Jjpexo6KDiNUGFr/zF/2A4srKM9S9v2uHgMXSU//hjgq1eGzqkIFql8T9gfX5ZaVOUzYBP3jIdIR3PKIA==
+
 "@vue/reactivity@3.2.3":
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/@vue/reactivity/-/reactivity-3.2.3.tgz#df466543542a2ae20553dea1efd57bec1da634f3"
@@ -8389,6 +8394,13 @@ vue@^3.1.5:
     "@vue/compiler-dom" "3.2.3"
     "@vue/runtime-dom" "3.2.3"
     "@vue/shared" "3.2.3"
+
+vuex@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-4.0.2.tgz#f896dbd5bf2a0e963f00c67e9b610de749ccacc9"
+  integrity sha512-M6r8uxELjZIK8kTKDGgZTYX/ahzblnzC4isU1tpmEuOIIKmV+TRdc+H4s8ds2NuZ7wpUTdGRzJRtoj+lI+pc0Q==
+  dependencies:
+    "@vue/devtools-api" "^6.0.0-beta.11"
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"

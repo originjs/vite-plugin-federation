@@ -4,9 +4,6 @@ import federation from "@originjs/vite-plugin-federation";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // optimizeDeps: {
-  //   exclude: ["foo_app1", "foo_rollup_spa"],
-  // },
   plugins: [
     vue(),
     federation({
@@ -16,7 +13,7 @@ export default defineConfig({
         "./Content": "./src/components/Content.vue",
         "./Button": "./src/components/Button.js",
       },
-      shared:["vue"]
+      shared: ["vue"]
     })
   ],
   build: {

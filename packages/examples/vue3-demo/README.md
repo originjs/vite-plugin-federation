@@ -8,5 +8,5 @@ This example demos consumption of federated modules from a rollup bundle. `layou
 
 Run `yarn start` . This will build and serve both `home` and `layout` on ports 3002 and 3001 respectively.
 
-- HOST (layout): [localhost:3001](http://localhost:3001/)
-- REMOTE (home): [localhost:3002](http://localhost:3002/)
+- HOST (layout): [localhost:5000](http://localhost:5000/)
+- REMOTE (home): [localhost:5001](http://localhost:5001/)
