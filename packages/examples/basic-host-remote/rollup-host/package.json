@@ -1,0 +1,13 @@
+{
+  "name": "rollup-host",
+  "version": "1.0.0",
+  "main": "dist",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c",
+    "serve": "http-server . -p 5000 --cors='*'"
+  },
+  "devDependencies": {
+    "rollup": "^2.56.0"
+  }
+}

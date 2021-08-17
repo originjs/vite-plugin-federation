@@ -8,7 +8,7 @@ export default {
   plugins: [
     federation({
       remotes: {
-        remote_app: "http://localhost:8081/remoteEntry.js",
+        remote_app: "http://localhost:5001/remoteEntry.js",
       }
     }),
   ],

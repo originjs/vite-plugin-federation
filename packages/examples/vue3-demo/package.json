@@ -1,12 +1,16 @@
 {
   "name": "vue3-demo",
   "private": true,
+  "version": "1.0.0",
   "workspaces": [
     "home",
     "layout"
   ],
   "scripts": {
     "build": "yarn workspaces run build"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "link:../../lib"
   },
   "license": "MulanPSL2"
 }

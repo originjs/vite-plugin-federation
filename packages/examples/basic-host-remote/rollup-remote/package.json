@@ -1,0 +1,13 @@
+{
+  "name": "rollup-remote",
+  "version": "1.0.0",
+  "main": "dist",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c",
+    "serve": "http-server ./dist -p 5001 --cors='*'"
+  },
+  "devDependencies": {
+    "rollup": "^2.56.0"
+  }
+}

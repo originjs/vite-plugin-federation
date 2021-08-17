@@ -1,6 +1,7 @@
 {
   "name": "simple-react",
   "private": true,
+  "version": "1.0.0",
   "workspaces": [
     "host",
     "remote"
@@ -10,6 +11,7 @@
     "build": "yarn workspaces run build"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-federation": "link:../../lib",
     "rimraf": "^3.0.2"
   }
 }
