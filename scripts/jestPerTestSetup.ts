@@ -59,8 +59,9 @@ beforeAll(async () => {
         }
       })
 
-      await execa('yarn', ['build'], { cwd: rootDir, stdio: 'inherit' })
       execa('yarn', ['serve'], { cwd: rootDir, stdio: 'inherit' })
+      await execa('yarn', ['build'], { cwd: rootDir, stdio: 'inherit' })
+
       const port = 5000
       // use resolved port/base from server
       const url = (global.viteTestUrl = `http://localhost:${port}`)
