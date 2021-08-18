@@ -6,7 +6,8 @@ This example demos consumption of federated modules from a rollup bundle. `layou
 
 # Running Demo
 
-Run `yarn start` . This will build and serve both `home` and `layout` on ports 3002 and 3001 respectively.
+Run `yarn start` . This will build and serve `common-lib`, `home` and `layout` on ports 5002, 5001 and 5000 respectively.
 
 - HOST (layout): [localhost:5000](http://localhost:5000/)
 - REMOTE (home): [localhost:5001](http://localhost:5001/)
+- REMOTE (common-lib): [localhost:5002](http://localhost:5002/)

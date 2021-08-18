@@ -1,6 +1,6 @@
 name: CI
 
-on: 
+on:
   push:
     branches:
       - '**'
@@ -22,7 +22,7 @@ jobs:
             node_version: 14
       fail-fast: false
 
-    name: "Build&Test: node-${{ matrix.node_version }}, ${{ matrix.os }}"
+    name: 'Build&Test: node-${{ matrix.node_version }}, ${{ matrix.os }}'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -56,4 +56,3 @@ jobs:
 
       - name: Test
         run: yarn test
-

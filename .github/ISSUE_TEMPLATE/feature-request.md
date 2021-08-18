@@ -4,7 +4,6 @@ about: Suggest an idea or enhancement.
 title: ''
 labels: 'feature-request'
 assignees: ''
-
 ---
 
 <!-- 💚 Thanks for your time to make us better with your feedbacks 💚 -->
