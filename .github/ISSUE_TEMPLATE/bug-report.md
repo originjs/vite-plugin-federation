@@ -4,7 +4,6 @@ about: Report a bug report to help us improve.
 title: ''
 labels: 'bug-report'
 assignees: ''
-
 ---
 
 <!-- 💚 Thanks for your time to make us better with your feedbacks 💚
@@ -32,8 +31,6 @@ Without a reproduction, it is so hard to address problem :(
 
 ### Steps to reproduce
 
-
 ### What is Expected?
-
 
 ### What is actually happening?

@@ -11,8 +11,10 @@
       <div class="app-label">
         #remote-component [REMOTE]
       </div>
+      <header-element />
       <content-element />
       <button-element />
+      <counter-element />
     </div>
   </div>
 </template>

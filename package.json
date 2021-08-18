@@ -17,7 +17,6 @@
     "test": "npm-run-all test:unit test:e2e",
     "test:unit": "jest",
     "test:e2e": "jest --runInBand --config ./jest.e2e.config.js"
-    
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",

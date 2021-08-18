@@ -7,13 +7,13 @@ export default defineConfig({
   plugins: [
     vue(),
     federation({
-      name: "common-lib",
-      filename: "remoteEntry.js",
+      name: 'home',
+      filename: 'remoteEntry.js',
       exposes: {
-        "./Content": "./src/components/Content.vue",
-        "./Button": "./src/components/Button.js",
+        './CommonCounter': './src/components/CommonCounter.vue',
+        './CommonHeader': './src/components/CommonHeader.vue'
       },
-      shared: ["vue"]
+      shared: ['vue']
     })
   ]
-});
+})
