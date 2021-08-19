@@ -3,7 +3,7 @@ import { OutputChunk, Plugin, AcornNode } from 'rollup'
 import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { sharedAssign, sharedScopeCode } from './util/objectUtil'
+import { parseOptions, sharedAssign, sharedScopeCode } from './utils'
 import { VitePluginFederationOptions } from '../types'
 
 function getModuleMarker(value: string, type?: string): string {
@@ -15,23 +15,29 @@ export default function federation(
 ): Plugin {
   const SHARED = 'shared'
   const moduleNames: string[] = []
-  const provideExposes = options.exposes || {}
+  const provideExposes = parseOptions(
+    options.exposes,
+    (item) => ({
+      import: item,
+      name: undefined
+    }),
+    (item) => ({
+      import: Array.isArray(item.import) ? item.import : [item.import],
+      name: item.name || undefined
+    })
+  )
   const externals: string[] = []
   const shared = sharedAssign(options.shared || [])
   let moduleMap = ''
   const exposesMap = new Map()
   // exposes module
-  for (const key in provideExposes) {
-    if (Object.prototype.hasOwnProperty.call(provideExposes, key)) {
-      const moduleName = getModuleMarker(`\${${key}}`, SHARED)
-      externals.push(moduleName)
-      externals.push(key)
-      const exposeFilepath = path
-        .resolve(provideExposes[key])
-        .replace(/\\/g, '/')
-      exposesMap.set(key, exposeFilepath)
-      moduleMap += `\n"${key}":()=>{return import('${exposeFilepath}')},`
-    }
+  for (const item of provideExposes) {
+    const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
+    externals.push(moduleName)
+    externals.push(item[0])
+    const exposeFilepath = path.resolve(item[1].import).replace(/\\/g, '/')
+    exposesMap.set(item[0], exposeFilepath)
+    moduleMap += `\n"${item[0]}":()=>{return import('${exposeFilepath}')},`
   }
   // shared module
   shared.forEach((value, key) => {
@@ -130,7 +136,7 @@ export default {
 
     buildStart() {
       // if we don't expose any modules, there is no need to emit file
-      if (Object.keys(provideExposes).length) {
+      if (provideExposes.length > 0) {
         this.emitFile({
           fileName: options.filename,
           type: 'chunk',

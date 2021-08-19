@@ -1,4 +1,4 @@
-import { SharedObject, SharedConfig } from '../../types'
+import { SharedObject, SharedConfig } from '../types'
 
 export function sharedAssign(
   shared: (string | SharedObject)[] | SharedObject
@@ -51,4 +51,43 @@ export function sharedScopeCode(
     })
   }
   return res
+}
+
+export function parseOptions(
+  options,
+  normalizeSimple,
+  normalizeOptions
+): any[] {
+  if (!options) {
+    return []
+  }
+  const list: any[] = []
+  const array = (items) => {
+    for (const item of items) {
+      if (typeof item === 'string') {
+        list.push([item, normalizeSimple(item, item)])
+      } else if (item && typeof item === 'object') {
+        object(item)
+      } else {
+        throw new Error('Unexpected options format')
+      }
+    }
+  }
+  const object = (obj) => {
+    for (const [key, value] of Object.entries(obj)) {
+      if (typeof value === 'string' || Array.isArray(value)) {
+        list.push([key, normalizeSimple(value, key)])
+      } else {
+        list.push([key, normalizeOptions(value, key)])
+      }
+    }
+  }
+  if (Array.isArray(options)) {
+    array(options)
+  } else if (typeof options === 'object') {
+    object(options)
+  } else {
+    throw new Error('Unexpected options format')
+  }
+  return list
 }
