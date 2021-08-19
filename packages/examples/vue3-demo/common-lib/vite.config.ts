@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     vue(),
     federation({
-      name: 'home',
+      name: 'common-lib',
       filename: 'remoteEntry.js',
       exposes: {
         './CommonCounter': './src/components/CommonCounter.vue',

@@ -101,7 +101,7 @@ export default {
   })
 
   return {
-    name: 'federation',
+    name: 'originjs:federation',
     options(_options) {
       // Split expose & shared module to separate chunks
       _options.preserveEntrySignatures = 'strict'
@@ -272,7 +272,14 @@ export default {
       }
     },
 
-    transform(code: string) {
+    transform(code: string, id: string) {
+      if (remotes.length === 0 || id.includes('node_modules')) {
+        return null
+      }
+      if (!/import/.test(code)) {
+        return null
+      }
+
       let ast: AcornNode | null = null
       try {
         ast = this.parse(code)

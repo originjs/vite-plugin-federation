@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     vue(),
     federation({
-      name: "common-lib",
+      name: "home",
       filename: "remoteEntry.js",
       exposes: {
         "./Content": "./src/components/Content.vue",
