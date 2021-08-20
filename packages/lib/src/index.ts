@@ -193,10 +193,6 @@ export default {
             if (chunk.isEntry) {
               exposesMap.forEach((value) => {
                 const replacePath = normalizePath(path.resolve(value))
-                console.log('----------chunk.facadeModuleId----------')
-                console.log(chunk.facadeModuleId)
-                console.log('----------replacePath----------')
-                console.log(replacePath)
                 // vite + vue3
                 if (
                   chunk.facadeModuleId != null &&
@@ -227,16 +223,12 @@ export default {
         }
       }
       // placeholder replace
-      console.log('----------replaceMap----------')
-      console.log(replaceMap)
       entryChunk.forEach((item) => {
         item.code = item.code.split(importAlias).join('import')
         replaceMap.forEach((value, key) => {
           item.code = item.code.replace(`('${key}')`, `('${value}')`)
           item.code = item.code.replace(`("${key}")`, `("${value}")`)
         })
-        console.log('----------[after]item.code----------')
-        console.log(item.code)
       })
       // collect import info
       if (exposesChunk.length) {
