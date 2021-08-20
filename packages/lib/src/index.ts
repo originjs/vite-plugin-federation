@@ -216,41 +216,23 @@ export default {
       const entryChunk: OutputChunk[] = []
       const exposesChunk: OutputChunk[] = []
       for (const file in bundle) {
-        if (Object.prototype.hasOwnProperty.call(bundle, file)) {
-          const chunk = bundle[file]
-          if (chunk.type === 'chunk') {
-            if (chunk.isEntry) {
-              exposesMap.forEach((value) => {
-                console.log(chunk.facadeModuleId)
-                console.log(value)
-                const resolvePath = path.resolve(value)
-                const replacePath = resolvePath.split('\\').join('/')
-                if (exposesChunk.indexOf(chunk) == -1) {
-                  // vite + vue3
-                  if (
-                    chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
-                    chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
-                  ) {
-                    replaceMap.set(replacePath, `./${chunk.fileName}`)
-                    exposesChunk.push(chunk)
-                  }
-                }
-                // if (options.filename === chunk.fileName) {
-                //     remoteChunk = chunk
-                // }
-              })
-              entryChunk.push(chunk)
-            } else {
-              //  shared path replace
-              if (shared.has(chunk.name)) {
-                replaceMap.set(
-                  getModuleMarker(`\${${chunk.name}}`, SHARED),
-                  `/${_options.dir}/${chunk.fileName}`
-                )
-                sharedChunkMap.set(path.basename(chunk.fileName), chunk.name)
+        const chunk = bundle[file]
+        if (chunk.type === 'chunk' && chunk.isEntry) {
+          exposesMap.forEach((value) => {
+            const resolvePath = path.resolve(value)
+            const replacePath = resolvePath.split('\\').join('/')
+            if (exposesChunk.indexOf(chunk) == -1) {
+              // vite + vue3
+              if (
+                chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
+                chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
+              ) {
+                replaceMap.set(replacePath, `./${chunk.fileName}`)
+                exposesChunk.push(chunk)
               }
             }
-          }
+          })
+          entryChunk.push(chunk)
         }
       }
       // placeholder replace
