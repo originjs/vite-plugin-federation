@@ -47,7 +47,7 @@ export default {
     // }
     // minifyInternalExports:false
   },
-  external: ['react', 'react-dom'],
+  // external: ['react', 'react-dom'],
 
   // treeshake:false,
 }
