@@ -177,21 +177,13 @@ export default {
               exposesMap.forEach((value) => {
                 const resolvePath = path.resolve(value)
                 const replacePath = resolvePath.split('\\').join('/')
-                console.log('----------chunk.facadeModuleId----------')
-                console.log(chunk.facadeModuleId)
-                console.log('----------value----------')
-                console.log(value)
-                console.log('----------replacePath----------')
-                console.log(replacePath)
-                console.log('----------resolvePath----------')
-                console.log(resolvePath)
-                if (exposesChunk.indexOf(chunk) == -1) {
-                  // vite + vue3
-                  if (
-                    chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
-                    chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
-                  ) {
-                    replaceMap.set(replacePath, `./${chunk.fileName}`)
+                // vite + vue3
+                if (
+                  chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
+                  chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
+                ) {
+                  replaceMap.set(replacePath, `./${chunk.fileName}`)
+                  if (exposesChunk.indexOf(chunk) == -1) {
                     exposesChunk.push(chunk)
                   }
                 }
@@ -217,8 +209,6 @@ export default {
       console.log('----------replaceMap----------')
       console.log(replaceMap)
       entryChunk.forEach((item) => {
-        console.log('----------[before]item.code----------')
-        console.log(item.code)
         item.code = item.code.split(importAlias).join('import')
         replaceMap.forEach((value, key) => {
           item.code = item.code.replace(`('${key}')`, `('${value}')`)
