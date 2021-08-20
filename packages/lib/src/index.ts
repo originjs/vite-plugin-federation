@@ -175,12 +175,16 @@ export default {
           if (chunk.type === 'chunk') {
             if (chunk.isEntry) {
               exposesMap.forEach((value) => {
+                const resolvePath = path.resolve(value)
+                const replacePath = resolvePath.split('\\').join('/')
                 console.log('----------chunk.facadeModuleId----------')
                 console.log(chunk.facadeModuleId)
                 console.log('----------value----------')
                 console.log(value)
-                const resolvePath = path.resolve(value)
-                const replacePath = resolvePath.split('\\').join('/')
+                console.log('----------replacePath----------')
+                console.log(replacePath)
+                console.log('----------resolvePath----------')
+                console.log(resolvePath)
                 if (exposesChunk.indexOf(chunk) == -1) {
                   // vite + vue3
                   if (
@@ -217,7 +221,8 @@ export default {
         console.log(item.code)
         item.code = item.code.split(importAlias).join('import')
         replaceMap.forEach((value, key) => {
-          item.code = item.code.replace(key, value)
+          item.code = item.code.replace(`('${key}')`, `('${value}')`)
+          item.code = item.code.replace(`("${key}")`, `("${value}")`)
         })
         console.log('----------[after]item.code----------')
         console.log(item.code)
