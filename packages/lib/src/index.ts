@@ -205,6 +205,7 @@ export default {
           bundle[realFileName].fileName = expectFileName
           replaceMap.set(realFileName, expectFileName)
           realFileName = expectFileName
+          value.set('fileName', realFileName)
         }
         // shared path replace, like __rf_shared__react => /dist/react.js
         replaceMap.set(
@@ -214,7 +215,6 @@ export default {
       })
       const entryChunk: OutputChunk[] = []
       const exposesChunk: OutputChunk[] = []
-      const sharedChunkMap = new Map()
       for (const file in bundle) {
         if (Object.prototype.hasOwnProperty.call(bundle, file)) {
           const chunk = bundle[file]
@@ -259,6 +259,11 @@ export default {
 
         replaceMap.forEach((value, key) => {
           item.code = item.code.replace(key, value)
+          const index = item.imports.indexOf(key)
+          if (index >= 0) {
+            // replace chunk.imports property
+            item.imports[index] = value
+          }
         })
       })
       // collect import info
@@ -267,6 +272,10 @@ export default {
         const VAR_GLOBAL = getModuleMarker('global', 'var')
         const VAR_MODULE_MAP = getModuleMarker('moduleMap', 'var')
         const VAR_SHARED = getModuleMarker('shared', 'var')
+        const fileName2SharedName = new Map()
+        shared.forEach((value, key) => {
+          fileName2SharedName.set(value.get('fileName'), key)
+        })
         exposesChunk.forEach((chunk) => {
           let lastImport: any = null
           const ast = this.parse(chunk.code)
@@ -275,9 +284,10 @@ export default {
           walk(ast, {
             enter(node: any) {
               if (node.type === 'ImportDeclaration') {
-                const key = path.basename(node.source.value)
-                if (sharedChunkMap.has(key)) {
-                  importMap.set(sharedChunkMap.get(key), {
+                const fileName = path.basename(node.source.value)
+                const sharedName = fileName2SharedName.get(fileName)
+                if (sharedName) {
+                  importMap.set(sharedName, {
                     source: node.source.value,
                     specifiers: node.specifiers
                   })
