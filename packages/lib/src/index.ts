@@ -11,6 +11,18 @@ function getModuleMarker(value: string, type?: string): string {
   return type ? `__rf_${type}__${value}` : `__rf_placeholder__${value}`
 }
 
+function getFileName(str: string | null): string {
+  if (str == null) {
+    return ''
+  }
+
+  const potIndex = str.indexOf('.')
+  if (potIndex != -1 && potIndex != 0) {
+    return str.substring(0, potIndex)
+  }
+  return str
+}
+
 export default function federation(
   options: VitePluginFederationOptions
 ): vitePlugin {
@@ -177,10 +189,15 @@ export default {
               exposesMap.forEach((value) => {
                 const resolvePath = path.resolve(value)
                 const replacePath = resolvePath.split('\\').join('/')
+                console.log('----------chunk.facadeModuleId----------')
+                console.log(chunk.facadeModuleId)
+                console.log('----------resolvePath----------')
+                console.log(resolvePath)
                 // vite + vue3
                 if (
-                  chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
-                  chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
+                  getFileName(chunk.facadeModuleId) ===
+                    getFileName(replacePath) ||
+                  getFileName(chunk.facadeModuleId) === getFileName(resolvePath)
                 ) {
                   replaceMap.set(replacePath, `./${chunk.fileName}`)
                   if (exposesChunk.indexOf(chunk) == -1) {
