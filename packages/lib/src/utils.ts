@@ -95,3 +95,7 @@ export function parseOptions(
 export function removeNonLetter(str): string {
   return str.replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
 }
+
+export function getModuleMarker(value: string, type?: string): string {
+  return type ? `__rf_${type}__${value}` : `__rf_placeholder__${value}`
+}
