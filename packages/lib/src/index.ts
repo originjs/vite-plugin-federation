@@ -4,7 +4,12 @@ import { Plugin as vitePlugin } from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { parseOptions, sharedAssign, sharedScopeCode } from './utils'
+import {
+  parseOptions,
+  removeNonLetter,
+  sharedAssign,
+  sharedScopeCode
+} from './utils'
 import { VitePluginFederationOptions } from '../types'
 
 function getModuleMarker(value: string, type?: string): string {
@@ -114,12 +119,17 @@ export default {
       // Split expose & shared module to separate chunks
       _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
-        _options.input = [_options.input]
+        _options.input = { index: _options.input }
       }
-      exposesMap.forEach((value) => {
-        if (Array.isArray(_options.input)) {
-          _options.input.push(value)
-        }
+      // add shared content into input
+      if (shared.size) {
+        shared.forEach((value, key) => {
+          _options.input![`${getModuleMarker(key, 'input')}`] = key
+        })
+      }
+      // add exposes content into input
+      exposesMap.forEach((value, key) => {
+        _options.input![removeNonLetter(key)] = value
       })
       // use external to suppress import warning
       _options.external = _options.external || []
@@ -164,47 +174,65 @@ export default {
       return null
     },
 
+    renderChunk(code, chunkInfo) {
+      const name = chunkInfo.name
+      if (chunkInfo.isEntry) {
+        const sharedName = name.match(/(?<=__rf_input__).*/)?.[0]
+        if (sharedName) {
+          shared
+            .get(sharedName)
+            ?.set(
+              'fileName',
+              chunkInfo.imports?.length === 1 &&
+                !Object.keys(chunkInfo.modules).length
+                ? chunkInfo.imports[0]
+                : chunkInfo.fileName
+            )
+        }
+      }
+      return null
+    },
+
     generateBundle: function (_options, bundle) {
+      const replaceMap = new Map()
+      shared.forEach((value, key) => {
+        let realFileName = value.get('fileName')
+        if (realFileName && !realFileName.startsWith('__rf_input')) {
+          const expectFileName = `__rf_input__${key}.js`
+          // delete non-used chunk
+          delete bundle[expectFileName]
+          //  rename chunk
+          bundle[realFileName].fileName = expectFileName
+          replaceMap.set(realFileName, expectFileName)
+          realFileName = expectFileName
+          value.set('fileName', realFileName)
+        }
+        // shared path replace, like __rf_shared__react => /dist/react.js
+        replaceMap.set(
+          getModuleMarker(`\${${key}}`, SHARED),
+          `/${_options.dir}/${realFileName}`
+        )
+      })
       const entryChunk: OutputChunk[] = []
       const exposesChunk: OutputChunk[] = []
-      const replaceMap = new Map()
-      const sharedChunkMap = new Map()
       for (const file in bundle) {
-        if (Object.prototype.hasOwnProperty.call(bundle, file)) {
-          const chunk = bundle[file]
-          if (chunk.type === 'chunk') {
-            if (chunk.isEntry) {
-              exposesMap.forEach((value) => {
-                console.log(chunk.facadeModuleId)
-                console.log(value)
-                const resolvePath = path.resolve(value)
-                const replacePath = resolvePath.split('\\').join('/')
-                if (exposesChunk.indexOf(chunk) == -1) {
-                  // vite + vue3
-                  if (
-                    chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
-                    chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
-                  ) {
-                    replaceMap.set(replacePath, `./${chunk.fileName}`)
-                    exposesChunk.push(chunk)
-                  }
-                }
-                // if (options.filename === chunk.fileName) {
-                //     remoteChunk = chunk
-                // }
-              })
-              entryChunk.push(chunk)
-            } else {
-              //  shared path replace
-              if (shared.has(chunk.name)) {
-                replaceMap.set(
-                  getModuleMarker(`\${${chunk.name}}`, SHARED),
-                  `/${_options.dir}/${chunk.fileName}`
-                )
-                sharedChunkMap.set(path.basename(chunk.fileName), chunk.name)
+        const chunk = bundle[file]
+        if (chunk.type === 'chunk' && chunk.isEntry) {
+          exposesMap.forEach((value) => {
+            const resolvePath = path.resolve(value)
+            const replacePath = resolvePath.split('\\').join('/')
+            if (exposesChunk.indexOf(chunk) == -1) {
+              // vite + vue3
+              if (
+                chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
+                chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
+              ) {
+                replaceMap.set(replacePath, `./${chunk.fileName}`)
+                exposesChunk.push(chunk)
               }
             }
-          }
+          })
+          entryChunk.push(chunk)
         }
       }
       // placeholder replace
@@ -213,6 +241,11 @@ export default {
 
         replaceMap.forEach((value, key) => {
           item.code = item.code.replace(key, value)
+          const index = item.imports.indexOf(key)
+          if (index >= 0) {
+            // replace chunk.imports property
+            item.imports[index] = value
+          }
         })
       })
       // collect import info
@@ -221,6 +254,10 @@ export default {
         const VAR_GLOBAL = getModuleMarker('global', 'var')
         const VAR_MODULE_MAP = getModuleMarker('moduleMap', 'var')
         const VAR_SHARED = getModuleMarker('shared', 'var')
+        const fileName2SharedName = new Map()
+        shared.forEach((value, key) => {
+          fileName2SharedName.set(value.get('fileName'), key)
+        })
         exposesChunk.forEach((chunk) => {
           let lastImport: any = null
           const ast = this.parse(chunk.code)
@@ -229,9 +266,10 @@ export default {
           walk(ast, {
             enter(node: any) {
               if (node.type === 'ImportDeclaration') {
-                const key = path.basename(node.source.value)
-                if (sharedChunkMap.has(key)) {
-                  importMap.set(sharedChunkMap.get(key), {
+                const fileName = path.basename(node.source.value)
+                const sharedName = fileName2SharedName.get(fileName)
+                if (sharedName) {
+                  importMap.set(sharedName, {
                     source: node.source.value,
                     specifiers: node.specifiers
                   })
@@ -341,15 +379,14 @@ export default {
     },
     outputOptions(options) {
       // add shared content into manualChunk
-      if (shared.size) {
-        options.manualChunks = options.manualChunks || {}
-        shared.forEach((value, key) => {
-          if (options.manualChunks) {
-            //TODO need to support more type
-            options.manualChunks[key] = [key]
-          }
-        })
-      }
+      // if (shared.size) {
+      //   options.manualChunks = options.manualChunks || {}
+      //   shared.forEach((value, key) => {
+      //     if (options.manualChunks) {
+      //       options.manualChunks[key] = [key]
+      //     }
+      //   })
+      // }
       return options
     }
   }
