@@ -1,5 +1,6 @@
 import * as path from 'path'
-import { OutputChunk, Plugin, AcornNode } from 'rollup'
+import { OutputChunk, AcornNode } from 'rollup'
+import { Plugin as vitePlugin } from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
@@ -12,7 +13,7 @@ function getModuleMarker(value: string, type?: string): string {
 
 export default function federation(
   options: VitePluginFederationOptions
-): Plugin {
+): vitePlugin {
   const SHARED = 'shared'
   const moduleNames: string[] = []
   const provideExposes = parseOptions(
@@ -29,6 +30,7 @@ export default function federation(
   const externals: string[] = []
   const shared = sharedAssign(options.shared || [])
   let moduleMap = ''
+  const importAlias = '__f__import__'
   const exposesMap = new Map()
   // exposes module
   for (const item of provideExposes) {
@@ -37,7 +39,7 @@ export default function federation(
     externals.push(item[0])
     const exposeFilepath = path.resolve(item[1].import).replace(/\\/g, '/')
     exposesMap.set(item[0], exposeFilepath)
-    moduleMap += `\n"${item[0]}":()=>{return import('${exposeFilepath}')},`
+    moduleMap += `\n"${item[0]}":()=>{return ${importAlias}('${exposeFilepath}')},`
   }
   // shared module
   shared.forEach((value, key) => {
@@ -173,16 +175,19 @@ export default {
           if (chunk.type === 'chunk') {
             if (chunk.isEntry) {
               exposesMap.forEach((value) => {
-                // Filter out duplicated exposes chunk
-                if (
-                  chunk.facadeModuleId!.indexOf(path.resolve(value)) >= 0 &&
-                  exposesChunk.indexOf(chunk) == -1
-                ) {
-                  replaceMap.set(
-                    getModuleMarker(`\${${value}}`),
-                    `http://localhost:8081/${chunk.fileName}`
-                  )
-                  exposesChunk.push(chunk)
+                console.log(chunk.facadeModuleId)
+                console.log(value)
+                const resolvePath = path.resolve(value)
+                const replacePath = resolvePath.split('\\').join('/')
+                if (exposesChunk.indexOf(chunk) == -1) {
+                  // vite + vue3
+                  if (
+                    chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
+                    chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
+                  ) {
+                    replaceMap.set(replacePath, `./${chunk.fileName}`)
+                    exposesChunk.push(chunk)
+                  }
                 }
                 // if (options.filename === chunk.fileName) {
                 //     remoteChunk = chunk
@@ -204,6 +209,8 @@ export default {
       }
       // placeholder replace
       entryChunk.forEach((item) => {
+        item.code = item.code.split(importAlias).join('import')
+
         replaceMap.forEach((value, key) => {
           item.code = item.code.replace(key, value)
         })
