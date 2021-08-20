@@ -91,3 +91,7 @@ export function parseOptions(
   }
   return list
 }
+
+export function removeNonLetter(str): string {
+  return str.replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
+}
