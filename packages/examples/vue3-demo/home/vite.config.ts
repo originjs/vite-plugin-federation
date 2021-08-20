@@ -15,5 +15,8 @@ export default defineConfig({
       },
       shared: ["vue"]
     })
-  ]
+  ],
+  build: {
+    minify: false
+  }
 });
