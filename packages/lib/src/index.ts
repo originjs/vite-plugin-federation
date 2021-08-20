@@ -114,7 +114,13 @@ export default {
       // Split expose & shared module to separate chunks
       _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
-        _options.input = [_options.input]
+        _options.input = { index: _options.input }
+      }
+      // add shared content into input
+      if (shared.size) {
+        shared.forEach((value, key) => {
+          _options.input![`${getModuleMarker(key, 'input')}`] = key
+        })
       }
       exposesMap.forEach((value) => {
         if (Array.isArray(_options.input)) {
@@ -164,10 +170,46 @@ export default {
       return null
     },
 
+    renderChunk(code, chunkInfo) {
+      const name = chunkInfo.name
+      if (chunkInfo.isEntry) {
+        const sharedName = name.match(/(?<=__rf_input__).*/)?.[0]
+        if (sharedName) {
+          shared
+            .get(sharedName)
+            ?.set(
+              'fileName',
+              chunkInfo.imports?.length === 1 &&
+                !Object.keys(chunkInfo.modules).length
+                ? chunkInfo.imports[0]
+                : chunkInfo.fileName
+            )
+        }
+      }
+      return null
+    },
+
     generateBundle: function (_options, bundle) {
+      const replaceMap = new Map()
+      shared.forEach((value, key) => {
+        let realFileName = value.get('fileName')
+        if (realFileName && !realFileName.startsWith('__rf_input')) {
+          const expectFileName = `__rf_input__${key}.js`
+          // delete non-used chunk
+          delete bundle[expectFileName]
+          //  rename chunk
+          bundle[realFileName].fileName = expectFileName
+          replaceMap.set(realFileName, expectFileName)
+          realFileName = expectFileName
+        }
+        // shared path replace, like __rf_shared__react => /dist/react.js
+        replaceMap.set(
+          getModuleMarker(`\${${key}}`, SHARED),
+          `/${_options.dir}/${realFileName}`
+        )
+      })
       const entryChunk: OutputChunk[] = []
       const exposesChunk: OutputChunk[] = []
-      const replaceMap = new Map()
       const sharedChunkMap = new Map()
       for (const file in bundle) {
         if (Object.prototype.hasOwnProperty.call(bundle, file)) {
@@ -341,15 +383,14 @@ export default {
     },
     outputOptions(options) {
       // add shared content into manualChunk
-      if (shared.size) {
-        options.manualChunks = options.manualChunks || {}
-        shared.forEach((value, key) => {
-          if (options.manualChunks) {
-            //TODO need to support more type
-            options.manualChunks[key] = [key]
-          }
-        })
-      }
+      // if (shared.size) {
+      //   options.manualChunks = options.manualChunks || {}
+      //   shared.forEach((value, key) => {
+      //     if (options.manualChunks) {
+      //       options.manualChunks[key] = [key]
+      //     }
+      //   })
+      // }
       return options
     }
   }
