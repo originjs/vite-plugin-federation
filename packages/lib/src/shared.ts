@@ -36,15 +36,17 @@ const shared: PluginHooks = {
     if (chunkInfo.isEntry) {
       const sharedName = name.match(/(?<=__rf_input__).*/)?.[0]
       if (sharedName) {
-        sharedMap
-          .get(sharedName)
-          ?.set(
-            'fileName',
-            chunkInfo.imports?.length === 1 &&
-              !Object.keys(chunkInfo.modules).length
-              ? chunkInfo.imports[0]
-              : chunkInfo.fileName
-          )
+        const filePath =
+          chunkInfo.imports?.length === 1 &&
+          !Object.keys(chunkInfo.modules).length
+            ? chunkInfo.imports[0]
+            : chunkInfo.fileName
+        const fileName = path.basename(filePath)
+        const fileDir = path.dirname(filePath)
+        const sharedProp = sharedMap.get(sharedName)
+        sharedProp?.set('fileName', fileName)
+        sharedProp?.set('fileDir', fileDir)
+        sharedProp?.set('filePath', filePath)
       }
     }
     return null
@@ -52,21 +54,34 @@ const shared: PluginHooks = {
 
   generateBundle: function (options, bundle) {
     sharedMap.forEach((value, key) => {
-      let realFileName = value.get('fileName')
-      if (realFileName && !realFileName.startsWith('__rf_input')) {
-        const expectFileName = `__rf_input__${key}.js`
+      const fileName = value.get('fileName')
+      const fileDir = value.get('fileDir')
+      let filePath = value.get('filePath')
+      if (filePath && !fileName.startsWith('__rf_input')) {
+        const expectName = `__rf_input__${key}`
+        let expectFileName = ''
+        // find expectName
+        for (const file in bundle) {
+          if (bundle[file].name === expectName) {
+            expectFileName = path.basename(bundle[file].fileName)
+          }
+        }
+        expectFileName = expectFileName ? expectFileName : `${expectName}.js`
+        // rollup fileName
+        const expectFilePath = `${fileDir}/${expectFileName}`
         // delete non-used chunk
-        delete bundle[expectFileName]
+        delete bundle[expectFilePath]
         //  rename chunk
-        bundle[realFileName].fileName = expectFileName
-        replaceMap.set(realFileName, expectFileName)
-        realFileName = expectFileName
-        value.set('fileName', realFileName)
+        bundle[filePath].fileName = expectFilePath
+        replaceMap.set(fileName, expectFileName)
+        filePath = expectFilePath
+        value.set('filePath', expectFilePath)
+        value.set('fileName', expectFileName)
       }
       // shared path replace, like __rf_shared__react => /dist/react.js
       replaceMap.set(
         getModuleMarker(`\${${key}}`, SHARED),
-        `/${options.dir}/${realFileName}`
+        `/${options.dir}/${filePath}`
       )
     })
     // placeholder replace
