@@ -175,7 +175,9 @@ export default {
           if (chunk.type === 'chunk') {
             if (chunk.isEntry) {
               exposesMap.forEach((value) => {
+                console.log('----------chunk.facadeModuleId----------')
                 console.log(chunk.facadeModuleId)
+                console.log('----------value----------')
                 console.log(value)
                 const resolvePath = path.resolve(value)
                 const replacePath = resolvePath.split('\\').join('/')
@@ -208,12 +210,17 @@ export default {
         }
       }
       // placeholder replace
+      console.log('----------replaceMap----------')
+      console.log(replaceMap)
       entryChunk.forEach((item) => {
+        console.log('----------[before]item.code----------')
+        console.log(item.code)
         item.code = item.code.split(importAlias).join('import')
-
         replaceMap.forEach((value, key) => {
           item.code = item.code.replace(key, value)
         })
+        console.log('----------[after]item.code----------')
+        console.log(item.code)
       })
       // collect import info
       if (exposesChunk.length) {
