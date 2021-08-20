@@ -1,4 +1,6 @@
 import { SharedObject, SharedConfig } from '../types'
+import * as path from 'path'
+import os from 'os'
 
 export function sharedAssign(
   shared: (string | SharedObject)[] | SharedObject
@@ -90,4 +92,13 @@ export function parseOptions(
     throw new Error('Unexpected options format')
   }
   return list
+}
+
+export function normalizePath(id: string): string {
+  const isWindows = os.platform() === 'win32'
+  return path.posix.normalize(isWindows ? slash(id) : id)
+}
+
+export function slash(p: string): string {
+  return p.replace(/\\/g, '/')
 }

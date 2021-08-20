@@ -4,7 +4,12 @@ import { Plugin as vitePlugin } from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { parseOptions, sharedAssign, sharedScopeCode } from './utils'
+import {
+  parseOptions,
+  sharedAssign,
+  sharedScopeCode,
+  normalizePath
+} from './utils'
 import { VitePluginFederationOptions } from '../types'
 
 function getModuleMarker(value: string, type?: string): string {
@@ -187,17 +192,16 @@ export default {
           if (chunk.type === 'chunk') {
             if (chunk.isEntry) {
               exposesMap.forEach((value) => {
-                const resolvePath = path.resolve(value)
-                const replacePath = resolvePath.split('\\').join('/')
+                const replacePath = normalizePath(path.resolve(value))
                 console.log('----------chunk.facadeModuleId----------')
                 console.log(chunk.facadeModuleId)
-                console.log('----------resolvePath----------')
-                console.log(resolvePath)
+                console.log('----------replacePath----------')
+                console.log(replacePath)
                 // vite + vue3
                 if (
-                  getFileName(chunk.facadeModuleId) ===
-                    getFileName(replacePath) ||
-                  getFileName(chunk.facadeModuleId) === getFileName(resolvePath)
+                  chunk.facadeModuleId != null &&
+                  getFileName(normalizePath(chunk.facadeModuleId)) ===
+                    getFileName(replacePath)
                 ) {
                   replaceMap.set(replacePath, `./${chunk.fileName}`)
                   if (exposesChunk.indexOf(chunk) == -1) {
