@@ -3,7 +3,12 @@ import { OutputChunk, Plugin, AcornNode } from 'rollup'
 import virtual from '@rollup/plugin-virtual'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { parseOptions, sharedAssign, sharedScopeCode } from './utils'
+import {
+  parseOptions,
+  removeNonLetter,
+  sharedAssign,
+  sharedScopeCode
+} from './utils'
 import { VitePluginFederationOptions } from '../types'
 
 function getModuleMarker(value: string, type?: string): string {
@@ -120,10 +125,9 @@ export default {
           _options.input![`${getModuleMarker(key, 'input')}`] = key
         })
       }
-      exposesMap.forEach((value) => {
-        if (Array.isArray(_options.input)) {
-          _options.input.push(value)
-        }
+      // add exposes content into input
+      exposesMap.forEach((value, key) => {
+        _options.input![removeNonLetter(key)] = value
       })
       // use external to suppress import warning
       _options.external = _options.external || []
