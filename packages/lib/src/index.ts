@@ -10,7 +10,9 @@ import {
   getModuleMarker,
   parseOptions,
   removeNonLetter,
-  sharedScopeCode
+  sharedScopeCode,
+  normalizePath,
+  getFileName
 } from './utils'
 import { VitePluginFederationOptions } from '../types'
 import { replaceMap, SHARED } from './public'
@@ -179,13 +181,15 @@ export default {
         const chunk = bundle[file]
         if (chunk.type === 'chunk' && chunk.isEntry) {
           exposesMap.forEach((value) => {
-            const resolvePath = path.resolve(value)
-            const replacePath = resolvePath.split('\\').join('/')
+            const replacePath = normalizePath(path.resolve(value))
+            console.log(chunk.facadeModuleId)
+            console.log(replacePath)
             if (!exposesChunkSet.has(chunk)) {
               // vite + vue3
               if (
-                chunk.facadeModuleId!.indexOf(replacePath) >= 0 ||
-                chunk.facadeModuleId!.indexOf(resolvePath + '.') >= 0
+                chunk.facadeModuleId != null &&
+                getFileName(normalizePath(chunk.facadeModuleId)) ===
+                  getFileName(replacePath)
               ) {
                 replaceMap.set(replacePath, `./${chunk.fileName}`)
                 exposesChunkSet.add(chunk)

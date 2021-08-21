@@ -1,4 +1,6 @@
 import { SharedObject, SharedConfig } from '../types'
+import * as path from 'path'
+import os from 'os'
 
 export function sharedAssign(
   shared: (string | SharedObject)[] | SharedObject
@@ -98,4 +100,25 @@ export function removeNonLetter(str): string {
 
 export function getModuleMarker(value: string, type?: string): string {
   return type ? `__rf_${type}__${value}` : `__rf_placeholder__${value}`
+}
+
+export function normalizePath(id: string): string {
+  const isWindows = os.platform() === 'win32'
+  return path.posix.normalize(isWindows ? slash(id) : id)
+}
+
+export function slash(p: string): string {
+  return p.replace(/\\/g, '/')
+}
+
+export function getFileName(str: string | null): string {
+  if (str == null) {
+    return ''
+  }
+
+  const potIndex = str.indexOf('.')
+  if (potIndex != -1 && potIndex != 0) {
+    return str.substring(0, potIndex)
+  }
+  return str
 }

@@ -84,10 +84,18 @@ const shared: PluginHooks = {
         `/${options.dir}/${filePath}`
       )
     })
+
     // placeholder replace
     entryChunkSet.forEach((item) => {
       item.code = item.code.split(IMPORT_ALIAS).join('import')
 
+      // accurately replace import absolute path to relative path
+      replaceMap.forEach((value, key) => {
+        item.code = item.code.replace(`('${key}')`, `('${value}')`)
+        item.code = item.code.replace(`("${key}")`, `("${value}")`)
+      })
+
+      // replace __rf_shared__xxx
       replaceMap.forEach((value, key) => {
         item.code = item.code.replace(key, value)
         const index = item.imports.indexOf(key)
