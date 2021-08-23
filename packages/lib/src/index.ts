@@ -141,7 +141,7 @@ export default {
       return _options
     },
 
-    buildStart() {
+    buildStart(inputOptions) {
       // if we don't expose any modules, there is no need to emit file
       if (provideExposes.length > 0) {
         this.emitFile({
@@ -150,6 +150,10 @@ export default {
           id: '__remoteEntryHelper__',
           preserveSignature: 'strict'
         })
+      }
+
+      for (const pluginHook of selfPlugin) {
+        pluginHook.buildStart?.call(this, inputOptions)
       }
     },
 
@@ -167,6 +171,12 @@ export default {
         return v
       }
       return null
+    },
+    outputOptions(outputOptions) {
+      for (const pluginHook of selfPlugin) {
+        pluginHook.outputOptions?.call(this, outputOptions)
+      }
+      return outputOptions
     },
 
     renderChunk(code, chunkInfo, _options) {

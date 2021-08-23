@@ -31,6 +31,39 @@ const shared: PluginHooks = {
     return inputOptions
   },
 
+  async buildStart(options) {
+    for (const entry of sharedMap) {
+      const key = entry[0]
+      const value = entry[1]
+      value.set('id', await this.resolveId(key))
+    }
+  },
+
+  outputOptions(outputOption) {
+    outputOption.manualChunks = outputOption.manualChunks || {}
+    if (typeof outputOption.manualChunks === 'function') {
+      //  proxy this function and add shared
+      outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
+        apply(target: any, thisArg: any, argArray: any[]): any {
+          const id = argArray[0]
+          //  if id is in shareMap , return id ,else return vite function
+          const find = [...sharedMap.values()].find(
+            (item) => id === item.get('id')
+          )
+          return find ? id : target(argArray[0], argArray[1])
+        }
+      })
+    } else {
+      // add shared to manualChunks, such as vue:['vue']
+      sharedMap.forEach((value, key) => {
+        if (outputOption.manualChunks) {
+          outputOption.manualChunks[key] = [key]
+        }
+      })
+    }
+    return outputOption
+  },
+
   renderChunk: (code, chunkInfo) => {
     const name = chunkInfo.name
     if (chunkInfo.isEntry) {
