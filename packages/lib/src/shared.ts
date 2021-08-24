@@ -35,6 +35,7 @@ const shared: PluginHooks = {
     for (const entry of sharedMap) {
       const key = entry[0]
       const value = entry[1]
+      value.set('idRegexp', RegExp(`node_modules[/\\\\]@?${key}[/\\\\]`))
       value.set('id', await this.resolveId(key))
     }
   },
@@ -44,13 +45,13 @@ const shared: PluginHooks = {
     if (typeof outputOption.manualChunks === 'function') {
       //  proxy this function and add shared
       outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
-        apply(target: any, thisArg: any, argArray: any[]): any {
+        apply(target, thisArg, argArray) {
           const id = argArray[0]
-          //  if id is in shareMap , return id ,else return vite function
-          const find = [...sharedMap.values()].find(
-            (item) => id === item.get('id')
+          //  if id is in shareMap , return id ,else return vite function value
+          const find = [...sharedMap.entries()].find((item) =>
+            id.match(item[1].get('idRegexp'))
           )
-          return find ? id : target(argArray[0], argArray[1])
+          return find ? find[0] : target(argArray[0], argArray[1])
         }
       })
     } else {
@@ -86,6 +87,7 @@ const shared: PluginHooks = {
   },
 
   generateBundle: function (options, bundle) {
+    const importReplaceMap = new Map()
     sharedMap.forEach((value, key) => {
       const fileName = value.get('fileName')
       const fileDir = value.get('fileDir')
@@ -105,8 +107,11 @@ const shared: PluginHooks = {
         // delete non-used chunk
         delete bundle[expectFilePath]
         //  rename chunk
-        bundle[filePath].fileName = expectFilePath
+        bundle[expectFilePath] = bundle[filePath]
+        bundle[expectFilePath].fileName = expectFilePath
+        delete bundle[filePath]
         replaceMap.set(fileName, expectFileName)
+        importReplaceMap.set(filePath, expectFilePath)
         filePath = expectFilePath
         value.set('filePath', expectFilePath)
         value.set('fileName', expectFileName)
@@ -116,6 +121,19 @@ const shared: PluginHooks = {
         getModuleMarker(`\${${key}}`, SHARED),
         `/${options.dir}/${filePath}`
       )
+    })
+
+    // replace every chunk import
+    importReplaceMap.forEach((value, key) => {
+      for (const fileKey in bundle) {
+        const chunk = bundle[fileKey]
+        if (chunk.type === 'chunk') {
+          const indexOf = chunk.imports?.indexOf(key)
+          if (indexOf >= 0) {
+            chunk[indexOf] = value
+          }
+        }
+      }
     })
 
     // placeholder replace
