@@ -7,8 +7,8 @@
     "rollup-remote"
   ],
   "scripts": {
-    "build": "lerna run build",
-    "serve": "lerna run serve --parallel",
+    "build": "lerna run build --loglevel=error",
+    "serve": "lerna run serve --parallel --loglevel=silent",
     "stop": "kill-port --port 5000,5001"
   },
   "license": "MulanPSL2",
