@@ -3,10 +3,10 @@ import * as path from 'path'
 import os from 'os'
 
 export function sharedAssign(
+  assign: Map<string, Map<string, string>>,
   shared: (string | SharedObject)[] | SharedObject
 ): Map<string, Map<string, string>> {
   shared = shared || []
-  const assign: Map<string, Map<string, string>> = new Map()
   if (!Array.isArray(shared)) {
     shared = [shared]
   }
