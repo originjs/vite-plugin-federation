@@ -192,8 +192,6 @@ export default {
         if (chunk.type === 'chunk' && chunk.isEntry) {
           exposesMap.forEach((value) => {
             const replacePath = normalizePath(path.resolve(value))
-            console.log(chunk.facadeModuleId)
-            console.log(replacePath)
             if (!exposesChunkSet.has(chunk)) {
               // vite + vue3
               if (
