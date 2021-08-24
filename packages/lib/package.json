@@ -30,7 +30,7 @@
   "homepage": "https://github.com/originjs/vite-plugin-federation#readme",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "rollup -c"
+    "build": "rollup -c --sourcemap"
   },
   "dependencies": {
     "estree-walker": "^1.0.1",
@@ -41,6 +41,6 @@
     "@rollup/plugin-typescript": "^8.2.5",
     "@rollup/plugin-virtual": "^2.0.3",
     "@types/estree": "^0.0.50",
-    "rollup": "c"
+    "rollup": "^2.56.0"
   }
 }

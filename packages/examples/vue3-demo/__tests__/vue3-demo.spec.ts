@@ -6,7 +6,7 @@ test.skip('should have no 404s', () => {
   })
 })
 
-test('remote button', async () => {
+test.skip('remote button', async () => {
   expect(
     await page.textContent('#btn-remote')
   ).toBe('Hello Remote Button')

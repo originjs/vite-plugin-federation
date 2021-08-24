@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "start": "lerna run start",
-    "build": "lerna run build",
-    "serve": "lerna run serve --parallel",
+    "build": "lerna run build --loglevel=error",
+    "serve": "lerna run serve --parallel --loglevel=silent",
     "stop": "kill-port --port 5000,5001,5002",
     "clean": "lerna run clean"
   },
