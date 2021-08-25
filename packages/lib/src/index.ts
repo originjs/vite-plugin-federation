@@ -5,11 +5,12 @@ import { remotesPlugin } from './remotes'
 import { sharedPlugin } from './shared'
 import { VitePluginFederationOptions } from '../types'
 import { IMPORT_ALIAS_REGEXP } from './public'
+import { PluginHooks } from '../types/pluginHooks'
 
 export default function federation(
   options: VitePluginFederationOptions
 ): Plugin {
-  const pluginList = [
+  const pluginList: PluginHooks[] = [
     exposesPlugin(options),
     sharedPlugin(options),
     remotesPlugin(options)

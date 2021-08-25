@@ -6,7 +6,14 @@ import {
   normalizePath,
   getFileName
 } from './utils'
-import { externals, IMPORT_ALIAS, SHARED, exposesChunkSet } from './public'
+import {
+  EXTERNALS,
+  IMPORT_ALIAS,
+  DYNAMIC_LOADING_CSS_ALIAS,
+  SHARED,
+  EXPOSES_CHUNK_SET,
+  EXPOSES_MAP
+} from './public'
 import { InputOptions, MinimalPluginContext } from 'rollup'
 import { VitePluginFederationOptions } from 'types'
 import { PluginHooks } from '../types/pluginHooks'
@@ -15,7 +22,6 @@ export function exposesPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   let moduleMap = ''
-  const exposesMap = new Map()
   const replaceMap = new Map()
   const provideExposes = parseOptions(
     options.exposes,
@@ -31,11 +37,14 @@ export function exposesPlugin(
   // exposes module
   for (const item of provideExposes) {
     const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
-    externals.push(moduleName)
-    externals.push(item[0])
+    EXTERNALS.push(moduleName)
+    EXTERNALS.push(item[0])
     const exposeFilepath = path.resolve(item[1].import).replace(/\\/g, '/')
-    exposesMap.set(item[0], exposeFilepath)
-    moduleMap += `\n"${item[0]}":()=>{return ${IMPORT_ALIAS}('${exposeFilepath}')},`
+    EXPOSES_MAP.set(item[0], exposeFilepath)
+    moduleMap += `\n"${item[0]}":()=>{
+      ${DYNAMIC_LOADING_CSS_ALIAS}('${exposeFilepath}')
+      return ${IMPORT_ALIAS}('${exposeFilepath}')
+    },`
   }
 
   return {
@@ -43,6 +52,13 @@ export function exposesPlugin(
     virtualFile: {
       // code generated for remote
       __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
+    export const dynamicLoadingCss = (cssFilePath) => {
+        const metaUrl = import.meta.url
+        const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('remoteEntry.js'))
+        const element = document.head.appendChild(document.createElement('link'))
+        element.href = curUrl + cssFilePath
+        element.rel = 'stylesheet'
+    };
     export const get =(module, getScope) => {
         return moduleMap[module]();
     };
@@ -64,10 +80,10 @@ export function exposesPlugin(
       if (typeof _options.input === 'string') {
         _options.input = { index: _options.input }
       }
-      exposesMap.forEach((value, key) => {
+      EXPOSES_MAP.forEach((value, key) => {
         _options.input![removeNonLetter(key)] = value
       })
-      externals.forEach((item) => {
+      EXTERNALS.forEach((item) => {
         if (Array.isArray(_options.external)) {
           _options.external.push(item)
         }
@@ -91,9 +107,9 @@ export function exposesPlugin(
       for (const file in bundle) {
         const chunk = bundle[file]
         if (chunk.type === 'chunk' && chunk.isEntry) {
-          exposesMap.forEach((value) => {
+          EXPOSES_MAP.forEach((value) => {
             const replacePath = normalizePath(path.resolve(value))
-            if (!exposesChunkSet.has(chunk)) {
+            if (!EXPOSES_CHUNK_SET.has(chunk)) {
               // vite + vue3
               if (
                 chunk.facadeModuleId != null &&
@@ -101,7 +117,7 @@ export function exposesPlugin(
                   getFileName(replacePath)
               ) {
                 replaceMap.set(replacePath, `./${chunk.fileName}`)
-                exposesChunkSet.add(chunk)
+                EXPOSES_CHUNK_SET.add(chunk)
               }
             }
           })
