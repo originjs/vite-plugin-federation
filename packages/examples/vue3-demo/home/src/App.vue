@@ -3,6 +3,7 @@
     <h3>Main App</h3>
     <Content />
     <Button />
+    <UnusedButton />
   </div>
 </template>
 
@@ -10,14 +11,12 @@
 import { ref, defineAsyncComponent } from "vue";
 import Content from "./components/Content.vue";
 import Button from "./components/Button.js";
+import UnusedButton from "./components/UnusedButton.vue";
 export default {
-  // components: {
-  //   Content: defineAsyncComponent(() => import("./components/Content.vue")),
-  //   Button: defineAsyncComponent(() => import("./components/Button.js")),
-  // },
   components: {
     Content,
     Button,
+    UnusedButton,
   },
   setup() {
     const count = ref(0);

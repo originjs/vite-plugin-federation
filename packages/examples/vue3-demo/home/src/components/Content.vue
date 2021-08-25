@@ -1,8 +1,13 @@
 <template>
-  <div>{{ title }}</div>
+  <h1>Red</h1>
+  <div :class="$style.red">{{ title }}</div>
+  <div :class="[$style.red, $style.bold]">Red and bold</div>
 </template>
 <script>
 export default {
+  created() {
+    console.log(this.$style.red)
+  },
   data() {
     return {
       title: 'Remote Component in Action..'
@@ -10,9 +15,11 @@ export default {
   }
 }
 </script>
-// 暂时不生效
-<style scope>
-h1 {
+<style module>
+.red {
   color: red;
+}
+.bold {
+  font-weight: bold;
 }
 </style>
