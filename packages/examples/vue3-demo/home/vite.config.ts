@@ -20,7 +20,7 @@ export default defineConfig({
   build: {
     target:'es2020',
     minify: false,
-    cssCodeSplit: true,
+    cssCodeSplit: false,
     rollupOptions: {
       output: {
         minifyInternalExports: false
