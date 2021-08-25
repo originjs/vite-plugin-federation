@@ -4,7 +4,7 @@ import MagicString from 'magic-string'
 import { AcornNode } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
 import { getModuleMarker, sharedScopeCode } from './utils'
-import { moduleNames, SHARED } from './public'
+import { IMPORT_ALIAS, moduleNames, SHARED } from './public'
 import { sharedMap } from './shared'
 
 export function remotesPlugin(
@@ -26,7 +26,7 @@ export function remotesPlugin(
                   (remote) =>
                     `${JSON.stringify(
                       remote.id
-                    )}: () => import(${JSON.stringify(remote.config)})`
+                    )}: () => ${IMPORT_ALIAS}(${JSON.stringify(remote.config)})`
                 )
                 .join(',\n  ')}
             };

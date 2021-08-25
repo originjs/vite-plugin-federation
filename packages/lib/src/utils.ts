@@ -1,6 +1,7 @@
 import { SharedObject, SharedConfig } from '../types'
 import * as path from 'path'
 import os from 'os'
+import { IMPORT_ALIAS } from './public'
 
 export function sharedAssign(
   assign: Map<string, Map<string, string>>,
@@ -45,10 +46,10 @@ export function sharedScopeCode(
       value.forEach((innerValue, innerkey) => {
         str += `${innerkey}:${JSON.stringify(innerValue)}, \n`
       })
-      const searchElement = `__rf_shared__\${${key}}`
-      if (modules.indexOf(searchElement) >= 0) {
-        str += `get: ()=> import('${searchElement}')`
-      }
+      str += `get: ()=> ${IMPORT_ALIAS}('${getModuleMarker(
+        `\${${key}}`,
+        'shareScope'
+      )}')`
       res.push(`'${key}':{${str}}`)
     })
   }
