@@ -52,8 +52,8 @@ export function exposesPlugin(
     virtualFile: {
       // code generated for remote
       __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
-    const dynamicLoadingCss = (cssFilePath) => {
-      const metaUrl = import_meta.url
+    export const dynamicLoadingCss = (cssFilePath) => {
+      const metaUrl = import.meta.url
       if (typeof metaUrl == 'undefined') {
         console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".')
         return
