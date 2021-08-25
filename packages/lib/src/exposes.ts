@@ -52,16 +52,22 @@ export function exposesPlugin(
     virtualFile: {
       // code generated for remote
       __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
-    export const dynamicLoadingCss = (cssFilePath) => {
-        const metaUrl = import.meta.url
-        const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('remoteEntry.js'))
-        const element = document.head.appendChild(document.createElement('link'))
-        element.href = curUrl + cssFilePath
-        element.rel = 'stylesheet'
-    };
+    const dynamicLoadingCss = (cssFilePath) => {
+      const metaUrl = import_meta.url
+      if (typeof metaUrl == 'undefined') {
+        console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".')
+        return
+      }
+      const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('remoteEntry.js'))
+      const element = document.head.appendChild(document.createElement('link'))
+      element.href = curUrl + cssFilePath
+      element.rel = 'stylesheet'
+    }
+
     export const get =(module, getScope) => {
         return moduleMap[module]();
     };
+    
     export const init =(shareScope, initScope) => {
         let global = window || node;
         global.${getModuleMarker('shared', 'var')}= shareScope
