@@ -13,10 +13,15 @@ export default defineConfig({
         './CommonCounter': './src/components/CommonCounter.vue',
         './CommonHeader': './src/components/CommonHeader.vue'
       },
-      shared: ['vue']
+      shared: ['vue',"vuex"]
     })
   ],
   build: {
-    minify: false
+    minify: false,
+    rollupOptions:{
+      output:{
+        minifyInternalExports:false
+      }
+    }
   }
 })
