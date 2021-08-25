@@ -13,10 +13,11 @@ export default defineConfig({
         './CommonCounter': './src/components/CommonCounter.vue',
         './CommonHeader': './src/components/CommonHeader.vue'
       },
-      shared: ['vue',"vuex"]
+      shared: ['vue']
     })
   ],
   build: {
+    // target:'es2020',
     minify: false,
     rollupOptions:{
       output:{

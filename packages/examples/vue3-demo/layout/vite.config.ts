@@ -13,15 +13,17 @@ export default defineConfig({
         home: "http://localhost:5001/remoteEntry.js",
         "common-lib": "http://localhost:5002/remoteEntry.js",
       },
-      shared: ["vue", "vuex"]
+      shared: ["vue"]
     })
   ],
   build: {
+    target:'es2020',
     minify: false,
+    cssCodeSplit: true,
     rollupOptions:{
       output:{
         minifyInternalExports:false
       }
     }
-  }
+  },
 });

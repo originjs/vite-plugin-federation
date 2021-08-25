@@ -27,9 +27,6 @@ export default {};
 img {
   width: 200px;
 }
-h1 {
-  font-family: Arial, Helvetica, sans-serif;
-}
 .remote-component {
   border: 1px solid blue;
   padding: 10px;

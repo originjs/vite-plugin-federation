@@ -1,6 +1,6 @@
 import { PluginHooks } from '../types/pluginHooks'
 import { getModuleMarker, sharedAssign } from './utils'
-import { exposesChunkSet, moduleNames, SHARED } from './public'
+import { EXPOSES_CHUNK_SET, MODULE_NAMES, SHARED } from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 import path from 'path'
@@ -14,7 +14,7 @@ export function sharedPlugin(
   sharedAssign(sharedMap, options.shared || [])
   sharedMap.forEach((value, key) => {
     const sharedModuleName = getModuleMarker(`\${${key}}`, SHARED)
-    moduleNames.push(sharedModuleName)
+    MODULE_NAMES.push(sharedModuleName)
   })
 
   return {
@@ -147,28 +147,7 @@ export function sharedPlugin(
         }
       })
 
-      // placeholder replace
-      // entryChunkSet.forEach((item) => {
-      //   item.code = item.code.split(IMPORT_ALIAS).join('import')
-      //
-      //   // accurately replace import absolute path to relative path
-      //   replaceMap.forEach((value, key) => {
-      //     item.code = item.code.replace(`('${key}')`, `('${value}')`)
-      //     item.code = item.code.replace(`("${key}")`, `("${value}")`)
-      //   })
-      //
-      //   // replace __rf_shared__xxx
-      //   replaceMap.forEach((value, key) => {
-      //     item.code = item.code.replace(key, value)
-      //     const index = item.imports.indexOf(key)
-      //     if (index >= 0) {
-      //       // replace chunk.imports property
-      //       item.imports[index] = value
-      //     }
-      //   })
-      // })
-
-      if (exposesChunkSet.size) {
+      if (EXPOSES_CHUNK_SET.size) {
         const FN_IMPORT = getModuleMarker('import', 'fn')
         const VAR_GLOBAL = getModuleMarker('global', 'var')
         const VAR_MODULE_MAP = getModuleMarker('moduleMap', 'var')
@@ -177,7 +156,7 @@ export function sharedPlugin(
         sharedMap.forEach((value, key) => {
           fileName2SharedName.set(value.get('fileName'), key)
         })
-        exposesChunkSet.forEach((chunk) => {
+        EXPOSES_CHUNK_SET.forEach((chunk) => {
           let lastImport: any = null
           const ast = this.parse(chunk.code)
           const importMap = new Map()
