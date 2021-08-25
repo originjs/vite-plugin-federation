@@ -79,7 +79,7 @@ export function remotesPlugin(
       const moduleFileMap = new Map()
       const cssFileMap = new Map()
       for (const file in bundle) {
-        if (path.extname(file) == '.css') {
+        if (path.extname(file) === '.css') {
           cssFileMap.set(path.parse(path.parse(file).name).name, file)
         } else {
           moduleFileMap.set(path.parse(path.parse(file).name).name, file)
@@ -90,6 +90,14 @@ export function remotesPlugin(
           moduleCssFileMap.set(moduleFileMap.get(key), value)
         }
       })
+
+      if (Object.keys(moduleCssFileMap).length === 0) {
+        moduleFileMap.forEach(function (value) {
+          cssFileMap.forEach(function (cssValue) {
+            moduleCssFileMap.set(value, cssValue)
+          })
+        })
+      }
 
       for (const file in bundle) {
         const chunk = bundle[file]

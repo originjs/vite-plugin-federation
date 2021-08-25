@@ -25,6 +25,11 @@ export default function federation(
 
   return {
     name: 'originjs:federation',
+    // for scenario vite.config.js build.cssCodeSplit: false
+    // vite:css-post plugin will summarize all the styles in the style.xxxxxx.css file
+    // so, this plugin need run after vite:css-post in post plugin list
+    enforce: 'post',
+    apply: 'build',
     options(_options) {
       _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
