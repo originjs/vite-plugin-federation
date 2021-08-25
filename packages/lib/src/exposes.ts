@@ -6,14 +6,7 @@ import {
   normalizePath,
   getFileName
 } from './utils'
-import {
-  externals,
-  replaceMap,
-  IMPORT_ALIAS,
-  SHARED,
-  exposesChunkSet,
-  entryChunkSet
-} from './public'
+import { externals, IMPORT_ALIAS, SHARED, exposesChunkSet } from './public'
 import { InputOptions, MinimalPluginContext } from 'rollup'
 import { VitePluginFederationOptions } from 'types'
 import { PluginHooks } from '../types/pluginHooks'
@@ -23,6 +16,7 @@ export function exposesPlugin(
 ): PluginHooks {
   let moduleMap = ''
   const exposesMap = new Map()
+  const replaceMap = new Map()
   const provideExposes = parseOptions(
     options.exposes,
     (item) => ({
@@ -73,12 +67,11 @@ export function exposesPlugin(
       exposesMap.forEach((value, key) => {
         _options.input![removeNonLetter(key)] = value
       })
-      // use external to suppress import warning
-      _options.external = _options.external || []
-      if (!Array.isArray(_options.external)) {
-        _options.external = [_options.external as string]
-      }
-      _options.external = _options.external.concat(externals)
+      externals.forEach((item) => {
+        if (Array.isArray(_options.external)) {
+          _options.external.push(item)
+        }
+      })
       return null
     },
 
@@ -112,8 +105,15 @@ export function exposesPlugin(
               }
             }
           })
-          entryChunkSet.add(chunk)
         }
+      }
+      for (const fileKey in bundle) {
+        const chunk = bundle[fileKey]
+        replaceMap.forEach((value, key) => {
+          if (chunk.type === 'chunk') {
+            chunk.code = chunk.code.replace(key, value)
+          }
+        })
       }
     }
   }

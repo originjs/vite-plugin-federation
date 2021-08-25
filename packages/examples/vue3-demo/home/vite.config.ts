@@ -13,10 +13,15 @@ export default defineConfig({
         "./Content": "./src/components/Content.vue",
         "./Button": "./src/components/Button.js",
       },
-      shared: ["vue"]
+      shared: ["vue" , "vuex"]
     })
   ],
   build: {
-    minify: false
+    minify: false,
+    rollupOptions:{
+      output:{
+        minifyInternalExports:false
+      }
+    }
   }
 });

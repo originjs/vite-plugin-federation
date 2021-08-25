@@ -17,6 +17,11 @@ export default defineConfig({
     })
   ],
   build: {
-    minify: false
+    minify: false,
+    rollupOptions:{
+      output:{
+        minifyInternalExports:false
+      }
+    }
   }
 });

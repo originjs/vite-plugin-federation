@@ -1,14 +1,6 @@
 import { PluginHooks } from '../types/pluginHooks'
 import { getModuleMarker, sharedAssign } from './utils'
-import {
-  entryChunkSet,
-  exposesChunkSet,
-  externals,
-  IMPORT_ALIAS,
-  moduleNames,
-  replaceMap,
-  SHARED
-} from './public'
+import { exposesChunkSet, moduleNames, SHARED } from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 import path from 'path'
@@ -22,7 +14,6 @@ export function sharedPlugin(
   sharedAssign(sharedMap, options.shared || [])
   sharedMap.forEach((value, key) => {
     const sharedModuleName = getModuleMarker(`\${${key}}`, SHARED)
-    externals.push(sharedModuleName)
     moduleNames.push(sharedModuleName)
   })
 
@@ -40,6 +31,11 @@ export function sharedPlugin(
         // add shared content into input
         sharedMap.forEach((value, key) => {
           inputOptions.input![`${getModuleMarker(key, 'input')}`] = key
+          if (Array.isArray(inputOptions.external)) {
+            inputOptions.external.push(
+              getModuleMarker(`\${${key}}`, 'shareScope')
+            )
+          }
         })
       }
       return inputOptions
@@ -55,7 +51,6 @@ export function sharedPlugin(
     },
 
     outputOptions(outputOption) {
-      outputOption.manualChunks = outputOption.manualChunks || {}
       if (typeof outputOption.manualChunks === 'function') {
         //  proxy this function and add shared
         outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
@@ -105,7 +100,7 @@ export function sharedPlugin(
       sharedMap.forEach((value, key) => {
         const fileName = value.get('fileName')
         const fileDir = value.get('fileDir')
-        let filePath = value.get('filePath')
+        const filePath = value.get('filePath')
         if (filePath && !fileName.startsWith('__rf_input')) {
           const expectName = `__rf_input__${key}`
           let expectFileName = ''
@@ -124,16 +119,13 @@ export function sharedPlugin(
           bundle[expectFilePath] = bundle[filePath]
           bundle[expectFilePath].fileName = expectFilePath
           delete bundle[filePath]
-          replaceMap.set(fileName, expectFileName)
           importReplaceMap.set(filePath, expectFilePath)
-          filePath = expectFilePath
           value.set('filePath', expectFilePath)
           value.set('fileName', expectFileName)
         }
-        // shared path replace, like __rf_shared__react => /dist/react.js
-        replaceMap.set(
-          getModuleMarker(`\${${key}}`, SHARED),
-          `/${options.dir}/${filePath}`
+        importReplaceMap.set(
+          getModuleMarker(`\${${key}}`, 'shareScope'),
+          `./${value.get('fileName')}`
         )
       })
 
@@ -142,34 +134,39 @@ export function sharedPlugin(
         for (const fileKey in bundle) {
           const chunk = bundle[fileKey]
           if (chunk.type === 'chunk') {
-            const indexOf = chunk.imports?.indexOf(key)
-            if (indexOf >= 0) {
-              chunk[indexOf] = value
+            const importIndexOf = chunk.imports.indexOf(key)
+            if (importIndexOf >= 0) {
+              chunk.imports[importIndexOf] = value
+              chunk.code = chunk.code.replace(
+                path.basename(key),
+                path.basename(value)
+              )
             }
+            chunk.code = chunk.code.replace(key, value)
           }
         }
       })
 
       // placeholder replace
-      entryChunkSet.forEach((item) => {
-        item.code = item.code.split(IMPORT_ALIAS).join('import')
-
-        // accurately replace import absolute path to relative path
-        replaceMap.forEach((value, key) => {
-          item.code = item.code.replace(`('${key}')`, `('${value}')`)
-          item.code = item.code.replace(`("${key}")`, `("${value}")`)
-        })
-
-        // replace __rf_shared__xxx
-        replaceMap.forEach((value, key) => {
-          item.code = item.code.replace(key, value)
-          const index = item.imports.indexOf(key)
-          if (index >= 0) {
-            // replace chunk.imports property
-            item.imports[index] = value
-          }
-        })
-      })
+      // entryChunkSet.forEach((item) => {
+      //   item.code = item.code.split(IMPORT_ALIAS).join('import')
+      //
+      //   // accurately replace import absolute path to relative path
+      //   replaceMap.forEach((value, key) => {
+      //     item.code = item.code.replace(`('${key}')`, `('${value}')`)
+      //     item.code = item.code.replace(`("${key}")`, `("${value}")`)
+      //   })
+      //
+      //   // replace __rf_shared__xxx
+      //   replaceMap.forEach((value, key) => {
+      //     item.code = item.code.replace(key, value)
+      //     const index = item.imports.indexOf(key)
+      //     if (index >= 0) {
+      //       // replace chunk.imports property
+      //       item.imports[index] = value
+      //     }
+      //   })
+      // })
 
       if (exposesChunkSet.size) {
         const FN_IMPORT = getModuleMarker('import', 'fn')
