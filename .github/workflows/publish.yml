@@ -30,7 +30,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           body: |
-            Please refer to [CHANGELOG.md](https://github.com/originjs/vite-plugin-federation/blob/main/CHANGELOG.md) for details.
+            Please refer to [CHANGELOG.md](https://github.com/originjs/vite-plugin-federation/blob/main/packages/lib/CHANGELOG.md) for details.
       - name: Publish to npm registry
         run: |
           cd packages/lib

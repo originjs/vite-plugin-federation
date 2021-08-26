@@ -14,7 +14,7 @@
   "license": "MulanPSL2",
   "devDependencies": {
     "@originjs/vite-plugin-federation": "link:../../lib",
-    "http-server": "^0.12.3",
+    "http-server": "^13.0.1",
     "kill-port": "^1.6.1",
     "lerna": "^4.0.0"
   }
