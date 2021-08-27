@@ -79,11 +79,19 @@ export function sharedPlugin(
       if (chunkInfo.isEntry) {
         const sharedName = name.match(/(?<=__rf_input__).*/)?.[0]
         if (sharedName) {
-          const filePath =
-            chunkInfo.imports?.length === 1 &&
-            !Object.keys(chunkInfo.modules).length
-              ? chunkInfo.imports[0]
-              : chunkInfo.fileName
+          let filePath = ''
+          if (Object.keys(chunkInfo.modules).length) {
+            filePath = chunkInfo.fileName
+          } else {
+            if (chunkInfo.imports.length === 1) {
+              filePath = chunkInfo.imports[0]
+            } else if (chunkInfo.imports.length > 1) {
+              const find = chunkInfo.imports.find((item) =>
+                new RegExp(`(^|\\/)${sharedName}\\.`).test(item)
+              )
+              filePath = find ?? ''
+            }
+          }
           const fileName = path.basename(filePath)
           const fileDir = path.dirname(filePath)
           const sharedProp = sharedMap.get(sharedName)
