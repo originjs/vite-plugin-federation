@@ -9,7 +9,8 @@ import {
 import {
   EXTERNALS,
   IMPORT_ALIAS,
-  DYNAMIC_LOADING_CSS_ALIAS,
+  DYNAMIC_LOADING_CSS,
+  DYNAMIC_LOADING_CSS_PREFIX,
   SHARED,
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP
@@ -42,7 +43,7 @@ export function exposesPlugin(
     const exposeFilepath = path.resolve(item[1].import).replace(/\\/g, '/')
     EXPOSES_MAP.set(item[0], exposeFilepath)
     moduleMap += `\n"${item[0]}":()=>{
-      ${DYNAMIC_LOADING_CSS_ALIAS}('${exposeFilepath}')
+      ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
       return ${IMPORT_ALIAS}('${exposeFilepath}')
     },`
   }
@@ -52,7 +53,7 @@ export function exposesPlugin(
     virtualFile: {
       // code generated for remote
       __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
-    export const dynamicLoadingCss = (cssFilePath) => {
+    export const ${DYNAMIC_LOADING_CSS} = (cssFilePath) => {
       const metaUrl = import.meta.url
       if (typeof metaUrl == 'undefined') {
         console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".')

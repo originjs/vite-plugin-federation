@@ -9,8 +9,7 @@ import {
   IMPORT_ALIAS,
   MODULE_NAMES,
   SHARED,
-  DYNAMIC_LOADING_CSS_ALIAS,
-  DYNAMIC_LOADING_CSS,
+  DYNAMIC_LOADING_CSS_PREFIX,
   EXPOSES_MAP
 } from './public'
 import { sharedMap } from './shared'
@@ -91,7 +90,7 @@ export function remotesPlugin(
         }
       })
 
-      if (Object.keys(moduleCssFileMap).length === 0) {
+      if (moduleCssFileMap.size === 0) {
         moduleFileMap.forEach(function (value) {
           cssFileMap.forEach(function (cssValue) {
             moduleCssFileMap.set(value, cssValue)
@@ -141,27 +140,42 @@ export function remotesPlugin(
         // replace __f__dynamic_loading_css__ to dynamicLoadingCss
         moduleCssFileMap.forEach((value, key) => {
           item.code = item.code.replace(
-            `${DYNAMIC_LOADING_CSS_ALIAS}("./${key}")`,
-            `${DYNAMIC_LOADING_CSS}("${value}")`
+            `("${DYNAMIC_LOADING_CSS_PREFIX}./${key}")`,
+            `("${value}")`
           )
           item.code = item.code.replace(
-            `${DYNAMIC_LOADING_CSS_ALIAS}('./${key}')`,
-            `${DYNAMIC_LOADING_CSS}('${value}')`
+            `('${DYNAMIC_LOADING_CSS_PREFIX}./${key}')`,
+            `('${value}')`
           )
         })
 
         // remove all __f__dynamic_loading_css__ after replace
-        while (item.code.indexOf(`${DYNAMIC_LOADING_CSS_ALIAS}`) > -1) {
-          const magicString = new MagicString(item.code)
-          magicString.remove(
-            item.code.indexOf(`${DYNAMIC_LOADING_CSS_ALIAS}`),
-            item.code.indexOf(
-              '\n',
-              item.code.indexOf(`${DYNAMIC_LOADING_CSS_ALIAS}`)
-            )
-          )
-          item.code = magicString.toString()
+        let ast: AcornNode | null = null
+        try {
+          ast = this.parse(item.code)
+        } catch (err) {
+          console.error(err)
         }
+        if (!ast) {
+          return null
+        }
+        const magicString = new MagicString(item.code)
+        // let cssFunctionName: string = DYNAMIC_LOADING_CSS
+        walk(ast, {
+          enter(node: any) {
+            if (
+              node.type === 'CallExpression' &&
+              typeof node?.arguments[0]?.value === 'string' &&
+              node?.arguments[0]?.value.indexOf(
+                `${DYNAMIC_LOADING_CSS_PREFIX}`
+              ) > -1
+            ) {
+              magicString.remove(node.start, node.end + 1)
+            }
+          }
+        })
+        item.code = magicString.toString()
+        // item.code = item.code.split(DYNAMIC_LOADING_CSS).join(cssFunctionName)
       })
     },
     transform(code: string, id: string) {
