@@ -59,7 +59,9 @@ export function exposesPlugin(
         console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".')
         return
       }
-      const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('remoteEntry.js'))
+      const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('${
+        options.filename
+      }'))
       const element = document.head.appendChild(document.createElement('link'))
       element.href = curUrl + cssFilePath
       element.rel = 'stylesheet'
