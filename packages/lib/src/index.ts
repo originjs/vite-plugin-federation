@@ -4,12 +4,16 @@ import { exposesPlugin } from './exposes'
 import { remotesPlugin } from './remotes'
 import { sharedPlugin } from './shared'
 import { VitePluginFederationOptions } from '../types'
-import { IMPORT_ALIAS_REGEXP } from './public'
+import { IMPORT_ALIAS_REGEXP, DEFAULT_ENTRY_FILENAME } from './public'
 import { PluginHooks } from '../types/pluginHooks'
 
 export default function federation(
   options: VitePluginFederationOptions
 ): Plugin {
+  options.filename = options.filename
+    ? options.filename
+    : DEFAULT_ENTRY_FILENAME
+
   const pluginList: PluginHooks[] = [
     exposesPlugin(options),
     sharedPlugin(options),
