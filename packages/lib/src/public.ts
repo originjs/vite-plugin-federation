@@ -6,6 +6,6 @@ export const SHARED = 'shared'
 export const IMPORT_ALIAS = '__f__import__'
 export const IMPORT_ALIAS_REGEXP = new RegExp(IMPORT_ALIAS, 'g')
 export const DYNAMIC_LOADING_CSS = 'dynamicLoadingCss'
-export const DYNAMIC_LOADING_CSS_ALIAS = '__f__dynamic_loading_css__'
+export const DYNAMIC_LOADING_CSS_PREFIX = '__v__css__'
 export const EXTERNALS: string[] = []
 export const MODULE_NAMES: string[] = []
