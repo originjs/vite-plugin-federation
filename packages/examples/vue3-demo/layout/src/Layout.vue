@@ -14,6 +14,7 @@
       <header-element />
       <content-element />
       <button-element />
+      <css-modules-button-element/>
       <counter-element />
     </div>
   </div>

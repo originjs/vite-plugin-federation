@@ -12,6 +12,7 @@ export default defineConfig({
       remotes: {
         home: "http://localhost:5001/remoteEntry.js",
         "common-lib": "http://localhost:5002/remoteEntry.js",
+        "css-modules":"http://localhost:5003/remoteEntry.js"
       },
       shared: ["vue"]
     })

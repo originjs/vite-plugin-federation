@@ -5,13 +5,14 @@
   "workspaces": [
     "home",
     "common-lib",
-    "layout"
+    "layout",
+    "css-modules"
   ],
   "scripts": {
     "start": "lerna run start",
     "build": "lerna run build --loglevel=error",
     "serve": "lerna run serve --parallel --loglevel=silent",
-    "stop": "kill-port --port 5000,5001,5002",
+    "stop": "kill-port --port 5000,5001,5002,5003",
     "clean": "lerna run clean"
   },
   "devDependencies": {
