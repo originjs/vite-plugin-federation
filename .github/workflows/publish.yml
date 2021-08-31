@@ -35,5 +35,5 @@ jobs:
         run: |
           cd packages/lib
           npm publish --access public
-        env: 
+        env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

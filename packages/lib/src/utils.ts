@@ -129,14 +129,20 @@ export function slash(p: string): string {
   return p.replace(/\\/g, '/')
 }
 
-export function getFileName(str: string | null): string {
-  if (str == null) {
-    return ''
+export function isSameFilepath(src: string, dest: string): boolean {
+  if (!src || !dest) {
+    return false
   }
+  src = normalizePath(src)
+  dest = normalizePath(dest)
 
-  const potIndex = str.indexOf('.')
-  if (potIndex != -1 && potIndex != 0) {
-    return str.substring(0, potIndex)
+  let index = src.lastIndexOf('.')
+  if (index != -1 && index != 0) {
+    src = src.substring(0, index)
   }
-  return str
+  index = dest.lastIndexOf('.')
+  if (index != -1 && index != 0) {
+    dest = dest.substring(0, index)
+  }
+  return src === dest
 }
