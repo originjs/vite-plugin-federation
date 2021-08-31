@@ -1,4 +1,4 @@
-import { sharedAssign, parseOptions } from '../src/utils'
+import { sharedAssign, parseOptions, isSameFilepath } from '../src/utils'
 import { ExposesObject } from '../types'
 
 test('objectUtil', () => {
@@ -78,4 +78,67 @@ test('parse exposes options', () => {
     'Button',
     { import: './src/components/Button.js' }
   ])
+})
+
+test('isSameFilepath', () => {
+  // exactly the same
+  expect(
+    isSameFilepath(
+      'D:\\federation-test\\src\\button.js',
+      'D:\\federation-test\\src\\button.js'
+    )
+  ).toBe(true)
+
+  // different separator
+  expect(
+    isSameFilepath(
+      'D:/federation-test/src/button.js',
+      'D:\\federation-test\\src\\button.js'
+    )
+  ).toBe(true)
+
+  // ignore file suffix
+  expect(
+    isSameFilepath(
+      'D:/federation-test/src/button',
+      'D:\\federation-test\\src\\button.js'
+    )
+  ).toBe(true)
+  expect(
+    isSameFilepath(
+      'D:/federation-test/src/button.vue',
+      'D:\\federation-test\\src\\button'
+    )
+  ).toBe(true)
+  expect(
+    isSameFilepath('D:/origin.js/src/button.vue', 'D:\\origin.js\\src\\button')
+  ).toBe(true)
+  expect(
+    isSameFilepath(
+      'D:/origin.js/src/button.vue',
+      'D:\\origin.js\\src\\button.js'
+    )
+  ).toBe(false)
+
+  // relative path
+  expect(isSameFilepath('D:/origin.js/src/button.vue', 'src/button.vue')).toBe(
+    false
+  )
+
+  // similar file path
+  expect(
+    isSameFilepath(
+      'D:\\origin.js\\src\\button.js',
+      'D:\\origin.js\\src\\button1.js'
+    )
+  ).toBe(false)
+  expect(
+    isSameFilepath(
+      'D:/federation-test/src/button.vue',
+      'D:/federation-test/src/button1'
+    )
+  ).toBe(false)
+  expect(
+    isSameFilepath('D:\\origin.js\\src\\button', 'D:\\origin.js\\src\\button1')
+  ).toBe(false)
 })

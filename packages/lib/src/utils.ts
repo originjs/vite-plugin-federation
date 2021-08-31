@@ -135,14 +135,16 @@ export function isSameFilepath(src: string, dest: string): boolean {
   }
   src = normalizePath(src)
   dest = normalizePath(dest)
-
-  let index = src.lastIndexOf('.')
-  if (index != -1 && index != 0) {
-    src = src.substring(0, index)
+  const srcExt = path.parse(src).ext
+  const destExt = path.parse(dest).ext
+  if (srcExt && destExt && srcExt !== destExt) {
+    return false
   }
-  index = dest.lastIndexOf('.')
-  if (index != -1 && index != 0) {
-    dest = dest.substring(0, index)
+  if (srcExt) {
+    src = src.slice(0, -srcExt.length)
+  }
+  if (destExt) {
+    dest = dest.slice(0, -destExt.length)
   }
   return src === dest
 }
