@@ -1,5 +1,5 @@
 import { PluginHooks } from '../types/pluginHooks'
-import { getModuleMarker, sharedAssign } from './utils'
+import { findDependencies, getModuleMarker, sharedAssign } from './utils'
 import { EXPOSES_CHUNK_SET, MODULE_NAMES, SHARED } from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
@@ -52,25 +52,51 @@ export function sharedPlugin(
 
     outputOptions(outputOption) {
       if (typeof outputOption.manualChunks === 'function') {
-        //  proxy this function and add shared
-        outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
-          apply(target, thisArg, argArray) {
-            const id = argArray[0]
-            //  if id is in shareMap , return id ,else return vite function value
-            const find = [...sharedMap.entries()].find((item) =>
-              id.match(item[1].get('idRegexp'))
-            )
-            return find ? find[0] : target(argArray[0], argArray[1])
-          }
+        const sets = new Set<string>()
+        const me = this
+        // set every shared used moduleIds
+        sharedMap.forEach((value) => {
+          const moduleId = value.get('id')
+          findDependencies.apply(me, [moduleId, sets])
+          value.set('dependencies', sets)
         })
-      } else {
-        // add shared to manualChunks, such as vue:['vue']
-        sharedMap.forEach((value, key) => {
+
+        const map = new Map()
+        // transform manualChunks from function to array property, like manualChunks:function(){...} to manualChunks:{}
+        for (const moduleId of this.getModuleIds()) {
+          if (!sets.has(moduleId)) {
+            const result = outputOption.manualChunks.apply(me, [
+              moduleId,
+              {
+                getModuleInfo: me.getModuleInfo,
+                getModuleIds: me.getModuleIds
+              }
+            ])
+            if (result) {
+              // save manualChunks function result
+              map.set(
+                result,
+                map.get(result) ? map.get(result).concat(moduleId) : [moduleId]
+              )
+            }
+          }
+        }
+
+        outputOption.manualChunks = {}
+        map.forEach((value, key) => {
           if (outputOption.manualChunks) {
-            outputOption.manualChunks[key] = [key]
+            outputOption.manualChunks[key] = value
           }
         })
       }
+
+      // add shared to manualChunks, such as vue:['vue']
+      sharedMap.forEach((value, key) => {
+        if (outputOption.manualChunks) {
+          outputOption.manualChunks[key] = [key]
+        }
+      })
+
       return outputOption
     },
 
