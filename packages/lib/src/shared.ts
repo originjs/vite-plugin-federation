@@ -52,19 +52,23 @@ export function sharedPlugin(
 
     outputOptions(outputOption) {
       if (typeof outputOption.manualChunks === 'function') {
-        const sets = new Set<string>()
         const me = this
+        // all shared used dependencies
+        const sharedDependencies = new Set<string>()
         // set every shared used moduleIds
         sharedMap.forEach((value) => {
+          const sets = new Set<string>()
           const moduleId = value.get('id')
           findDependencies.apply(me, [moduleId, sets])
           value.set('dependencies', sets)
+          sets.forEach((dep) => {
+            sharedDependencies.add(dep)
+          })
         })
-
         const map = new Map()
         // transform manualChunks from function to array property, like manualChunks:function(){...} to manualChunks:{}
         for (const moduleId of this.getModuleIds()) {
-          if (!sets.has(moduleId)) {
+          if (!sharedDependencies.has(moduleId)) {
             const result = outputOption.manualChunks.apply(me, [
               moduleId,
               {
@@ -74,10 +78,8 @@ export function sharedPlugin(
             ])
             if (result) {
               // save manualChunks function result
-              map.set(
-                result,
-                map.get(result) ? map.get(result).concat(moduleId) : [moduleId]
-              )
+              const deps: string[] = map.get(result)
+              map.set(result, deps ? deps.concat(moduleId) : [moduleId])
             }
           }
         }
