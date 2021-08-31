@@ -2,6 +2,7 @@ import { SharedObject, SharedConfig } from '../types'
 import * as path from 'path'
 import os from 'os'
 import { IMPORT_ALIAS } from './public'
+import { PluginContext } from 'rollup'
 
 export function sharedAssign(
   assign: Map<string, Map<string, string>>,
@@ -33,6 +34,22 @@ export function sharedAssign(
   })
 
   return assign
+}
+
+export function findDependencies(
+  this: PluginContext,
+  id: string,
+  sets: Set<string>
+): void {
+  if (!sets.has(id)) {
+    sets.add(id)
+    const moduleInfo = this.getModuleInfo(id)
+    if (moduleInfo?.importedIds) {
+      moduleInfo.importedIds.forEach((id) => {
+        findDependencies.apply(this, [id, sets])
+      })
+    }
+  }
 }
 
 export function sharedScopeCode(
