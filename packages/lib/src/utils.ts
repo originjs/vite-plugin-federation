@@ -1,6 +1,5 @@
 import { SharedObject, SharedConfig } from '../types'
 import * as path from 'path'
-import os from 'os'
 import { IMPORT_ALIAS } from './public'
 import { PluginContext } from 'rollup'
 
@@ -112,7 +111,7 @@ export function parseOptions(
   return list
 }
 
-export function removeNonLetter(str): string {
+export function removeNonLetter(str: string): string {
   return str.replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
 }
 
@@ -121,12 +120,7 @@ export function getModuleMarker(value: string, type?: string): string {
 }
 
 export function normalizePath(id: string): string {
-  const isWindows = os.platform() === 'win32'
-  return path.posix.normalize(isWindows ? slash(id) : id)
-}
-
-export function slash(p: string): string {
-  return p.replace(/\\/g, '/')
+  return path.posix.normalize(id.replace(/\\/g, '/'))
 }
 
 export function isSameFilepath(src: string, dest: string): boolean {
