@@ -102,36 +102,35 @@ export function sharedPlugin(
       return outputOption
     },
 
-    renderChunk: (code, chunkInfo) => {
-      const name = chunkInfo.name
-      if (chunkInfo.isEntry) {
-        const sharedName = name.match(/(?<=__rf_input__).*/)?.[0]
-        if (sharedName) {
-          let filePath = ''
-          if (Object.keys(chunkInfo.modules).length) {
-            filePath = chunkInfo.fileName
-          } else {
-            if (chunkInfo.imports.length === 1) {
-              filePath = chunkInfo.imports[0]
-            } else if (chunkInfo.imports.length > 1) {
-              const find = chunkInfo.imports.find((item) =>
-                new RegExp(`(^|\\/)${sharedName}\\.`).test(item)
-              )
-              filePath = find ?? ''
+    generateBundle: function (options, bundle) {
+      // Find out the real shared file
+      for (const fileName in bundle) {
+        const chunk = bundle[fileName]
+        if (chunk.type === 'chunk' && chunk.isEntry) {
+          const sharedName = chunk.name.match(/(?<=__rf_input__).*/)?.[0]
+          if (sharedName) {
+            let filePath = ''
+            if (Object.keys(chunk.modules).length) {
+              filePath = chunk.fileName
+            } else {
+              if (chunk.imports.length === 1) {
+                filePath = chunk.imports[0]
+              } else if (chunk.imports.length > 1) {
+                filePath =
+                  chunk.imports.find(
+                    (item) => bundle[item].name === sharedName
+                  ) ?? ''
+              }
             }
+            const fileName = path.basename(filePath)
+            const fileDir = path.dirname(filePath)
+            const sharedProp = sharedMap.get(sharedName)
+            sharedProp?.set('fileName', fileName)
+            sharedProp?.set('fileDir', fileDir)
+            sharedProp?.set('filePath', filePath)
           }
-          const fileName = path.basename(filePath)
-          const fileDir = path.dirname(filePath)
-          const sharedProp = sharedMap.get(sharedName)
-          sharedProp?.set('fileName', fileName)
-          sharedProp?.set('fileDir', fileDir)
-          sharedProp?.set('filePath', filePath)
         }
       }
-      return null
-    },
-
-    generateBundle: function (options, bundle) {
       const importReplaceMap = new Map()
       sharedMap.forEach((value, key) => {
         const fileName = value.get('fileName')
