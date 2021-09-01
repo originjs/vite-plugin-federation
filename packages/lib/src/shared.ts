@@ -6,7 +6,7 @@ import { walk } from 'estree-walker'
 import path from 'path'
 import { VitePluginFederationOptions } from 'types'
 
-export const sharedMap: Map<string, Map<string, any>> = new Map()
+export let sharedMap: Map<string, Map<string, any>> = new Map()
 
 export function sharedPlugin(
   options: VitePluginFederationOptions
@@ -51,85 +51,125 @@ export function sharedPlugin(
     },
 
     outputOptions(outputOption) {
-      if (typeof outputOption.manualChunks === 'function') {
-        const sets = new Set<string>()
-        const me = this
-        // set every shared used moduleIds
-        sharedMap.forEach((value) => {
-          const moduleId = value.get('id')
-          findDependencies.apply(me, [moduleId, sets])
-          value.set('dependencies', sets)
-        })
+      const that = this
+      const priority: string[] = []
+      const depInShared = new Map()
+      // set every shared used moduleIds
+      sharedMap.forEach((value, key) => {
+        // pick every shared moduleId
+        const sharedModuleIds = new Map<string, string>()
+        const usedSharedModuleIds = new Set<string>()
+        sharedMap.forEach((value, key) =>
+          sharedModuleIds.set(value.get('id'), key)
+        )
+        const moduleId = value.get('id')
+        // remove itself
+        sharedModuleIds.delete(moduleId)
+        depInShared.set(key, usedSharedModuleIds)
+        const deps = new Set<string>()
+        findDependencies.apply(that, [
+          moduleId,
+          deps,
+          sharedModuleIds,
+          usedSharedModuleIds
+        ])
+        value.set('dependencies', deps)
+      })
+      // judge dependencies priority
+      const orderByDepCount: Map<string, Set<string>>[] = []
+      depInShared.forEach((value, key) => {
+        if (!orderByDepCount[value.size]) {
+          orderByDepCount[value.size] = new Map()
+        }
+        orderByDepCount[value.size].set(key, value)
+      })
 
-        const map = new Map()
-        // transform manualChunks from function to array property, like manualChunks:function(){...} to manualChunks:{}
-        for (const moduleId of this.getModuleIds()) {
-          if (!sets.has(moduleId)) {
-            const result = outputOption.manualChunks.apply(me, [
-              moduleId,
-              {
-                getModuleInfo: me.getModuleInfo,
-                getModuleIds: me.getModuleIds
-              }
-            ])
-            if (result) {
-              // save manualChunks function result
-              map.set(
-                result,
-                map.get(result) ? map.get(result).concat(moduleId) : [moduleId]
-              )
-            }
+      // dependency nothing is first
+      for (let i = 0; i < orderByDepCount.length; i++) {
+        if (i === 0) {
+          for (const key of orderByDepCount[i].keys()) {
+            priority.push(key)
+          }
+        } else {
+          for (const entries of orderByDepCount[i].entries()) {
+            addDep(entries, priority, depInShared)
           }
         }
+      }
 
-        outputOption.manualChunks = {}
-        map.forEach((value, key) => {
-          if (outputOption.manualChunks) {
-            outputOption.manualChunks[key] = value
+      function addDep(entries, priority, depInShared) {
+        const key = entries[0]
+        const value = entries[1]
+        for (const dep of value) {
+          if (!priority.includes(dep)) {
+            addDep([dep, depInShared.get(dep)], priority, depInShared)
+          }
+        }
+        if (!priority.includes(key)) {
+          priority.push(key)
+        }
+      }
+      // adjust the map order according to priority
+      const shareMapClone = new Map<string, Map<string, any>>()
+      priority.forEach((item) => {
+        const value = sharedMap.get(item)
+        if (value) {
+          shareMapClone.set(item, value)
+        }
+      })
+      sharedMap = shareMapClone
+
+      // only active when manualChunks is function,array not to solve
+      if (typeof outputOption.manualChunks === 'function') {
+        outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
+          apply(target, thisArg, argArray) {
+            const id = argArray[0]
+            //  if id is in shareMap , return id ,else return vite function value
+            let find = ''
+            for (const sharedMapElement of sharedMap) {
+              const key = sharedMapElement[0]
+              const value = sharedMapElement[1]
+              if (value.get('dependencies')?.has(id)) {
+                find = key
+                break
+              }
+            }
+            return find ? find : target(argArray[0], argArray[1])
           }
         })
       }
-
-      // add shared to manualChunks, such as vue:['vue']
-      sharedMap.forEach((value, key) => {
-        if (outputOption.manualChunks) {
-          outputOption.manualChunks[key] = [key]
-        }
-      })
-
       return outputOption
     },
 
-    renderChunk: (code, chunkInfo) => {
-      const name = chunkInfo.name
-      if (chunkInfo.isEntry) {
-        const sharedName = name.match(/(?<=__rf_input__).*/)?.[0]
-        if (sharedName) {
-          let filePath = ''
-          if (Object.keys(chunkInfo.modules).length) {
-            filePath = chunkInfo.fileName
-          } else {
-            if (chunkInfo.imports.length === 1) {
-              filePath = chunkInfo.imports[0]
-            } else if (chunkInfo.imports.length > 1) {
-              const find = chunkInfo.imports.find((item) =>
-                new RegExp(`(^|\\/)${sharedName}\\.`).test(item)
-              )
-              filePath = find ?? ''
+    generateBundle: function (options, bundle) {
+      // Find out the real shared file
+      for (const fileName in bundle) {
+        const chunk = bundle[fileName]
+        if (chunk.type === 'chunk' && chunk.isEntry) {
+          const sharedName = chunk.name.match(/(?<=__rf_input__).*/)?.[0]
+          if (sharedName) {
+            let filePath = ''
+            if (Object.keys(chunk.modules).length) {
+              filePath = chunk.fileName
+            } else {
+              if (chunk.imports.length === 1) {
+                filePath = chunk.imports[0]
+              } else if (chunk.imports.length > 1) {
+                filePath =
+                  chunk.imports.find(
+                    (item) => bundle[item].name === sharedName
+                  ) ?? ''
+              }
             }
+            const fileName = path.basename(filePath)
+            const fileDir = path.dirname(filePath)
+            const sharedProp = sharedMap.get(sharedName)
+            sharedProp?.set('fileName', fileName)
+            sharedProp?.set('fileDir', fileDir)
+            sharedProp?.set('filePath', filePath)
           }
-          const fileName = path.basename(filePath)
-          const fileDir = path.dirname(filePath)
-          const sharedProp = sharedMap.get(sharedName)
-          sharedProp?.set('fileName', fileName)
-          sharedProp?.set('fileDir', fileDir)
-          sharedProp?.set('filePath', filePath)
         }
       }
-      return null
-    },
-
-    generateBundle: function (options, bundle) {
       const importReplaceMap = new Map()
       sharedMap.forEach((value, key) => {
         const fileName = value.get('fileName')

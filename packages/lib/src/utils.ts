@@ -38,15 +38,25 @@ export function sharedAssign(
 export function findDependencies(
   this: PluginContext,
   id: string,
-  sets: Set<string>
+  sets: Set<string>,
+  sharedModuleIds: Map<string, string>,
+  usedSharedModuleIds: Set<string>
 ): void {
   if (!sets.has(id)) {
     sets.add(id)
     const moduleInfo = this.getModuleInfo(id)
     if (moduleInfo?.importedIds) {
       moduleInfo.importedIds.forEach((id) => {
-        findDependencies.apply(this, [id, sets])
+        findDependencies.apply(this, [
+          id,
+          sets,
+          sharedModuleIds,
+          usedSharedModuleIds
+        ])
       })
+    }
+    if (sharedModuleIds.has(id)) {
+      usedSharedModuleIds.add(sharedModuleIds.get(id) as string)
     }
   }
 }
