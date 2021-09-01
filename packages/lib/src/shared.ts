@@ -51,7 +51,7 @@ export function sharedPlugin(
     },
 
     outputOptions(outputOption) {
-      const me = this
+      const that = this
       const priority: string[] = []
       const depInShared = new Map()
       // set every shared used moduleIds
