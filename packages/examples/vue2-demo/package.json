@@ -1,0 +1,28 @@
+{
+  "name": "vue2-demo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "host-simple",
+    "remote-simple"
+  ],
+  "scripts": {
+    "start": "lerna run start",
+    "build": "lerna run build --loglevel=error",
+    "serve": "lerna run serve --parallel --loglevel=silent",
+    "stop": "kill-port --port 5010, 5011, 5012, 5013",
+    "clean": "lerna run clean",
+    "test": "lerna run test",
+    "test-filter-host": "lerna run test --scope = host-simple",
+    "test-filter-more": "lerna run test --scope={host, basic-host-remote}",
+    "new-version": "lerna version --conventional-commits --yes",
+    "test-change": "lerna run test --since",
+    "diff": "lerna diff"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "link:../../lib",
+    "kill-port": "^1.6.1",
+    "lerna": "^4.0.0"
+  },
+  "license": "MulanPSL2"
+}
