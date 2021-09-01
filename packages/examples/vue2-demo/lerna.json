@@ -1,0 +1,9 @@
+{
+  "packages": [
+    "host-simple",
+    "remote-simple"
+  ],
+  "version": "0.0.0",
+  "npmClient": "yarn",
+  "useWorkspaces": true
+}
