@@ -67,7 +67,7 @@ export function sharedPlugin(
         sharedModuleIds.delete(moduleId)
         depInShared.set(key, usedSharedModuleIds)
         const deps = new Set<string>()
-        findDependencies.apply(me, [
+        findDependencies.apply(that, [
           moduleId,
           deps,
           sharedModuleIds,
