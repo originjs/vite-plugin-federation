@@ -116,30 +116,7 @@ export function exposesPlugin(
     },
 
     generateBundle(_options, bundle) {
-      const moduleFileMap = new Map()
-      const cssFileMap = new Map()
-      const moduleCssFileMap = new Map()
-
-      for (const file in bundle) {
-        if (path.extname(file) === '.css') {
-          cssFileMap.set(path.parse(path.parse(file).name).name, file)
-        } else {
-          moduleFileMap.set(path.parse(path.parse(file).name).name, file)
-        }
-      }
-      cssFileMap.forEach(function (value, key) {
-        if (moduleFileMap.get(key) != null) {
-          moduleCssFileMap.set(moduleFileMap.get(key), value)
-        }
-      })
-
-      if (moduleCssFileMap.size === 0) {
-        moduleFileMap.forEach(function (value) {
-          cssFileMap.forEach(function (cssValue) {
-            moduleCssFileMap.set(value, cssValue)
-          })
-        })
-      }
+      const moduleCssFileMap = getChunkCssRelation(bundle)
 
       // replace import absolute path to chunk's fileName in remoteEntry.js
       let remoteEntryChunk
@@ -207,6 +184,52 @@ export function exposesPlugin(
         })
         item.code = magicString.toString()
       }
+    }
+  }
+
+  /**
+   *
+   * Gets the relationship between CSS and JS based on the original file name
+   * @param bundle bundle
+   * @returns relationship between CSS and JS
+   */
+  function getChunkCssRelation(bundle) {
+    const cssFileMap = new Map()
+    const moduleCssFileMap = new Map()
+
+    for (const file in bundle) {
+      if (path.extname(file) === '.css') {
+        cssFileMap.set(getOriginalFileName(file), file)
+      }
+    }
+
+    for (const file in bundle) {
+      let name = getOriginalFileName(file)
+      if (cssFileMap.get(name) != null && path.extname(file) !== '.css') {
+        moduleCssFileMap.set(file, cssFileMap.get(name))
+        continue
+      }
+      if (bundle[file]?.imports?.length === 1) {
+        name = getOriginalFileName(bundle[file].imports[0])
+        if (cssFileMap.get(name) != null) {
+          moduleCssFileMap.set(file, cssFileMap.get(name))
+          continue
+        }
+      }
+    }
+
+    // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
+    if (moduleCssFileMap.size === 0) {
+      for (const file in bundle) {
+        cssFileMap.forEach(function (css) {
+          moduleCssFileMap.set(file, css)
+        })
+      }
+    }
+    return moduleCssFileMap
+
+    function getOriginalFileName(file: string): string {
+      return path.parse(path.parse(file).name).name
     }
   }
 }

@@ -1,8 +1,6 @@
 <template>
-  <section class="section">
-    <h1>
-      This is a section from /host-simple.
-    </h1>
+  <section :class="$style.section">
+    <h1 :class="$style.h1">This is a section from /host-simple.</h1>
 
     <slot />
   </section>
@@ -10,11 +8,15 @@
 
 <script>
 export default {
-  name: 'Section',
+  name: 'Section'
 }
 </script>
 
-<style>
+<style module>
+.h1 {
+  border: 5px solid red !important;
+  padding: 1px !important;
+}
 .section {
   border: 1px solid black;
   padding: 10px;
