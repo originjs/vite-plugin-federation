@@ -4,7 +4,11 @@ import { exposesPlugin } from './exposes'
 import { remotesPlugin } from './remotes'
 import { sharedPlugin } from './shared'
 import { VitePluginFederationOptions } from '../types'
-import { IMPORT_ALIAS_REGEXP, DEFAULT_ENTRY_FILENAME } from './public'
+import {
+  IMPORT_ALIAS_REGEXP,
+  DEFAULT_ENTRY_FILENAME,
+  builderInfo
+} from './public'
 import { PluginHooks } from '../types/pluginHooks'
 
 export default function federation(
@@ -47,6 +51,10 @@ export default function federation(
         pluginHook.options?.call(this, _options)
       }
       return _options
+    },
+    config() {
+      // only run when builder is vite,rollup doesnt have hook named `config`
+      builderInfo.builder = 'vite'
     },
 
     buildStart(inputOptions) {

@@ -1,6 +1,12 @@
 import { PluginHooks } from '../types/pluginHooks'
 import { findDependencies, getModuleMarker, sharedAssign } from './utils'
-import { EXPOSES_CHUNK_SET, MODULE_NAMES, SHARED } from './public'
+import {
+  builderInfo,
+  EXPOSES_CHUNK_SET,
+  MODULE_NAMES,
+  ROLLUP,
+  SHARED
+} from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 import path from 'path'
@@ -171,6 +177,7 @@ export function sharedPlugin(
         }
       }
       const importReplaceMap = new Map()
+      // rename file and remove unnecessary file
       sharedMap.forEach((value, key) => {
         const fileName = value.get('fileName')
         const fileDir = value.get('fileDir')
@@ -182,17 +189,23 @@ export function sharedPlugin(
           for (const file in bundle) {
             if (bundle[file].name === expectName) {
               expectFileName = path.basename(bundle[file].fileName)
+              break
             }
           }
           expectFileName = expectFileName ? expectFileName : `${expectName}.js`
           // rollup fileName
           const expectFilePath = `${fileDir}/${expectFileName}`
+          // fileName or filePath,vite is filePath,rollup is filename
+          const expectFileNameOrPath =
+            builderInfo.builder === ROLLUP ? expectFileName : expectFilePath
+          const fileNameOrPath =
+            builderInfo.builder === ROLLUP ? fileName : filePath
           // delete non-used chunk
-          delete bundle[expectFilePath]
+          delete bundle[expectFileNameOrPath]
           //  rename chunk
-          bundle[expectFilePath] = bundle[filePath]
-          bundle[expectFilePath].fileName = expectFilePath
-          delete bundle[filePath]
+          bundle[expectFileNameOrPath] = bundle[fileNameOrPath]
+          bundle[expectFileNameOrPath].fileName = expectFileNameOrPath
+          delete bundle[fileNameOrPath]
           importReplaceMap.set(filePath, expectFilePath)
           value.set('filePath', expectFilePath)
           value.set('fileName', expectFileName)
