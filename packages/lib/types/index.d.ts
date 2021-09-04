@@ -73,6 +73,10 @@ declare interface VitePluginFederationOptions {
 
 type Exposes = (string | ExposesObject)[] | ExposesObject
 
+type Remotes = (string | RemotesObject)[] | RemotesObject
+
+type ConfigTypeSet = ExposesConfig | RemotesConfig | SharedConfig
+
 /**
  * Modules that should be exposed by this container. Property names are used as public paths.
  */

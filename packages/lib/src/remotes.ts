@@ -1,21 +1,30 @@
-import { VitePluginFederationOptions } from 'types'
+import { RemotesConfig, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
-import { getModuleMarker, sharedScopeCode } from './utils'
+import { getModuleMarker, sharedScopeCode, parseOptions } from './utils'
 import { IMPORT_ALIAS, MODULE_NAMES, SHARED } from './public'
 import { sharedMap } from './shared'
 
 export function remotesPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
-  const providedRemotes = options.remotes || {}
-  const remotes: { id: string; config: string }[] = []
-
-  Object.keys(providedRemotes).forEach((id) => {
-    remotes.push(Object.assign({}, { id, config: providedRemotes[id] }))
-  })
+  const providedRemotes = parseOptions(
+    options.remotes ? options.remotes : {},
+    (item) => ({
+      external: Array.isArray(item) ? item : [item],
+      shareScope: options.shareScope || 'default'
+    }),
+    (item) => ({
+      external: Array.isArray(item.external) ? item.external : [item.external],
+      shareScope: item.shareScope || options.shareScope || 'default'
+    })
+  )
+  const remotes: { id: string; config: RemotesConfig }[] = []
+  for (const item of providedRemotes) {
+    remotes.push({ id: item[0], config: item[1] })
+  }
 
   return {
     name: 'originjs:remotes',
@@ -27,7 +36,9 @@ export function remotesPlugin(
                   (remote) =>
                     `${JSON.stringify(
                       remote.id
-                    )}: () => ${IMPORT_ALIAS}(${JSON.stringify(remote.config)})`
+                    )}: () => ${IMPORT_ALIAS}(${JSON.stringify(
+                      remote.config.external[0]
+                    )})`
                 )
                 .join(',\n  ')}
             };
