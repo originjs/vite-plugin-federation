@@ -27,7 +27,7 @@ export function exposesPlugin(
   let moduleMap = ''
   const replaceMap = new Map()
   const provideExposes = parseOptions(
-    options.exposes ? options.exposes : {},
+    options.exposes,
     (item) => ({
       import: item,
       name: undefined

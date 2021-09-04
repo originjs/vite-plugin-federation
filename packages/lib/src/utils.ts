@@ -89,7 +89,7 @@ export function sharedScopeCode(
 }
 
 export function parseOptions(
-  options: Exposes | Remotes,
+  options: Exposes | Remotes | undefined,
   normalizeSimple: (value: any, key: any) => ConfigTypeSet,
   normalizeOptions: (value: any, key: any) => ConfigTypeSet
 ): (string | ConfigTypeSet)[] {
