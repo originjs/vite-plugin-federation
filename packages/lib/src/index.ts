@@ -79,6 +79,16 @@ export default function federation(
       return null
     },
 
+    transform(code: string, id: string) {
+      for (const pluginHook of pluginList) {
+        const result = pluginHook.transform?.call(this, code, id)
+        if (result) {
+          return result
+        }
+      }
+      return code
+    },
+
     outputOptions(outputOptions) {
       outputOptions.manualChunks = outputOptions.manualChunks || {}
       for (const pluginHook of pluginList) {
@@ -105,13 +115,6 @@ export default function federation(
         if (chunk.type === 'chunk') {
           chunk.code = chunk.code.replace(IMPORT_ALIAS_REGEXP, 'import')
         }
-      }
-    },
-
-    transform(code: string, id: string) {
-      for (const pluginHook of pluginList) {
-        if (pluginHook.transform)
-          return pluginHook.transform.call(this, code, id)
       }
     }
   }
