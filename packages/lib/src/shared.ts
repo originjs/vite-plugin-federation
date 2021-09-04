@@ -3,14 +3,17 @@ import { findDependencies, getModuleMarker, sharedAssign } from './utils'
 import {
   builderInfo,
   EXPOSES_CHUNK_SET,
+  EXPOSES_MAP,
   MODULE_NAMES,
   ROLLUP,
-  SHARED
+  SHARED,
+  VITE
 } from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 import path from 'path'
 import { VitePluginFederationOptions } from 'types'
+import { RenderedChunk } from 'rollup'
 
 export let sharedMap: Map<string, Map<string, any>> = new Map()
 
@@ -22,10 +25,28 @@ export function sharedPlugin(
     const sharedModuleName = getModuleMarker(`\${${key}}`, SHARED)
     MODULE_NAMES.push(sharedModuleName)
   })
+  const exposesModuleIdSet = new Set()
+  EXPOSES_MAP.forEach((value) => {
+    exposesModuleIdSet.add(`${value}.js`)
+  })
 
   return {
     name: 'originjs:shared',
-
+    virtualFile: {
+      __rf_fn__import: `async function importShared(name) {
+          const moduleMap= ${getModuleMarker('moduleMap', 'var')}
+          if (globalThis.__rf_var__shared?.[name]) {
+            if (!globalThis.__rf_var__shared[name].lib) {
+              globalThis.__rf_var__shared[name].lib = await (globalThis.__rf_var__shared[name].get())
+            }
+            return globalThis.__rf_var__shared[name].lib;
+          } else {
+            return import(moduleMap[name]);
+          }
+      }
+      export default importShared;
+      `
+    },
     options(inputOptions) {
       if (sharedMap.size) {
         // remove item which is both in external and shared
@@ -51,8 +72,15 @@ export function sharedPlugin(
       for (const entry of sharedMap) {
         const key = entry[0]
         const value = entry[1]
-        value.set('idRegexp', RegExp(`node_modules[/\\\\]@?${key}[/\\\\]`))
         value.set('id', await this.resolveId(key))
+      }
+      if (sharedMap.size && EXPOSES_MAP.size) {
+        this.emitFile({
+          fileName: '__rf_fn__import.js',
+          type: 'chunk',
+          id: '__rf_fn__import',
+          preserveSignature: 'strict'
+        })
       }
     },
 
@@ -149,6 +177,7 @@ export function sharedPlugin(
 
     generateBundle: function (options, bundle) {
       // Find out the real shared file
+      let sharedImport: RenderedChunk | undefined
       for (const fileName in bundle) {
         const chunk = bundle[fileName]
         if (chunk.type === 'chunk' && chunk.isEntry) {
@@ -170,12 +199,20 @@ export function sharedPlugin(
             const fileName = path.basename(filePath)
             const fileDir = path.dirname(filePath)
             const sharedProp = sharedMap.get(sharedName)
-            sharedProp?.set('fileName', fileName)
-            sharedProp?.set('fileDir', fileDir)
-            sharedProp?.set('filePath', filePath)
+            if (sharedProp) {
+              sharedProp.set('fileName', fileName)
+              sharedProp.set('fileDir', fileDir)
+              sharedProp.set('filePath', filePath)
+            }
+          } else {
+            // record the __rf_fn_import chunk
+            if (chunk.name === getModuleMarker('import', 'fn')) {
+              sharedImport = chunk
+            }
           }
         }
       }
+
       const importReplaceMap = new Map()
       // rename file and remove unnecessary file
       sharedMap.forEach((value, key) => {
@@ -234,11 +271,25 @@ export function sharedPlugin(
         }
       })
 
-      if (EXPOSES_CHUNK_SET.size) {
+      if (EXPOSES_CHUNK_SET.size && sharedMap.size) {
+        const PLACEHOLDER_MODULE_MAP = `{${[...sharedMap.keys()]
+          .map((item) => {
+            return `'${item}':'${sharedMap.get(item)?.get('filePath')}'`
+          })
+          .join(',')}}`
+        if (sharedImport) {
+          // modify shareImport generate dir,only vite need
+          if (builderInfo.builder === VITE) {
+            sharedImport.fileName = `${path.dirname(
+              Array.from(EXPOSES_CHUNK_SET)[0].fileName
+            )}${path.sep}${sharedImport.fileName}`
+          }
+          sharedImport.code = sharedImport.code?.replace(
+            getModuleMarker('moduleMap', 'var'),
+            PLACEHOLDER_MODULE_MAP
+          )
+        }
         const FN_IMPORT = getModuleMarker('import', 'fn')
-        const VAR_GLOBAL = getModuleMarker('global', 'var')
-        const VAR_MODULE_MAP = getModuleMarker('moduleMap', 'var')
-        const VAR_SHARED = getModuleMarker('shared', 'var')
         const fileName2SharedName = new Map()
         sharedMap.forEach((value, key) => {
           fileName2SharedName.set(value.get('fileName'), key)
@@ -271,37 +322,17 @@ export function sharedPlugin(
             .map((item) => {
               let str = ''
               importMap.get(item).specifiers?.forEach((space) => {
-                str += `let ${space.local.name} = (await ${FN_IMPORT}('${item}'))['${space.imported.name}'] \n`
+                str += `const ${space.local.name} = (await ${FN_IMPORT}('${item}'))['${space.imported.name}'] \n`
               })
               return str
             })
             .join('')
-
-          //    generate variable moduleMap declare
-          const PLACEHOLDER_MODULE_MAP = `{${[...importMap.keys()]
-            .map((item) => {
-              return `'${item}':'${importMap.get(item).source}'`
-            })
-            .join(',')}}`
-          // all insert code
-          const dynamicCode = `\n
-                    ${PLACEHOLDER_VAR}
-                    async function ${FN_IMPORT} (name) {
-                        let ${VAR_GLOBAL} = window || node;
-                        const ${VAR_MODULE_MAP} = ${PLACEHOLDER_MODULE_MAP}
-                        if (${VAR_GLOBAL}.${VAR_SHARED}?.[name]) {
-							if (!${VAR_GLOBAL}.${VAR_SHARED}[name].lib) {
-								${VAR_GLOBAL}.${VAR_SHARED}[name].lib = await (${VAR_GLOBAL}.${VAR_SHARED}[name].get())
-							}
-							return ${VAR_GLOBAL}.${VAR_SHARED}[name].lib;
-						} else {
-							return import(${VAR_MODULE_MAP}[name])
-						}
-                      }`
-
           if (lastImport) {
             //  append code after lastImport
-            magicString.appendRight(lastImport.end, dynamicCode)
+            magicString.prepend(
+              `\n import ${FN_IMPORT} from '.${path.sep}${FN_IMPORT}.js'\n`
+            )
+            magicString.appendRight(lastImport.end, PLACEHOLDER_VAR)
           }
           chunk.code = magicString.toString()
         })
