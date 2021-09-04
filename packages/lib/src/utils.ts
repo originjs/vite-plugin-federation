@@ -1,4 +1,10 @@
-import { SharedObject, SharedConfig } from '../types'
+import {
+  Exposes,
+  Remotes,
+  SharedObject,
+  ConfigTypeSet,
+  SharedConfig
+} from '../types'
 import * as path from 'path'
 import { IMPORT_ALIAS } from './public'
 import { PluginContext } from 'rollup'
@@ -83,15 +89,17 @@ export function sharedScopeCode(
 }
 
 export function parseOptions(
-  options,
-  normalizeSimple,
-  normalizeOptions
-): any[] {
+  options: Exposes | Remotes,
+  normalizeSimple: (value: any, key: any) => ConfigTypeSet,
+  normalizeOptions: (value: any, key: any) => ConfigTypeSet
+): (string | ConfigTypeSet)[] {
   if (!options) {
     return []
   }
-  const list: any[] = []
-  const array = (items) => {
+  const list: {
+    [index: number]: string | ConfigTypeSet
+  }[] = []
+  const array = (items: (string | ConfigTypeSet)[]) => {
     for (const item of items) {
       if (typeof item === 'string') {
         list.push([item, normalizeSimple(item, item)])
