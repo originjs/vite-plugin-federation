@@ -1,46 +1,7 @@
-import {
-  Exposes,
-  Remotes,
-  Shared,
-  SharedObject,
-  ConfigTypeSet,
-  SharedConfig
-} from '../types'
+import { Exposes, Remotes, Shared, ConfigTypeSet } from '../types'
 import * as path from 'path'
 import { IMPORT_ALIAS } from './public'
 import { PluginContext } from 'rollup'
-
-export function sharedAssign(
-  assign: Map<string, Map<string, string>>,
-  shared: (string | SharedObject)[] | SharedObject
-): Map<string, Map<string, string>> {
-  shared = shared || []
-  if (!Array.isArray(shared)) {
-    shared = [shared]
-  }
-  shared.forEach((item) => {
-    if (typeof item === 'string') {
-      assign.set(item, new Map<string, string>())
-    } else {
-      // type is SharedObject
-      for (const key in item) {
-        if (Object.prototype.hasOwnProperty.call(item, key) && item[key]) {
-          const paramMap: Map<string, string> = new Map()
-          if (typeof item[key] === 'string') {
-            paramMap.set('version', item[key] as string)
-          } else {
-            for (const itemElementKey in item[key] as SharedConfig) {
-              paramMap.set(itemElementKey, item[key][itemElementKey])
-            }
-          }
-          assign.set(key, paramMap)
-        }
-      }
-    }
-  })
-
-  return assign
-}
 
 export function findDependencies(
   this: PluginContext,
@@ -134,7 +95,18 @@ export function parseOptions(
 }
 
 export function removeNonLetter(str: string): string {
-  return str.replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
+  const wordRegexp = new RegExp('\\w+')
+  let needUpperCase = false
+  let ret = ''
+  for (const c of str) {
+    if (wordRegexp.test(c)) {
+      ret += needUpperCase ? c.toUpperCase() : c
+      needUpperCase = false
+    } else {
+      needUpperCase = true
+    }
+  }
+  return ret
 }
 
 export function getModuleMarker(value: string, type?: string): string {

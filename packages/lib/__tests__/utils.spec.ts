@@ -1,8 +1,23 @@
-import { sharedAssign, parseOptions, isSameFilepath } from '../src/utils'
+import {
+  parseOptions,
+  isSameFilepath,
+  removeNonLetter,
+  getModuleMarker
+} from '../src/utils'
 import { ExposesObject } from '../types'
 
-test('objectUtil', () => {
-  expect(sharedAssign).toBeDefined()
+test('remove nonLetter', () => {
+  const includeUnderline = 'user_name'
+  const includeDash = 'user-name'
+  const all = 'U"s-e@r#n$a%m^e&*(),./;[]{}'
+  expect(removeNonLetter(includeUnderline)).toMatch('user_name')
+  expect(removeNonLetter(includeDash)).toMatch('userName')
+  expect(removeNonLetter(all)).toMatch('USERNAME')
+})
+
+test('get moduleMarker', () => {
+  expect('__rf_placeholder__test').toMatch(getModuleMarker('test'))
+  expect('__rf_type__test').toMatch(getModuleMarker('test', 'type'))
 })
 
 test('parse exposes options', () => {
@@ -77,6 +92,38 @@ test('parse exposes options', () => {
   expect(ret[1]).toMatchObject([
     'Button',
     { import: './src/components/Button.js' }
+  ])
+
+  //  shared array
+  expect(
+    parseOptions(
+      ['vue', 'react', 'react-dom'],
+      (item) => ({
+        import: item
+      }),
+      (item) => item
+    )
+  ).toMatchObject([
+    ['vue', { import: 'vue' }],
+    ['react', { import: 'react' }],
+    ['react-dom', { import: 'react-dom' }]
+  ])
+
+  // sharedObject
+  expect(
+    parseOptions(
+      {
+        vue: { requiredVersion: '3.1.1' },
+        react: { requiredVersion: '16.1.0' }
+      },
+      (item) => ({
+        import: item
+      }),
+      (item) => item
+    )
+  ).toMatchObject([
+    ['vue', { requiredVersion: '3.1.1' }],
+    ['react', { requiredVersion: '16.1.0' }]
   ])
 })
 
