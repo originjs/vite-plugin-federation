@@ -1,6 +1,5 @@
 import { Exposes, Remotes, Shared, ConfigTypeSet } from '../types'
 import * as path from 'path'
-import { IMPORT_ALIAS } from './public'
 import { PluginContext } from 'rollup'
 
 export function findDependencies(
@@ -27,30 +26,6 @@ export function findDependencies(
       usedSharedModuleIds.add(sharedModuleIds.get(id) as string)
     }
   }
-}
-
-export function sharedScopeCode(shared: (string | ConfigTypeSet)[]): string[] {
-  const res: string[] = []
-  if (shared.length) {
-    shared.forEach((arr) => {
-      const sharedName = arr[0]
-      const obj = arr[1]
-      let str = ''
-      if (typeof obj === 'object') {
-        Object.entries(obj).forEach((entry) => {
-          const key = entry[0]
-          const value = entry[1]
-          str += `${key}:${JSON.stringify(value)}, \n`
-        })
-        str += `get: ()=> ${IMPORT_ALIAS}('${getModuleMarker(
-          `\${${sharedName}}`,
-          'shareScope'
-        )}')`
-        res.push(`'${sharedName}':{${str}}`)
-      }
-    })
-  }
-  return res
 }
 
 export function parseOptions(
