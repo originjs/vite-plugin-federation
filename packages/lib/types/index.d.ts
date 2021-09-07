@@ -75,7 +75,17 @@ type Exposes = (string | ExposesObject)[] | ExposesObject
 
 type Remotes = (string | RemotesObject)[] | RemotesObject
 
+type Shared = (string | SharedObject)[] | SharedObject
+
 type ConfigTypeSet = ExposesConfig | RemotesConfig | SharedConfig
+
+declare interface SharedRuntimeInfo {
+  id: string
+  dependencies: string[]
+  fileName: string
+  fileDir: string
+  filePath: string
+}
 
 /**
  * Modules that should be exposed by this container. Property names are used as public paths.

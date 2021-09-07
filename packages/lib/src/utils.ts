@@ -1,6 +1,7 @@
 import {
   Exposes,
   Remotes,
+  Shared,
   SharedObject,
   ConfigTypeSet,
   SharedConfig
@@ -67,29 +68,32 @@ export function findDependencies(
   }
 }
 
-export function sharedScopeCode(
-  shared: Map<string, Map<string, any>>,
-  modules: string[]
-): string[] {
+export function sharedScopeCode(shared: (string | ConfigTypeSet)[]): string[] {
   const res: string[] = []
-  if (shared.size) {
-    shared.forEach((value, key) => {
+  if (shared.length) {
+    shared.forEach((arr) => {
+      const sharedName = arr[0]
+      const obj = arr[1]
       let str = ''
-      value.forEach((innerValue, innerkey) => {
-        str += `${innerkey}:${JSON.stringify(innerValue)}, \n`
-      })
-      str += `get: ()=> ${IMPORT_ALIAS}('${getModuleMarker(
-        `\${${key}}`,
-        'shareScope'
-      )}')`
-      res.push(`'${key}':{${str}}`)
+      if (typeof obj === 'object') {
+        Object.entries(obj).forEach((entry) => {
+          const key = entry[0]
+          const value = entry[1]
+          str += `${key}:${JSON.stringify(value)}, \n`
+        })
+        str += `get: ()=> ${IMPORT_ALIAS}('${getModuleMarker(
+          `\${${sharedName}}`,
+          'shareScope'
+        )}')`
+        res.push(`'${sharedName}':{${str}}`)
+      }
     })
   }
   return res
 }
 
 export function parseOptions(
-  options: Exposes | Remotes | undefined,
+  options: Exposes | Remotes | Shared | undefined,
   normalizeSimple: (value: any, key: any) => ConfigTypeSet,
   normalizeOptions: (value: any, key: any) => ConfigTypeSet
 ): (string | ConfigTypeSet)[] {
