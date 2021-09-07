@@ -3,9 +3,9 @@ import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
-import { getModuleMarker, sharedScopeCode, parseOptions } from './utils'
-import { IMPORT_ALIAS, MODULE_NAMES, SHARED } from './public'
-import { sharedMap } from './shared'
+import { sharedScopeCode, parseOptions } from './utils'
+import { IMPORT_ALIAS } from './public'
+import { shared } from './shared'
 
 export function remotesPlugin(
   options: VitePluginFederationOptions
@@ -52,12 +52,7 @@ export function remotesPlugin(
             }
             
             const shareScope = {
-            ${sharedScopeCode(
-              sharedMap,
-              MODULE_NAMES.filter((item) =>
-                item.startsWith(getModuleMarker('', SHARED))
-              )
-            ).join(',')} 
+            ${sharedScopeCode(shared).join(',')} 
             };
             
             const initMap = {};

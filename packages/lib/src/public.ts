@@ -9,7 +9,6 @@ export const DYNAMIC_LOADING_CSS = 'dynamicLoadingCss'
 export const DYNAMIC_LOADING_CSS_PREFIX = '__v__css__'
 export const DEFAULT_ENTRY_FILENAME = 'remoteEntry.js'
 export const EXTERNALS: string[] = []
-export const MODULE_NAMES: string[] = []
 export const builderInfo = {
   builder: 'rollup',
   version: ''

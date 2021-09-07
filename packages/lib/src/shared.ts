@@ -1,30 +1,37 @@
 import { PluginHooks } from '../types/pluginHooks'
-import { findDependencies, getModuleMarker, sharedAssign } from './utils'
+import { findDependencies, getModuleMarker, parseOptions } from './utils'
 import {
   builderInfo,
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
-  MODULE_NAMES,
   ROLLUP,
-  SHARED,
   VITE
 } from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 import path from 'path'
-import { VitePluginFederationOptions } from 'types'
+import {
+  ConfigTypeSet,
+  VitePluginFederationOptions,
+  SharedRuntimeInfo
+} from 'types'
 import { RenderedChunk } from 'rollup'
 
-export let sharedMap: Map<string, Map<string, any>> = new Map()
+export let shared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
 
 export function sharedPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
-  sharedAssign(sharedMap, options.shared || [])
-  sharedMap.forEach((value, key) => {
-    const sharedModuleName = getModuleMarker(`\${${key}}`, SHARED)
-    MODULE_NAMES.push(sharedModuleName)
-  })
+  shared = parseOptions(
+    options.shared || {},
+    (item) => ({
+      import: item
+    }),
+    (item) => item
+  ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
+  const sharedNames = new Set<string>()
+  shared.forEach((value) => sharedNames.add(value[0]))
+  shared = shared as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
   const exposesModuleIdSet = new Set()
   EXPOSES_MAP.forEach((value) => {
     exposesModuleIdSet.add(`${value}.js`)
@@ -48,19 +55,20 @@ export function sharedPlugin(
       `
     },
     options(inputOptions) {
-      if (sharedMap.size) {
+      if (sharedNames.size) {
         // remove item which is both in external and shared
         inputOptions.external = (inputOptions.external as [])?.filter(
           (item) => {
-            return !sharedMap.has(item)
+            return !sharedNames.has(item)
           }
         )
         // add shared content into input
-        sharedMap.forEach((value, key) => {
-          inputOptions.input![`${getModuleMarker(key, 'input')}`] = key
+        sharedNames.forEach((shareName) => {
+          inputOptions.input![`${getModuleMarker(shareName, 'input')}`] =
+            shareName
           if (Array.isArray(inputOptions.external)) {
             inputOptions.external.push(
-              getModuleMarker(`\${${key}}`, 'shareScope')
+              getModuleMarker(`\${${shareName}}`, 'shareScope')
             )
           }
         })
@@ -68,13 +76,11 @@ export function sharedPlugin(
       return inputOptions
     },
 
-    async buildStart(options) {
-      for (const entry of sharedMap) {
-        const key = entry[0]
-        const value = entry[1]
-        value.set('id', await this.resolveId(key))
+    async buildStart() {
+      for (const arr of shared) {
+        arr[1].id = await this.resolveId(arr[0])
       }
-      if (sharedMap.size && EXPOSES_MAP.size) {
+      if (shared.length && EXPOSES_MAP.size) {
         this.emitFile({
           fileName: '__rf_fn__import.js',
           type: 'chunk',
@@ -84,30 +90,28 @@ export function sharedPlugin(
       }
     },
 
-    outputOptions(outputOption) {
+    outputOptions: function (outputOption) {
       const that = this
       const priority: string[] = []
       const depInShared = new Map()
-      // set every shared used moduleIds
-      sharedMap.forEach((value, key) => {
+      shared.forEach((value) => {
+        const shareName = value[0]
         // pick every shared moduleId
-        const sharedModuleIds = new Map<string, string>()
         const usedSharedModuleIds = new Set<string>()
-        sharedMap.forEach((value, key) =>
-          sharedModuleIds.set(value.get('id'), key)
-        )
-        const moduleId = value.get('id')
-        // remove itself
-        sharedModuleIds.delete(moduleId)
-        depInShared.set(key, usedSharedModuleIds)
+        const sharedModuleIds = new Map<string, string>()
+        // exclude itself
+        shared
+          .filter((item) => item[0] !== shareName)
+          .forEach((item) => sharedModuleIds.set(item[1].id, item[0]))
+        depInShared.set(shareName, usedSharedModuleIds)
         const deps = new Set<string>()
         findDependencies.apply(that, [
-          moduleId,
+          value[1].id,
           deps,
           sharedModuleIds,
           usedSharedModuleIds
         ])
-        value.set('dependencies', deps)
+        value[1].dependencies = deps
       })
       // judge dependencies priority
       const orderByDepCount: Map<string, Set<string>>[] = []
@@ -143,32 +147,22 @@ export function sharedPlugin(
           priority.push(key)
         }
       }
+
       // adjust the map order according to priority
-      const shareMapClone = new Map<string, Map<string, any>>()
-      priority.forEach((item) => {
-        const value = sharedMap.get(item)
-        if (value) {
-          shareMapClone.set(item, value)
-        }
+      shared.sort((a, b) => {
+        const aIndex = shared.findIndex((value) => value[0] === a[0])
+        const bIndex = shared.findIndex((value) => value[0] === b[0])
+        return aIndex - bIndex
       })
-      sharedMap = shareMapClone
 
       // only active when manualChunks is function,array not to solve
       if (typeof outputOption.manualChunks === 'function') {
         outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
           apply(target, thisArg, argArray) {
             const id = argArray[0]
-            //  if id is in shareMap , return id ,else return vite function value
-            let find = ''
-            for (const sharedMapElement of sharedMap) {
-              const key = sharedMapElement[0]
-              const value = sharedMapElement[1]
-              if (value.get('dependencies')?.has(id)) {
-                find = key
-                break
-              }
-            }
-            return find ? find : target(argArray[0], argArray[1])
+            //  if id is in shared dependencies, return id ,else return vite function value
+            const find = shared.find((arr) => arr[1].dependencies.has(id))
+            return find ? find[0] : target(argArray[0], argArray[1])
           }
         })
       }
@@ -198,11 +192,13 @@ export function sharedPlugin(
             }
             const fileName = path.basename(filePath)
             const fileDir = path.dirname(filePath)
-            const sharedProp = sharedMap.get(sharedName)
+            const sharedProp = shared.find(
+              (item) => sharedNames === item[0]
+            )?.[1]
             if (sharedProp) {
-              sharedProp.set('fileName', fileName)
-              sharedProp.set('fileDir', fileDir)
-              sharedProp.set('filePath', filePath)
+              sharedProp.file = fileName
+              sharedProp.fileDir = fileDir
+              sharedProp.filePath = filePath
             }
           } else {
             // record the __rf_fn_import chunk
@@ -215,12 +211,14 @@ export function sharedPlugin(
 
       const importReplaceMap = new Map()
       // rename file and remove unnecessary file
-      sharedMap.forEach((value, key) => {
-        const fileName = value.get('fileName')
-        const fileDir = value.get('fileDir')
-        const filePath = value.get('filePath')
+      shared.forEach((arr) => {
+        const sharedName = arr[0]
+        const sharedProp = arr[1]
+        const fileName = sharedProp.fileName
+        const fileDir = sharedProp.fileDir
+        const filePath = sharedProp.filePath
         if (filePath && !fileName.startsWith('__rf_input')) {
-          const expectName = `__rf_input__${key}`
+          const expectName = `__rf_input__${sharedName}`
           let expectFileName = ''
           // find expectName
           for (const file in bundle) {
@@ -244,12 +242,12 @@ export function sharedPlugin(
           bundle[expectFileNameOrPath].fileName = expectFileNameOrPath
           delete bundle[fileNameOrPath]
           importReplaceMap.set(filePath, expectFilePath)
-          value.set('filePath', expectFilePath)
-          value.set('fileName', expectFileName)
+          sharedProp.filePath = expectFilePath
+          sharedProp.fileName = expectFileName
         }
         importReplaceMap.set(
-          getModuleMarker(`\${${key}}`, 'shareScope'),
-          `./${value.get('fileName')}`
+          getModuleMarker(`\${${sharedName}}`, 'shareScope'),
+          `./${sharedProp.fileName}`
         )
       })
 
@@ -271,10 +269,12 @@ export function sharedPlugin(
         }
       })
 
-      if (EXPOSES_CHUNK_SET.size && sharedMap.size) {
-        const PLACEHOLDER_MODULE_MAP = `{${[...sharedMap.keys()]
+      if (EXPOSES_CHUNK_SET.size && shared.length) {
+        const PLACEHOLDER_MODULE_MAP = `{${[...sharedNames.keys()]
           .map((item) => {
-            return `'${item}':'${sharedMap.get(item)?.get('filePath')}'`
+            return `'${item}':'${
+              shared.find((arr) => arr[0] === item)?.[1].filePath
+            }'`
           })
           .join(',')}}`
         if (sharedImport) {
@@ -290,10 +290,6 @@ export function sharedPlugin(
           )
         }
         const FN_IMPORT = getModuleMarker('import', 'fn')
-        const fileName2SharedName = new Map()
-        sharedMap.forEach((value, key) => {
-          fileName2SharedName.set(value.get('fileName'), key)
-        })
         EXPOSES_CHUNK_SET.forEach((chunk) => {
           let lastImport: any = null
           const ast = this.parse(chunk.code)
@@ -303,7 +299,9 @@ export function sharedPlugin(
             enter(node: any) {
               if (node.type === 'ImportDeclaration') {
                 const fileName = path.basename(node.source.value)
-                const sharedName = fileName2SharedName.get(fileName)
+                const sharedName = shared.find(
+                  (arr) => arr[1].fileName === fileName
+                )?.[0]
                 if (sharedName) {
                   importMap.set(sharedName, {
                     source: node.source.value,
