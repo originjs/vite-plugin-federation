@@ -1,9 +1,13 @@
-import { RemotesConfig, VitePluginFederationOptions } from 'types'
+import {
+  ConfigTypeSet,
+  RemotesConfig,
+  VitePluginFederationOptions
+} from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
-import { sharedScopeCode, parseOptions } from './utils'
+import { parseOptions, getModuleMarker } from './utils'
 import { IMPORT_ALIAS } from './public'
 import { shared } from './shared'
 
@@ -42,30 +46,23 @@ export function remotesPlugin(
                 )
                 .join(',\n  ')}
             };
-            
             const processModule = (mod) => {
               if (mod && mod.__useDefault) {
                 return mod.default;
               }
-            
               return mod;
             }
-            
             const shareScope = {
             ${sharedScopeCode(shared).join(',')} 
             };
-            
             const initMap = {};
-            
             export default {
               ensure: async (remoteId) => {
                 const remote = await remotesMap[remoteId]();
-            
                 if (!initMap[remoteId]) {
                   remote.init(shareScope);
                   initMap[remoteId] = true;
                 }
-            
                 return remote;
               }
             };`
@@ -124,5 +121,27 @@ export function remotesPlugin(
         map: null
       }
     }
+  }
+
+  function sharedScopeCode(shared: (string | ConfigTypeSet)[]): string[] {
+    const res: string[] = []
+    if (shared.length) {
+      shared.forEach((arr) => {
+        const sharedName = arr[0]
+        const obj = arr[1]
+        let str = ''
+        if (typeof obj === 'object' && obj.import) {
+          Object.entries(obj).forEach(([key, value]) => {
+            str += `${key}:${JSON.stringify(value)}, \n`
+          })
+          str += `get: ()=> ${IMPORT_ALIAS}('${getModuleMarker(
+            `\${${sharedName}}`,
+            'shareScope'
+          )}')`
+          res.push(`'${sharedName}':{${str}}`)
+        }
+      })
+    }
+    return res
   }
 }

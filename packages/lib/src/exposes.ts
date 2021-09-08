@@ -74,8 +74,7 @@ export function exposesPlugin(
     };
     
     export const init =(shareScope, initScope) => {
-        let global = window || node;
-        global.${getModuleMarker('shared', 'var')}= shareScope
+        globalThis.${getModuleMarker('shared', 'var')}= shareScope
     };`
     },
 

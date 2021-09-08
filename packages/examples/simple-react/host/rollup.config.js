@@ -34,7 +34,8 @@ export default {
       shared: {
         react: {
           singleton: true,
-          requiredVersion: pkg.dependencies.react
+          requiredVersion: pkg.dependencies.react,
+          import:false
         },
         'react-dom': {
           singleton: true,

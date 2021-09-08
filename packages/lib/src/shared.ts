@@ -27,11 +27,11 @@ export function sharedPlugin(
     (item) => ({
       import: item
     }),
-    (item) => item
+    (value, key) =>
+      'import' in value ? value : Object.assign(value, { import: key })
   ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
   const sharedNames = new Set<string>()
   shared.forEach((value) => sharedNames.add(value[0]))
-  shared = shared as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
   const exposesModuleIdSet = new Set()
   EXPOSES_MAP.forEach((value) => {
     exposesModuleIdSet.add(`${value}.js`)
@@ -135,9 +135,7 @@ export function sharedPlugin(
         }
       }
 
-      function addDep(entries, priority, depInShared) {
-        const key = entries[0]
-        const value = entries[1]
+      function addDep([key, value], priority, depInShared) {
         for (const dep of value) {
           if (!priority.includes(dep)) {
             addDep([dep, depInShared.get(dep)], priority, depInShared)
@@ -193,10 +191,10 @@ export function sharedPlugin(
             const fileName = path.basename(filePath)
             const fileDir = path.dirname(filePath)
             const sharedProp = shared.find(
-              (item) => sharedNames === item[0]
+              (item) => sharedName === item[0]
             )?.[1]
             if (sharedProp) {
-              sharedProp.file = fileName
+              sharedProp.fileName = fileName
               sharedProp.fileDir = fileDir
               sharedProp.filePath = filePath
             }
@@ -214,9 +212,7 @@ export function sharedPlugin(
       shared.forEach((arr) => {
         const sharedName = arr[0]
         const sharedProp = arr[1]
-        const fileName = sharedProp.fileName
-        const fileDir = sharedProp.fileDir
-        const filePath = sharedProp.filePath
+        const { fileName, fileDir, filePath } = sharedProp
         if (filePath && !fileName.startsWith('__rf_input')) {
           const expectName = `__rf_input__${sharedName}`
           let expectFileName = ''
