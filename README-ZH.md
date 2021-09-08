@@ -84,7 +84,7 @@ export default {
 }
 ```
 
-### 步骤一：异步引用
+### 步骤二：异步引用
 
 vue2 为例
 
@@ -164,3 +164,9 @@ vite-plugin-federation 在开发构建过程正需要依赖，建议全局安装
 - lerna
 - rimraf
 
+Github CI 构建，非工程必备：
+
+- playwright-chromium
+
+## Wiki
+[设计架构](https://github.com/originjs/vite-plugin-federation/wiki)
