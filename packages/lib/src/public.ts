@@ -1,6 +1,6 @@
-import { OutputChunk } from 'rollup'
+import { RenderedChunk } from 'rollup'
 // for generateBundle Hook replace
-export const EXPOSES_CHUNK_SET = new Set<OutputChunk>()
+export const EXPOSES_CHUNK_SET = new Set<RenderedChunk>()
 export const EXPOSES_MAP = new Map()
 export const SHARED = 'shared'
 export const IMPORT_ALIAS = '__f__import__'

@@ -113,7 +113,20 @@ export function exposesPlugin(
         })
       }
     },
-
+    renderChunk(code, chunk, _) {
+      if (chunk.type === 'chunk' && chunk.isEntry) {
+        EXPOSES_MAP.forEach((value) => {
+          if (
+            chunk.facadeModuleId != null &&
+            isSameFilepath(chunk.facadeModuleId, value)
+          ) {
+            replaceMap.set(value, `./${chunk.fileName}`)
+            EXPOSES_CHUNK_SET.add(chunk)
+          }
+        })
+      }
+      return null
+    },
     generateBundle(_options, bundle) {
       const moduleCssFileMap = getChunkCssRelation(bundle)
 
@@ -125,15 +138,6 @@ export function exposesPlugin(
           if (!remoteEntryChunk && chunk.fileName === options.filename) {
             remoteEntryChunk = chunk
           }
-          EXPOSES_MAP.forEach((value) => {
-            if (
-              chunk.facadeModuleId != null &&
-              isSameFilepath(chunk.facadeModuleId, value)
-            ) {
-              replaceMap.set(value, `./${chunk.fileName}`)
-              EXPOSES_CHUNK_SET.add(chunk)
-            }
-          })
         }
       }
       // placeholder replace

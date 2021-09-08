@@ -230,7 +230,7 @@ declare interface SharedConfig {
   /**
    * Provided module that should be provided to share scope. Also acts as fallback module if no shared module is found in share scope or version isn't valid. Defaults to the property name.
    */
-  import?: string | false
+  import?: boolean
 
   /**
    * Package name to determine required version from description file. This is only needed when package name can't be automatically determined from request.
