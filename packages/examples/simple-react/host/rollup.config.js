@@ -9,17 +9,8 @@ export default {
   input: {
 
     index: 'src/index.js',
-    // __rf_input__vue: "vue",
-    // __rf_input__react: "react",
-    // "__rf_input__react-dom": "react-dom"
-    // vue: "vue",
-    // react: "react",
-    // reactDom: "react-dom"
   },
   plugins: [
-    // injectProcessEnv({
-    //   NODE_ENV: 'production'
-    // }),
     resolve(),
     babel(),
     commonjs(),
@@ -35,7 +26,7 @@ export default {
         react: {
           singleton: true,
           requiredVersion: pkg.dependencies.react,
-          import:false
+          version: '16.13.1'
         },
         'react-dom': {
           singleton: true,
@@ -47,12 +38,5 @@ export default {
   output: {
     format: 'esm',
     dir: pkg.main,
-    // manualChunks:{
-    //   'react':['react'],
-    //   'react-dom':['react-dom']
-    // }
-    // minifyInternalExports: false
   },
-  // external: ['react', 'react-dom' , 'vue'],
-  // treeshake: false
 }

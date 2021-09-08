@@ -53,7 +53,7 @@ export function remotesPlugin(
               return mod;
             }
             const shareScope = {
-            ${sharedScopeCode(shared).join(',')} 
+            ${getModuleMarker('shareScope')}
             };
             const initMap = {};
             export default {
@@ -69,6 +69,12 @@ export function remotesPlugin(
     },
 
     transform(code: string, id: string) {
+      if (id === '\0virtual:__federation__') {
+        return code.replace(
+          getModuleMarker('shareScope'),
+          sharedScopeCode(shared).join(',')
+        )
+      }
       if (remotes.length === 0 || id.includes('node_modules')) {
         return null
       }
@@ -125,14 +131,17 @@ export function remotesPlugin(
 
   function sharedScopeCode(shared: (string | ConfigTypeSet)[]): string[] {
     const res: string[] = []
+    const displayField = new Set<string>()
+    displayField.add('version')
     if (shared.length) {
       shared.forEach((arr) => {
         const sharedName = arr[0]
         const obj = arr[1]
         let str = ''
-        if (typeof obj === 'object' && obj.import) {
+        if (typeof obj === 'object') {
           Object.entries(obj).forEach(([key, value]) => {
-            str += `${key}:${JSON.stringify(value)}, \n`
+            if (displayField.has(key))
+              str += `${key}:${JSON.stringify(value)}, \n`
           })
           str += `get: ()=> ${IMPORT_ALIAS}('${getModuleMarker(
             `\${${sharedName}}`,

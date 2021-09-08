@@ -19,8 +19,8 @@ export default function federation(
     : DEFAULT_ENTRY_FILENAME
 
   const pluginList: PluginHooks[] = [
-    exposesPlugin(options),
     sharedPlugin(options),
+    exposesPlugin(options),
     remotesPlugin(options)
   ]
   let virtualFiles = {}

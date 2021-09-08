@@ -24,11 +24,11 @@ export function sharedPlugin(
 ): PluginHooks {
   shared = parseOptions(
     options.shared || {},
-    (item) => ({
-      import: item
+    () => ({
+      import: true
     }),
-    (value, key) =>
-      'import' in value ? value : Object.assign(value, { import: key })
+    (value) =>
+      'import' in value ? value : Object.assign(value, { import: true })
   ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
   const sharedNames = new Set<string>()
   shared.forEach((value) => sharedNames.add(value[0]))
@@ -40,16 +40,21 @@ export function sharedPlugin(
   return {
     name: 'originjs:shared',
     virtualFile: {
-      __rf_fn__import: `async function importShared(name) {
-          const moduleMap= ${getModuleMarker('moduleMap', 'var')}
-          if (globalThis.__rf_var__shared?.[name]) {
-            if (!globalThis.__rf_var__shared[name].lib) {
-              globalThis.__rf_var__shared[name].lib = await (globalThis.__rf_var__shared[name].get())
-            }
-            return globalThis.__rf_var__shared[name].lib;
-          } else {
-            return import(moduleMap[name]);
+      __rf_fn__import: `
+      const moduleMap= ${getModuleMarker('moduleMap', 'var')}
+      async function importShared(name,isImport=true) {
+        if (globalThis.__rf_var__shared?.[name]) {
+          if (!globalThis.__rf_var__shared[name].lib) {
+            globalThis.__rf_var__shared[name].lib = await (globalThis.__rf_var__shared[name].get())
           }
+          return globalThis.__rf_var__shared[name].lib;
+        } else {
+          if(isImport){
+            return import(moduleMap[name]);
+          }else {
+            throw new Error(\`\${name} shared module is unavailable, because the host shared module is unavailable and 'import:false' is configured, causing the fallback module to be unavailable\`)
+          }
+        }
       }
       export default importShared;
       `
@@ -78,7 +83,25 @@ export function sharedPlugin(
 
     async buildStart() {
       for (const arr of shared) {
-        arr[1].id = await this.resolveId(arr[0])
+        const id = await this.resolveId(arr[0])
+        if (id) {
+          arr[1].id = id
+          if (!arr[1].version) {
+            const packageJsonPath = `${id.split(arr[0])[0]}${arr[0]}${
+              path.sep
+            }package.json`
+            try {
+              arr[1].version = (await import(packageJsonPath)).version
+              arr[1].version.length
+            } catch (e) {
+              this.error(
+                `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
+              )
+            }
+          }
+        } else {
+          this.error(`Unable to find the corresponding entry file of ${arr[0]}`)
+        }
       }
       if (shared.length && EXPOSES_MAP.size) {
         this.emitFile({
@@ -287,48 +310,52 @@ export function sharedPlugin(
         }
         const FN_IMPORT = getModuleMarker('import', 'fn')
         EXPOSES_CHUNK_SET.forEach((chunk) => {
-          let lastImport: any = null
-          const ast = this.parse(chunk.code)
-          const importMap = new Map()
-          const magicString = new MagicString(chunk.code)
-          walk(ast, {
-            enter(node: any) {
-              if (node.type === 'ImportDeclaration') {
-                const fileName = path.basename(node.source.value)
-                const sharedName = shared.find(
-                  (arr) => arr[1].fileName === fileName
-                )?.[0]
-                if (sharedName) {
-                  importMap.set(sharedName, {
-                    source: node.source.value,
-                    specifiers: node.specifiers
-                  })
-                  //  replace import with empty
-                  magicString.overwrite(node.start, node.end, '')
+          if (chunk.code) {
+            let lastImport: any = null
+            const ast = this.parse(chunk.code)
+            const importMap = new Map()
+            const magicString = new MagicString(chunk.code!)
+            walk(ast, {
+              enter(node: any) {
+                if (node.type === 'ImportDeclaration') {
+                  const fileName = path.basename(node.source.value)
+                  const sharedItem = shared.find(
+                    (arr) => arr[1].fileName === fileName
+                  )
+                  const sharedName = sharedItem?.[0]
+                  if (sharedName) {
+                    importMap.set(sharedName, {
+                      source: node.source.value,
+                      specifiers: node.specifiers,
+                      import: sharedItem?.[1].import
+                    })
+                    //  replace import with empty
+                    magicString.overwrite(node.start, node.end, '')
+                  }
+                  // record the last import to insert dynamic import code
+                  lastImport = node
                 }
-                // record the last import to insert dynamic import code
-                lastImport = node
               }
-            }
-          })
-          //  generate variable declare
-          const PLACEHOLDER_VAR = [...importMap.keys()]
-            .map((item) => {
-              let str = ''
-              importMap.get(item).specifiers?.forEach((space) => {
-                str += `const ${space.local.name} = (await ${FN_IMPORT}('${item}'))['${space.imported.name}'] \n`
-              })
-              return str
             })
-            .join('')
-          if (lastImport) {
-            //  append code after lastImport
-            magicString.prepend(
-              `\n import ${FN_IMPORT} from './${FN_IMPORT}.js'\n`
-            )
-            magicString.appendRight(lastImport.end, PLACEHOLDER_VAR)
+            //  generate variable declare
+            const PLACEHOLDER_VAR = [...importMap.entries()]
+              .map(([key, value]) => {
+                let str = ''
+                value.specifiers?.forEach((space) => {
+                  str += `const ${space.local.name} = (await ${FN_IMPORT}('${key}',${value.import}))['${space.imported.name}'] \n`
+                })
+                return str
+              })
+              .join('')
+            if (lastImport) {
+              //  append code after lastImport
+              magicString.prepend(
+                `\n import ${FN_IMPORT} from './${FN_IMPORT}.js'\n`
+              )
+              magicString.appendRight(lastImport.end, PLACEHOLDER_VAR)
+            }
+            chunk.code = magicString.toString()
           }
-          chunk.code = magicString.toString()
         })
       }
     }
