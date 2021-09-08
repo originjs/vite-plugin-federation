@@ -324,7 +324,7 @@ export function sharedPlugin(
           if (lastImport) {
             //  append code after lastImport
             magicString.prepend(
-              `\n import ${FN_IMPORT} from '.${path.sep}${FN_IMPORT}.js'\n`
+              `\n import ${FN_IMPORT} from './${FN_IMPORT}.js'\n`
             )
             magicString.appendRight(lastImport.end, PLACEHOLDER_VAR)
           }
