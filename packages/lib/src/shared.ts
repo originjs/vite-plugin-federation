@@ -87,10 +87,9 @@ export function sharedPlugin(
         if (id) {
           arr[1].id = id
           if (!arr[1].version) {
-            const lastIndex = id.lastIndexOf(`${path.sep}${arr[0]}${path.sep}`)
-            const packageJsonPath = `${id.substring(0, lastIndex)}${path.sep}${
-              arr[0]
-            }${path.sep}package.json`
+            const packageJsonPath = `${id.split(arr[0])[0]}${arr[0]}${
+              path.sep
+            }package.json`
             try {
               arr[1].version = (await import(packageJsonPath)).version
               arr[1].version.length
