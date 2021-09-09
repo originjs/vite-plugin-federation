@@ -212,11 +212,16 @@ export function exposesPlugin(
         moduleCssFileMap.set(file, cssFileMap.get(name))
         continue
       }
-      if (bundle[file]?.imports?.length === 1) {
-        name = getOriginalFileName(bundle[file].imports[0])
+
+      // Replace the null reference file with the original file
+      const chunk = bundle[file]
+      if (
+        chunk?.modules != undefined &&
+        Object.keys(chunk?.modules)?.length === 0
+      ) {
+        name = getOriginalFileName(chunk.imports[0])
         if (cssFileMap.get(name) != null) {
           moduleCssFileMap.set(file, cssFileMap.get(name))
-          continue
         }
       }
     }
