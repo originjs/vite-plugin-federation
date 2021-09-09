@@ -87,9 +87,10 @@ export function sharedPlugin(
         if (id) {
           arr[1].id = id
           if (!arr[1].version) {
-            const packageJsonPath = `${id.split(arr[0])[0]}${arr[0]}${
-              path.sep
-            }package.json`
+            const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
+            const packageJsonPath = `${id.split(regExp)[0]}node_modules/${
+              arr[0]
+            }/package.json`
             try {
               arr[1].version = (await import(packageJsonPath)).version
               arr[1].version.length
