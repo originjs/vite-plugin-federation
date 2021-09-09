@@ -1,3 +1,29 @@
+## [0.0.3](https://github.com/originjs/vite-plugin-federation/compare/v0.0.1...v0.0.3) (2021-09-09)
+
+
+### Bug Fixes
+
+* close issue [#45](https://github.com/originjs/vite-plugin-federation/issues/45) [#48](https://github.com/originjs/vite-plugin-federation/issues/48) ([6d7c567](https://github.com/originjs/vite-plugin-federation/commit/6d7c567345dfef2e802b6e89382b294aaf81f8d7))
+* add testcase for isSameFilepath and fix bugs ([3db8a0d](https://github.com/originjs/vite-plugin-federation/commit/3db8a0dee7510305b7f65277c0995fc4388d0b29))
+* circular dependencies bug ([#47](https://github.com/originjs/vite-plugin-federation/issues/47)) ([95be98d](https://github.com/originjs/vite-plugin-federation/commit/95be98db2833f618fbf6bd7b86309a036bc2ef3a))
+* dependabot alerts for ecstatic ([ae8d829](https://github.com/originjs/vite-plugin-federation/commit/ae8d829e0f739417499aebb26641e90ef5220ff9))
+* fix style bug when build.minify true ([#37](https://github.com/originjs/vite-plugin-federation/issues/37)) ([eb6f9fd](https://github.com/originjs/vite-plugin-federation/commit/eb6f9fd84a2ab615ef18e684ef065ef037672ee5))
+* import path error ([069b702](https://github.com/originjs/vite-plugin-federation/commit/069b702d5c5b6997e83f0685c601b1750ce7926f))
+* import shared failure ([ca0056d](https://github.com/originjs/vite-plugin-federation/commit/ca0056d49d7b2e81816292bc3af32815364306f3))
+* rename export name bug and circular dependency problems(few cases will have problems) ([#43](https://github.com/originjs/vite-plugin-federation/issues/43)) ([e3b75bf](https://github.com/originjs/vite-plugin-federation/commit/e3b75bf9a806a1fd5ddbdf9fe9f103951205c0af))
+* shared renderChunk function error ([0870de9](https://github.com/originjs/vite-plugin-federation/commit/0870de92961a4443c23282fabc0a5017b2aa27f5))
+* get css file path error ([#67](https://github.com/originjs/vite-plugin-federation/issues/67)) ([0c83750](https://github.com/originjs/vite-plugin-federation/commit/0c8375073ea2193189c4df09486919811585411a))
+
+
+### Features
+
+* add util of merging options ([#54](https://github.com/originjs/vite-plugin-federation/issues/54)) ([ceae847](https://github.com/originjs/vite-plugin-federation/commit/ceae847c766aee7a334a05119b597d3430ba6674))
+* rename filename distinguish vite and rollup ([#49](https://github.com/originjs/vite-plugin-federation/issues/49)) ([32ba2ab](https://github.com/originjs/vite-plugin-federation/commit/32ba2aba47bb84a2f711e4fb556a2bfc27be03f7))
+* support import property of shared ([d2ed02a](https://github.com/originjs/vite-plugin-federation/commit/d2ed02a3f04949740dbecc549115daa09aec614a))
+* use __rf_fn__import to replace more shared code in exposes ([#55](https://github.com/originjs/vite-plugin-federation/issues/55)) ([3b52e13](https://github.com/originjs/vite-plugin-federation/commit/3b52e13b679157088b940cfe3ad1b50470971457))
+
+
+
 
 ## [0.0.1](https://github.com/originjs/vite-plugin-federation/compare/de5f75f8a2377873430443c65d36534564736a2a...v0.0.1) (2021-08-26)
 
