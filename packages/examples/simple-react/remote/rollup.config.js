@@ -27,9 +27,8 @@ export default {
       shared: [
         {
           react: {
-            import: false,
             singleton: true,
-            requiredVersion: pkg.dependencies.react,
+            requiredVersion:pkg.dependencies['react']
           },
           'react-dom': {
             singleton: true,
@@ -42,10 +41,6 @@ export default {
   output: {
     format: 'esm',
     dir: pkg.main,
-    // manualChunks:{
-    //   'react':['react'],
-    //   'react-dom':['react-dom']
-    // }
     // minifyInternalExports:false
   },
   // external: ['react', 'react-dom'],
