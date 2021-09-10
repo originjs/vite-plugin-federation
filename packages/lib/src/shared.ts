@@ -42,21 +42,49 @@ export function sharedPlugin(
     virtualFile: {
       __rf_fn__import: `
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
-      async function importShared(name,isImport=true) {
-        if (globalThis.__rf_var__shared?.[name]) {
-          if (!globalThis.__rf_var__shared[name].lib) {
-            globalThis.__rf_var__shared[name].lib = await (globalThis.__rf_var__shared[name].get())
-          }
-          return globalThis.__rf_var__shared[name].lib;
+      const sharedInfo = ${getModuleMarker('sharedInfo', 'var')}
+      let errorMessage = [];
+      async function importShared(name) {
+        if (errorMessage.length) {
+          errorMessage = []
+        }
+        const providerModule = await getProviderSharedModule(name);
+        if (providerModule) {
+          return providerModule
         } else {
-          if(isImport){
-            return import(moduleMap[name]);
+          const consumerModule = await getConsumerSharedModule(name);
+          if(consumerModule){
+            return consumerModule
           }else {
-            throw new Error(\`\${name} shared module is unavailable, because the host shared module is unavailable and 'import:false' is configured, causing the fallback module to be unavailable\`)
+            throw Error(errorMessage.join(','))
           }
         }
       }
-      export default importShared;
+      async function getProviderSharedModule(name) {
+        if (globalThis.__rf_var__shared?.[name]) {
+          const dep = globalThis.__rf_var__shared[name];
+          if (sharedInfo[name]?.requiredVersion) {
+            // judge version satisfy
+            const satisfies = await import('semver/functions/satisfies');
+            const fn = satisfies.default||satisfies
+            if (fn(dep.version, sharedInfo[name].requiredVersion)) {
+              return dep.get()
+            } else {
+              errorMessage.push(\`provider support \${name}(\${dep.version}) is not satisfied requiredVersion(\${sharedInfo[name].requiredVersion})\`)
+            }
+          } else {
+            return dep.get() 
+          }
+        }
+      }
+      async function getConsumerSharedModule(name) {
+        if (sharedInfo[name]?.import) {
+          return import(moduleMap[name])
+        } else {
+          errorMessage.push(\`consumer config import=false,so cant use callback shared module\`)
+        }
+      }
+      export {importShared as default};
       `
     },
     options(inputOptions) {
@@ -290,23 +318,38 @@ export function sharedPlugin(
       })
 
       if (EXPOSES_CHUNK_SET.size && shared.length) {
-        const PLACEHOLDER_MODULE_MAP = `{${[...sharedNames.keys()]
-          .map((item) => {
-            return `'${item}':'${
-              shared.find((arr) => arr[0] === item)?.[1].filePath
-            }'`
-          })
+        const moduleMapCode = `{${[...shared]
+          .map((item) => `'${item[0]}':'${item[1].filePath}'`)
           .join(',')}}`
         if (sharedImport) {
           // modify shareImport generate dir,only vite need
           if (builderInfo.builder === VITE) {
-            sharedImport.fileName = `${path.dirname(
+            const fileDir = path.dirname(
               Array.from(EXPOSES_CHUNK_SET)[0].fileName
-            )}${path.sep}${sharedImport.fileName}`
+            )
+            sharedImport.fileName = `${fileDir}${path.sep}${sharedImport.fileName}`
+            // replace fn_import dynamic semver path
+            sharedImport.code = sharedImport.code?.replace(
+              `${sharedImport.dynamicImports[0]}`,
+              `./${path.basename(sharedImport.dynamicImports[0])}`
+            )
           }
           sharedImport.code = sharedImport.code?.replace(
             getModuleMarker('moduleMap', 'var'),
-            PLACEHOLDER_MODULE_MAP
+            moduleMapCode
+          )
+          const obj = {}
+          // only need little field
+          shared.forEach(
+            (value) =>
+              (obj[value[0]] = {
+                import: value[1].import,
+                requiredVersion: value[1].requiredVersion
+              })
+          )
+          sharedImport.code = sharedImport.code?.replace(
+            getModuleMarker('sharedInfo', 'var'),
+            JSON.stringify(obj)
           )
         }
         const FN_IMPORT = getModuleMarker('import', 'fn')
@@ -327,8 +370,7 @@ export function sharedPlugin(
                   if (sharedName) {
                     importMap.set(sharedName, {
                       source: node.source.value,
-                      specifiers: node.specifiers,
-                      import: sharedItem?.[1].import
+                      specifiers: node.specifiers
                     })
                     //  replace import with empty
                     magicString.overwrite(node.start, node.end, '')
@@ -343,7 +385,7 @@ export function sharedPlugin(
               .map(([key, value]) => {
                 let str = ''
                 value.specifiers?.forEach((space) => {
-                  str += `const ${space.local.name} = (await ${FN_IMPORT}('${key}',${value.import}))['${space.imported.name}'] \n`
+                  str += `const ${space.local.name} = (await ${FN_IMPORT}('${key}'))['${space.imported.name}'] \n`
                 })
                 return str
               })
