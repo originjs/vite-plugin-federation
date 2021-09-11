@@ -133,6 +133,7 @@ export function remotesPlugin(
     const res: string[] = []
     const displayField = new Set<string>()
     displayField.add('version')
+    displayField.add('shareScope')
     if (shared.length) {
       shared.forEach((arr) => {
         const sharedName = arr[0]

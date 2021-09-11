@@ -27,12 +27,11 @@ export default {
       shared: [
         {
           react: {
-            singleton: true,
-            requiredVersion:pkg.dependencies['react']
+            requiredVersion: '^1.0.0',
           },
           'react-dom': {
-            singleton: true,
-            requiredVersion: pkg.dependencies['react-dom']
+            requiredVersion: pkg.dependencies['react-dom'],
+            import:false
           }
         }
       ]

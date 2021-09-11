@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import federation from '@originjs/vite-plugin-federation'
 
@@ -13,16 +13,20 @@ export default defineConfig({
         './CommonCounter': './src/components/CommonCounter.vue',
         './CommonHeader': './src/components/CommonHeader.vue'
       },
-      shared: ['vue']
+      shared: {
+        vue: {
+          requiredVersion:'^1.0.0'
+        }
+      }
     })
   ],
   build: {
-    target:'es2020',
+    target: 'es2020',
     minify: false,
     cssCodeSplit: true,
-    rollupOptions:{
-      output:{
-        minifyInternalExports:false
+    rollupOptions: {
+      output: {
+        minifyInternalExports: false
       }
     }
   }
