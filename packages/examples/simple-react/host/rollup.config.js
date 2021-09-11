@@ -26,11 +26,11 @@ export default {
         react: {
           singleton: true,
           requiredVersion: pkg.dependencies.react,
-          version: '16.13.1'
+          version: '16.13.1',
         },
         'react-dom': {
           singleton: true,
-          requiredVersion: pkg.dependencies['react-dom']
+          requiredVersion: pkg.dependencies['react-dom'],
         }
       }
     })

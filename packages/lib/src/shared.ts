@@ -25,10 +25,14 @@ export function sharedPlugin(
   shared = parseOptions(
     options.shared || {},
     () => ({
-      import: true
+      import: true,
+      shareScope: 'default'
     }),
-    (value) =>
-      'import' in value ? value : Object.assign(value, { import: true })
+    (value) => {
+      value.import = value.import ?? true
+      value.shareScope = value.shareScope || 'default'
+      return value
+    }
   ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
   const sharedNames = new Set<string>()
   shared.forEach((value) => sharedNames.add(value[0]))
@@ -44,11 +48,11 @@ export function sharedPlugin(
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
       const sharedInfo = ${getModuleMarker('sharedInfo', 'var')}
       let errorMessage = [];
-      async function importShared(name) {
+      async function importShared(name,shareScope) {
         if (errorMessage.length) {
           errorMessage = []
         }
-        const providerModule = await getProviderSharedModule(name);
+        const providerModule = await getProviderSharedModule(name,shareScope);
         if (providerModule) {
           return providerModule
         } else {
@@ -60,9 +64,9 @@ export function sharedPlugin(
           }
         }
       }
-      async function getProviderSharedModule(name) {
-        if (globalThis.__rf_var__shared?.[name]) {
-          const dep = globalThis.__rf_var__shared[name];
+      async function getProviderSharedModule(name,shareScope) {
+        if (globalThis?.__rf_var__shared?.[shareScope]?.[name]) {
+          const dep = globalThis.__rf_var__shared[shareScope][name];
           if (sharedInfo[name]?.requiredVersion) {
             // judge version satisfy
             const satisfies = await import('semver/functions/satisfies');
@@ -290,9 +294,11 @@ export function sharedPlugin(
           bundle[expectFileNameOrPath].fileName = expectFileNameOrPath
           delete bundle[fileNameOrPath]
           importReplaceMap.set(filePath, expectFilePath)
-          sharedProp.filePath = expectFilePath
           sharedProp.fileName = expectFileName
         }
+        sharedProp.filePath =
+          '/' +
+          `${sharedProp.fileDir}/${sharedProp.fileName}`.replace(/^\.?\//, '')
         importReplaceMap.set(
           getModuleMarker(`\${${sharedName}}`, 'shareScope'),
           `./${sharedProp.fileName}`
@@ -370,7 +376,8 @@ export function sharedPlugin(
                   if (sharedName) {
                     importMap.set(sharedName, {
                       source: node.source.value,
-                      specifiers: node.specifiers
+                      specifiers: node.specifiers,
+                      sharedItem: sharedItem?.[1]
                     })
                     //  replace import with empty
                     magicString.overwrite(node.start, node.end, '')
@@ -385,7 +392,7 @@ export function sharedPlugin(
               .map(([key, value]) => {
                 let str = ''
                 value.specifiers?.forEach((space) => {
-                  str += `const ${space.local.name} = (await ${FN_IMPORT}('${key}'))['${space.imported.name}'] \n`
+                  str += `const ${space.local.name} = (await ${FN_IMPORT}('${key}','${value.sharedItem.shareScope}'))['${space.imported.name}'] \n`
                 })
                 return str
               })

@@ -68,14 +68,26 @@ export function exposesPlugin(
       element.href = curUrl + cssFilePath
       element.rel = 'stylesheet'
     }
-
-    export const get =(module, getScope) => {
+    export const get =(module) => {
         return moduleMap[module]();
     };
-    
-    export const init =(shareScope, initScope) => {
-        globalThis.${getModuleMarker('shared', 'var')}= shareScope
-    };`
+    export const init =(shareScope) => {
+      globalThis['__rf_var__shared'] = globalThis['__rf_var__shared'] || {};
+      Object.entries(shareScope).forEach(([key, value]) => {
+        globalThis['${getModuleMarker(
+          'shared',
+          'var'
+        )}'][value.shareScope] = globalThis['${getModuleMarker(
+        'shared',
+        'var'
+      )}'][value.shareScope] || {};
+        const global = globalThis['${getModuleMarker(
+          'shared',
+          'var'
+        )}'][value.shareScope];
+        global[key] = global[key] || value;
+      });
+    }`
     },
 
     options(
