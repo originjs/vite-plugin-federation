@@ -16,6 +16,8 @@ import {
   SharedRuntimeInfo
 } from 'types'
 import { RenderedChunk } from 'rollup'
+import { providedRemotes } from './remotes'
+import { provideExposes } from './exposes'
 
 export let shared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
 
@@ -40,6 +42,8 @@ export function sharedPlugin(
   EXPOSES_MAP.forEach((value) => {
     exposesModuleIdSet.add(`${value}.js`)
   })
+  let isHost
+  let isRemote
 
   return {
     name: 'originjs:shared',
@@ -92,6 +96,8 @@ export function sharedPlugin(
       `
     },
     options(inputOptions) {
+      isHost = !!providedRemotes.length
+      isRemote = !!provideExposes.length
       if (sharedNames.size) {
         // remove item which is both in external and shared
         inputOptions.external = (inputOptions.external as [])?.filter(
@@ -116,27 +122,23 @@ export function sharedPlugin(
     async buildStart() {
       for (const arr of shared) {
         const id = await this.resolveId(arr[0])
-        if (id) {
-          arr[1].id = id
-          if (!arr[1].version) {
-            const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
-            const packageJsonPath = `${id.split(regExp)[0]}node_modules/${
-              arr[0]
-            }/package.json`
-            try {
-              arr[1].version = (await import(packageJsonPath)).version
-              arr[1].version.length
-            } catch (e) {
-              this.error(
-                `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
-              )
-            }
+        arr[1].id = id
+        if (isHost && !arr[1].version) {
+          const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
+          const packageJsonPath = `${id?.split(regExp)[0]}node_modules/${
+            arr[0]
+          }/package.json`
+          try {
+            arr[1].version = (await import(packageJsonPath)).version
+            arr[1].version.length
+          } catch (e) {
+            this.error(
+              `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
+            )
           }
-        } else {
-          this.error(`Unable to find the corresponding entry file of ${arr[0]}`)
         }
       }
-      if (shared.length && EXPOSES_MAP.size) {
+      if (shared.length && isRemote) {
         this.emitFile({
           fileName: '__rf_fn__import.js',
           type: 'chunk',

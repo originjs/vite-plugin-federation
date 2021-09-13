@@ -21,12 +21,14 @@ import { PluginHooks } from '../types/pluginHooks'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 
+export let provideExposes
+
 export function exposesPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   let moduleMap = ''
   const replaceMap = new Map()
-  const provideExposes = parseOptions(
+  provideExposes = parseOptions(
     options.exposes,
     (item) => ({
       import: item,
