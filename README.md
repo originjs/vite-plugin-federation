@@ -67,6 +67,47 @@ export default {
 }
 ```
 
+## Configuration description
+
+### exposes
+#### `name: string`
+Required as the module name of the remote module.
+
+#### `filename:string`
+As the entry file of the remote module, not required, default is `remoteEntry.js`
+
+As the remote module, the list of components exposed to the public, required for the remote module.
+```js
+exposes: {
+// 'externally exposed component name': 'externally exposed component address'
+'. /remote-simple-button': '. /src/components/Button.vue',
+'. /remote-simple-section': '. /src/components/Section.vue'
+},
+  ```
+### remotes
+The remote module entry file referenced as a local module
+  ```js
+  remotes: {
+      // 'remote module name': 'remote module entry file address'
+      'remote-simple': 'http://localhost:5011/remoteEntry.js',
+  },
+  ```
+
+### shared
+Dependencies shared by local and remote modules. Local modules need to configure the dependencies of all used remote modules; remote modules need to configure the dependencies of externally provided components.
+> configuration information
+#### `import: boolean`
+
+The default is `true`, whether to add shared to the module, only for the `remote` side, `remote` will reduce some of the packaging time when this configuration is turned on, because there is no need to package some of the `shared`, but once there is no `shared` module available on the `host` side, it will report an error directly, because there is no fallback module available
+#### `shareScope: string`
+
+Default is `defualt`, the shared domain name, just keep the `remote` and `host` sides the same
+#### `version: string`
+
+Only works on `host` side, the version of the shared module provided is `version` of the `package.json` file in the shared package by default, you need to configure it manually only if you can't get `version` by this method
+#### `requiredVersion: string`
+
+Only for the `remote` side, it specifies the required version of the `host shared` used, when the version of the `host` side does not meet the `requiredVersion` requirement, it will use its own `shared` module, provided that it is not configured with `import=false`, which is not enabled by default
 ## Examples
 
 - [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
