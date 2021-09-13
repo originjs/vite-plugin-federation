@@ -11,10 +11,12 @@ import { parseOptions, getModuleMarker } from './utils'
 import { IMPORT_ALIAS } from './public'
 import { shared } from './shared'
 
+export let providedRemotes
+
 export function remotesPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
-  const providedRemotes = parseOptions(
+  providedRemotes = parseOptions(
     options.remotes ? options.remotes : {},
     (item) => ({
       external: Array.isArray(item) ? item : [item],
