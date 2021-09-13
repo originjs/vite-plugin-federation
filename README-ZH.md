@@ -118,12 +118,16 @@ vue2 为例
 
 ## 配置项说明
 
-- name：作为远程模块的模块名称，必填。
 
-- filename：作为远程模块的入口文件，非必填，默认为`remoteEntry.js`
 
-- exposes：作为远程模块，对外暴露的组件列表，远程模块必填。
+### exposes
+#### `name：string`
+作为远程模块的模块名称，必填。
 
+#### `filename：string`
+作为远程模块的入口文件，非必填，默认为`remoteEntry.js`
+
+作为远程模块，对外暴露的组件列表，远程模块必填。
   ```js
   exposes: {
       // '对外暴露的组件名称':'对外暴露的组件地址'
@@ -132,8 +136,8 @@ vue2 为例
   },
   ```
 
-- remotes：作为本地模块，引用的远端模块入口文件
-
+### remotes
+作为本地模块，引用的远端模块入口文件
   ```js
   remotes: {
       // '远端模块名称':'远端模块入口文件地址'
@@ -141,15 +145,27 @@ vue2 为例
   },
   ```
 
-- shared：本地模块和远程模块共享的依赖。本地模块需配置所有使用到的远端模块的依赖；远端模块需要配置对外提供的组件的依赖。
-
+### shared
+本地模块和远程模块共享的依赖。本地模块需配置所有使用到的远端模块的依赖；远端模块需要配置对外提供的组件的依赖。
+> 配置信息
+####  `import: boolean`
+ 
+默认为 `true` ，是否加入shared共享该模块，仅对 `remote` 端生效，`remote` 开启该配置后，会减少部分打包时间，因为不需要打包部分` shared`，但是一旦 `host` 端没有可用的 `shared` 模块，会直接报错，因为没有可用的回退模块
+#### `shareScope: string`
+ 
+默认为 `defualt`，共享域名称，保持 `remote` 和 `host` 端一致即可
+#### `version: string`
+ 
+仅对 `host` 端生效，提供的share模块的版本，默认为share包中的 `package.json` 文件的 `version` ，只有当以此法无法获取 `version` 时才需要手动配置
+####  `requiredVersion: string`
+ 
+仅对 `remote` 端生效，规定所使用的 `host shared` 所需要的版本，当 `host` 端的版本不符合 `requiredVersion` 要求时，会使用自己的 `shared` 模块，前提是自己没有配置 `import=false` ，默认不启用该功能
 ## 例子
++ [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
++ [simple-react](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react)
++ [vue3-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo)
++ [vue2-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue2-demo)
 
-
-- [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
-- [simple-react](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react)
-- [vue3-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo)
-- [vue2-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue2-demo)
 
 ## 构建
 
