@@ -69,6 +69,11 @@ declare interface VitePluginFederationOptions {
    * Modules that should be shared in the share scope. When provided, property names are used to match requested modules in this compilation.
    */
   shared?: (string | SharedObject)[] | SharedObject
+
+  /**
+   * Current operating mode
+   */
+  mode?: string
 }
 
 type Exposes = (string | ExposesObject)[] | ExposesObject

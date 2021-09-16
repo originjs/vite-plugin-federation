@@ -1,5 +1,6 @@
-import { Plugin } from 'vite'
+import { Plugin, UserConfig } from 'vite'
 import virtual from '@rollup/plugin-virtual'
+import { devExposesPlugin } from './devExposes'
 import { exposesPlugin } from './exposes'
 import { remotesPlugin } from './remotes'
 import { sharedPlugin } from './shared'
@@ -18,18 +19,29 @@ export default function federation(
     ? options.filename
     : DEFAULT_ENTRY_FILENAME
 
-  const pluginList: PluginHooks[] = [
-    sharedPlugin(options),
-    exposesPlugin(options),
-    remotesPlugin(options)
-  ]
-  let virtualFiles = {}
-  pluginList.forEach((plugin) => {
-    if (plugin.virtualFile) {
-      virtualFiles = Object.assign(virtualFiles, plugin.virtualFile)
+  let pluginList: PluginHooks[]
+  let virtualMod
+
+  function extendPlugins(mode: string) {
+    options.mode = mode
+    if (mode == 'development') {
+      pluginList = [devExposesPlugin(options)]
+    } else {
+      pluginList = [
+        sharedPlugin(options),
+        exposesPlugin(options),
+        remotesPlugin(options)
+      ]
     }
-  })
-  const virtualMod = virtual(virtualFiles)
+
+    let virtualFiles = {}
+    pluginList.forEach((plugin) => {
+      if (plugin.virtualFile) {
+        virtualFiles = Object.assign(virtualFiles, plugin.virtualFile)
+      }
+    })
+    virtualMod = virtual(virtualFiles)
+  }
 
   return {
     name: 'originjs:federation',
@@ -37,7 +49,7 @@ export default function federation(
     // vite:css-post plugin will summarize all the styles in the style.xxxxxx.css file
     // so, this plugin need run after vite:css-post in post plugin list
     enforce: 'post',
-    apply: 'build',
+    // apply:'build',
     options(_options) {
       _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
@@ -52,7 +64,8 @@ export default function federation(
       }
       return _options
     },
-    config() {
+    config(config: UserConfig, env: { mode: string; command: string }) {
+      extendPlugins(env.mode)
       // only run when builder is vite,rollup doesnt have hook named `config`
       builderInfo.builder = 'vite'
     },
