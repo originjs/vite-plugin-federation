@@ -13,7 +13,8 @@ import {
   DYNAMIC_LOADING_CSS_PREFIX,
   SHARED,
   EXPOSES_CHUNK_SET,
-  EXPOSES_MAP
+  EXPOSES_MAP,
+  parsedOptions
 } from './public'
 import { AcornNode, InputOptions, MinimalPluginContext } from 'rollup'
 import { VitePluginFederationOptions } from 'types'
@@ -28,7 +29,7 @@ export function exposesPlugin(
 ): PluginHooks {
   let moduleMap = ''
   const replaceMap = new Map()
-  provideExposes = parseOptions(
+  parsedOptions.exposes = provideExposes = parseOptions(
     options.exposes,
     (item) => ({
       import: item,

@@ -8,15 +8,14 @@ import MagicString from 'magic-string'
 import { AcornNode } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
 import { parseOptions, getModuleMarker } from './utils'
-import { IMPORT_ALIAS } from './public'
-import { shared } from './shared'
+import { IMPORT_ALIAS, parsedOptions } from './public'
 
 export let providedRemotes
 
 export function remotesPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
-  providedRemotes = parseOptions(
+  parsedOptions.remotes = providedRemotes = parseOptions(
     options.remotes ? options.remotes : {},
     (item) => ({
       external: Array.isArray(item) ? item : [item],
@@ -74,7 +73,7 @@ export function remotesPlugin(
       if (id === '\0virtual:__federation__') {
         return code.replace(
           getModuleMarker('shareScope'),
-          sharedScopeCode(shared).join(',')
+          sharedScopeCode(parsedOptions.shared).join(',')
         )
       }
       if (remotes.length === 0 || id.includes('node_modules')) {

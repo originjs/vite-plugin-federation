@@ -4,6 +4,7 @@ import {
   builderInfo,
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
+  parsedOptions,
   ROLLUP,
   VITE
 } from './public'
@@ -16,15 +17,13 @@ import {
   SharedRuntimeInfo
 } from 'types'
 import { RenderedChunk } from 'rollup'
-import { providedRemotes } from './remotes'
-import { provideExposes } from './exposes'
 
-export let shared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
+export let provideShared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
 
 export function sharedPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
-  shared = parseOptions(
+  parsedOptions.shared = provideShared = parseOptions(
     options.shared || {},
     () => ({
       import: true,
@@ -37,7 +36,7 @@ export function sharedPlugin(
     }
   ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
   const sharedNames = new Set<string>()
-  shared.forEach((value) => sharedNames.add(value[0]))
+  provideShared.forEach((value) => sharedNames.add(value[0]))
   const exposesModuleIdSet = new Set()
   EXPOSES_MAP.forEach((value) => {
     exposesModuleIdSet.add(`${value}.js`)
@@ -96,8 +95,8 @@ export function sharedPlugin(
       `
     },
     options(inputOptions) {
-      isHost = !!providedRemotes.length
-      isRemote = !!provideExposes.length
+      isHost = !!parsedOptions.remotes.length
+      isRemote = !!parsedOptions.exposes.length
       if (sharedNames.size) {
         // remove item which is both in external and shared
         inputOptions.external = (inputOptions.external as [])?.filter(
@@ -120,7 +119,7 @@ export function sharedPlugin(
     },
 
     async buildStart() {
-      for (const arr of shared) {
+      for (const arr of provideShared) {
         const id = await this.resolveId(arr[0])
         arr[1].id = id
         if (isHost && !arr[1].version) {
@@ -138,7 +137,7 @@ export function sharedPlugin(
           }
         }
       }
-      if (shared.length && isRemote) {
+      if (provideShared.length && isRemote) {
         this.emitFile({
           fileName: '__rf_fn__import.js',
           type: 'chunk',
@@ -152,13 +151,13 @@ export function sharedPlugin(
       const that = this
       const priority: string[] = []
       const depInShared = new Map()
-      shared.forEach((value) => {
+      provideShared.forEach((value) => {
         const shareName = value[0]
         // pick every shared moduleId
         const usedSharedModuleIds = new Set<string>()
         const sharedModuleIds = new Map<string, string>()
         // exclude itself
-        shared
+        provideShared
           .filter((item) => item[0] !== shareName)
           .forEach((item) => sharedModuleIds.set(item[1].id, item[0]))
         depInShared.set(shareName, usedSharedModuleIds)
@@ -205,9 +204,9 @@ export function sharedPlugin(
       }
 
       // adjust the map order according to priority
-      shared.sort((a, b) => {
-        const aIndex = shared.findIndex((value) => value[0] === a[0])
-        const bIndex = shared.findIndex((value) => value[0] === b[0])
+      provideShared.sort((a, b) => {
+        const aIndex = provideShared.findIndex((value) => value[0] === a[0])
+        const bIndex = provideShared.findIndex((value) => value[0] === b[0])
         return aIndex - bIndex
       })
 
@@ -217,7 +216,9 @@ export function sharedPlugin(
           apply(target, thisArg, argArray) {
             const id = argArray[0]
             //  if id is in shared dependencies, return id ,else return vite function value
-            const find = shared.find((arr) => arr[1].dependencies.has(id))
+            const find = provideShared.find((arr) =>
+              arr[1].dependencies.has(id)
+            )
             return find ? find[0] : target(argArray[0], argArray[1])
           }
         })
@@ -248,7 +249,7 @@ export function sharedPlugin(
             }
             const fileName = path.basename(filePath)
             const fileDir = path.dirname(filePath)
-            const sharedProp = shared.find(
+            const sharedProp = provideShared.find(
               (item) => sharedName === item[0]
             )?.[1]
             if (sharedProp) {
@@ -267,7 +268,7 @@ export function sharedPlugin(
 
       const importReplaceMap = new Map()
       // rename file and remove unnecessary file
-      shared.forEach((arr) => {
+      provideShared.forEach((arr) => {
         const sharedName = arr[0]
         const sharedProp = arr[1]
         const { fileName, fileDir, filePath } = sharedProp
@@ -325,8 +326,8 @@ export function sharedPlugin(
         }
       })
 
-      if (EXPOSES_CHUNK_SET.size && shared.length) {
-        const moduleMapCode = `{${[...shared]
+      if (EXPOSES_CHUNK_SET.size && provideShared.length) {
+        const moduleMapCode = `{${[...provideShared]
           .map((item) => `'${item[0]}':'${item[1].filePath}'`)
           .join(',')}}`
         if (sharedImport) {
@@ -348,7 +349,7 @@ export function sharedPlugin(
           )
           const obj = {}
           // only need little field
-          shared.forEach(
+          provideShared.forEach(
             (value) =>
               (obj[value[0]] = {
                 import: value[1].import,
@@ -371,7 +372,7 @@ export function sharedPlugin(
               enter(node: any) {
                 if (node.type === 'ImportDeclaration') {
                   const fileName = path.basename(node.source.value)
-                  const sharedItem = shared.find(
+                  const sharedItem = provideShared.find(
                     (arr) => arr[1].fileName === fileName
                   )
                   const sharedName = sharedItem?.[0]
