@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite --port 5002 --strictPort",
-    "serve": "kill-port --port 5002 & vite preview --port 5002 --strictPort",
+    "serve": "vite preview --port 5002 --strictPort",
     "build": "vite build",
     "clean": "rm -rf dist"
   },
