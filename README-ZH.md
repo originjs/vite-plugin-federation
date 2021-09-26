@@ -5,87 +5,79 @@
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
  </p>
 
-# vite-plugin-federation
+# vite-plugin-federation
+
+一个支持模块联邦的 Vite 插件
+灵感来源于 Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) 特性.
 
 
-一个支持模块联邦的 Vite 插件
-灵感来源于 Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) 特性.
+## 安装
 
 
-## 安装
-
-
-使用 npm:
+使用 npm:
 
 
 ```
-npm install @originjs/vite-plugin-federation --save-dev
+npm install @originjs/vite-plugin-federation --save-dev
 ```
 
-## 使用
+## 使用
 
 使用 federation 主要分为几个步骤：
 
 ### 步骤一：修改配置
-
-
-- 使用 Vite 构建的项目, 修改 `vite.config.js`文件:
+- 使用 Vite 构建的项目, 修改 `vite.config.js`文件:
 
 
 ```js
-import { defineConfig } from 'vite'
-import federation from "@originjs/vite-plugin-federation";
+import { defineConfig } from 'vite'
+import federation from "@originjs/vite-plugin-federation";
 
-export default defineConfig({
-  plugins: [
-    federation({
-      name: 'module-name',
-      filename: 'remoteEntry.js',
-      exposes: {
-        './Button': './src/Button.vue',
-      },
-      remotes:{
-          foo: 'remote_foo'
-      }
-      shared: ['vue']
-    })
-  ],
+export default defineConfig({
+  plugins: [
+    federation({
+      name: 'module-name',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './Button': './src/Button.vue',
+      },
+      remotes:{
+          foo: 'remote_foo'
+      }
+      shared: ['vue']
+    })
+  ],
 })
-
 
 ```
 
-
-
-
-- 使用 Rollup 构建的项目, 修改`rollup.config.js`文件:
-
+- 使用 Rollup 构建的项目, 修改`rollup.config.js`文件:
 
 ```js
-import federation from '@originjs/vite-plugin-federation'
+import federation from '@originjs/vite-plugin-federation'
 
 
-export default {
-  input: 'src/index.js',
-  output: {
-    format: 'esm',
-    dir: 'dist'
-  },
-  plugins: [
-    federation({
-      filename: 'remoteEntry.js',
-      exposes: {
-        './Button': './src/button'
-      },
-      shared: ['react']
-    })
-  ]
+export default {
+  input: 'src/index.js',
+  output: {
+    format: 'esm',
+    dir: 'dist'
+  },
+  plugins: [
+    federation({
+      filename: 'remoteEntry.js',
+      exposes: {
+        './Button': './src/button'
+      },
+      shared: ['react']
+    })
+  ]
 }
 ```
 
 ### 步骤二：异步引用
 
-vue2 为例
+Vue2 为例
 
 ```vue
 <script>
@@ -111,15 +103,7 @@ vue2 为例
   </div>
 </template>
 ```
-
-
-
-
-
 ## 配置项说明
-
-
-
 ### exposes
 #### `name：string`
 作为远程模块的模块名称，必填。
