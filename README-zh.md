@@ -1,4 +1,5 @@
-[English](./README.md) | 简体中文
+# vite-plugin-federation
+
 <p align="center">
   <a href="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml"><img src="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build Status"></a>
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/v/@originjs/vite-plugin-federation" alt="Version"></a>
@@ -6,87 +7,74 @@
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
  </p>
 
-# vite-plugin-federation
+一个支持模块联邦的 Vite 插件
+灵感来源于 Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) 特性.
 
+## 安装
 
-一个支持模块联邦的 Vite 插件
-灵感来源于 Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) 特性.
-
-
-## 安装
-
-
-使用 npm:
-
+使用 npm:
 
 ```
-npm install @originjs/vite-plugin-federation --save-dev
+npm install @originjs/vite-plugin-federation --save-dev
 ```
 
-## 使用
+## 使用
 
 使用 federation 主要分为几个步骤：
 
 ### 步骤一：修改配置
-
-
-- 使用 Vite 构建的项目, 修改 `vite.config.js`文件:
+- 使用 Vite 构建的项目, 修改 `vite.config.js`文件:
 
 
 ```js
-import { defineConfig } from 'vite'
-import federation from "@originjs/vite-plugin-federation";
+import { defineConfig } from 'vite'
+import federation from "@originjs/vite-plugin-federation";
 
-export default defineConfig({
-  plugins: [
-    federation({
-      name: 'module-name',
-      filename: 'remoteEntry.js',
-      exposes: {
-        './Button': './src/Button.vue',
-      },
-      remotes:{
-          foo: 'remote_foo'
-      }
-      shared: ['vue']
-    })
-  ],
+export default defineConfig({
+  plugins: [
+    federation({
+      name: 'module-name',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './Button': './src/Button.vue',
+      },
+      remotes:{
+          foo: 'remote_foo'
+      }
+      shared: ['vue']
+    })
+  ],
 })
-
 
 ```
 
-
-
-
-- 使用 Rollup 构建的项目, 修改`rollup.config.js`文件:
-
+- 使用 Rollup 构建的项目, 修改`rollup.config.js`文件:
 
 ```js
-import federation from '@originjs/vite-plugin-federation'
+import federation from '@originjs/vite-plugin-federation'
 
 
-export default {
-  input: 'src/index.js',
-  output: {
-    format: 'esm',
-    dir: 'dist'
-  },
-  plugins: [
-    federation({
-      filename: 'remoteEntry.js',
-      exposes: {
-        './Button': './src/button'
-      },
-      shared: ['react']
-    })
-  ]
+export default {
+  input: 'src/index.js',
+  output: {
+    format: 'esm',
+    dir: 'dist'
+  },
+  plugins: [
+    federation({
+      filename: 'remoteEntry.js',
+      exposes: {
+        './Button': './src/button'
+      },
+      shared: ['react']
+    })
+  ]
 }
 ```
 
 ### 步骤二：异步引用
 
-vue2 为例
+Vue2 为例
 
 ```vue
 <script>
@@ -105,22 +93,15 @@ export default {
 
 vue2 为例
 
-```
+```js
 <template>
-  <div>
-  		<RemoteButtonScoped />
-  </div>
+    <div>
+        <RemoteButtonScoped />
+    </div>
 </template>
 ```
 
-
-
-
-
 ## 配置项说明
-
-
-
 ### exposes
 #### `name：string`
 作为远程模块的模块名称，必填。
@@ -150,16 +131,16 @@ vue2 为例
 本地模块和远程模块共享的依赖。本地模块需配置所有使用到的远端模块的依赖；远端模块需要配置对外提供的组件的依赖。
 > 配置信息
 ####  `import: boolean`
- 
+
 默认为 `true` ，是否加入shared共享该模块，仅对 `remote` 端生效，`remote` 开启该配置后，会减少部分打包时间，因为不需要打包部分` shared`，但是一旦 `host` 端没有可用的 `shared` 模块，会直接报错，因为没有可用的回退模块
 #### `shareScope: string`
- 
+
 默认为 `defualt`，共享域名称，保持 `remote` 和 `host` 端一致即可
 #### `version: string`
- 
+
 仅对 `host` 端生效，提供的share模块的版本，默认为share包中的 `package.json` 文件的 `version` ，只有当以此法无法获取 `version` 时才需要手动配置
 ####  `requiredVersion: string`
- 
+
 仅对 `remote` 端生效，规定所使用的 `host shared` 所需要的版本，当 `host` 端的版本不符合 `requiredVersion` 要求时，会使用自己的 `shared` 模块，前提是自己没有配置 `import=false` ，默认不启用该功能
 ## 例子
 + [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)

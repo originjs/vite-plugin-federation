@@ -1,12 +1,11 @@
-English | [简体中文](./README-zh.md)
+# vite-plugin-federation
+
 <p align="center">
   <a href="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml"><img src="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build Status"></a>
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/v/@originjs/vite-plugin-federation" alt="Version"></a>
   <a href="https://nodejs.org/en/about/releases/"><img src="https://img.shields.io/node/v/vite.svg" alt="Node Compatibility"></a>
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
  </p>
-
-# vite-plugin-federation
 
 A Vite plugin which support Module Federation.
 Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) feature.
@@ -20,7 +19,8 @@ npm install @originjs/vite-plugin-federation --save-dev
 ```
 
 ## Usage
-
+The main steps in using federation are:
+### Step 1: change the configuration
 - for a Vite project, in `vite.config.js`:
 
 ```js
@@ -50,6 +50,7 @@ export default defineConfig({
 ```js
 import federation from '@originjs/vite-plugin-federation'
 
+
 export default {
   input: 'src/index.js',
   output: {
@@ -68,6 +69,35 @@ export default {
 }
 ```
 
+### Step 2: asynchronous references
+
+Vue2, for example
+
+```vue
+<script>
+export default {
+  name: 'App',
+  components: {
+    RemoteButtonScoped: () => import('remote-simple/remote-simple-button-scoped'),
+  }
+}
+</script>
+```
+
+
+
+### Step 3: Use Remote module components
+
+Vue2, for example
+
+```
+<template>
+  <div>
+  		<RemoteButtonScoped />
+  </div>
+</template>
+```
+
 ## Configuration description
 
 ### exposes
@@ -81,17 +111,17 @@ As the remote module, the list of components exposed to the public, required for
 ```js
 exposes: {
 // 'externally exposed component name': 'externally exposed component address'
-'. /remote-simple-button': '. /src/components/Button.vue',
-'. /remote-simple-section': '. /src/components/Section.vue'
+    '. /remote-simple-button': '. /src/components/Button.vue',
+        '. /remote-simple-section': '. /src/components/Section.vue'
 },
   ```
 ### remotes
 The remote module entry file referenced as a local module
   ```js
   remotes: {
-      // 'remote module name': 'remote module entry file address'
-      'remote-simple': 'http://localhost:5011/remoteEntry.js',
-  },
+    // 'remote module name': 'remote module entry file address'
+    'remote-simple': 'http://localhost:5011/remoteEntry.js',
+},
   ```
 
 ### shared
@@ -110,7 +140,27 @@ Only works on `host` side, the version of the shared module provided is `version
 
 Only for the `remote` side, it specifies the required version of the `host shared` used, when the version of the `host` side does not meet the `requiredVersion` requirement, it will use its own `shared` module, provided that it is not configured with `import=false`, which is not enabled by default
 ## Examples
++ [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
++ [simple-react](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react)
++ [vue3-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo)
++ [vue2-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue2-demo)
 
-- [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
-- [simple-react](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react)
-- [vue3-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo)
+
+## Construct
+
+vite-plugin-federation dependencies are required during the development and build process, and global installation is recommended.
+
+- rollup
+- vite
+
+Part of example requires dependencies, recommended for global installation.
+
+- lerna
+- rimraf
+
+Github CI build, not engineering required:
+
+- playwright-chromium
+
+## Wiki
+[Design framework](https://github.com/originjs/vite-plugin-federation/wiki)
