@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5010 --strictPort",
     "build": "vite build",
     "serve": "kill-port --port 5010 & vite preview --port 5010 --strictPort",
     "test": "echo test $name"

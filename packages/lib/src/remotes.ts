@@ -1,3 +1,4 @@
+import { UserConfig, ConfigEnv } from 'vite'
 import {
   ConfigTypeSet,
   RemotesConfig,
@@ -5,7 +6,7 @@ import {
 } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { AcornNode } from 'rollup'
+import { AcornNode, TransformPluginContext } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
 import { parseOptions, getModuleMarker } from './utils'
 import { IMPORT_ALIAS, parsedOptions } from './public'
@@ -39,11 +40,9 @@ export function remotesPlugin(
               ${remotes
                 .map(
                   (remote) =>
-                    `${JSON.stringify(
-                      remote.id
-                    )}: () => ${IMPORT_ALIAS}(${JSON.stringify(
-                      remote.config.external[0]
-                    )})`
+                    `${JSON.stringify(remote.id)}: () => ${
+                      options.mode === 'development' ? 'import' : IMPORT_ALIAS
+                    }(${JSON.stringify(remote.config.external[0])})`
                 )
                 .join(',\n  ')}
             };
@@ -53,8 +52,13 @@ export function remotesPlugin(
               }
               return mod;
             }
+          
             const shareScope = {
-            ${getModuleMarker('shareScope')}
+              ${
+                options.mode === 'development'
+                  ? ''
+                  : getModuleMarker('shareScope')
+              }
             };
             const initMap = {};
             export default {
@@ -68,9 +72,31 @@ export function remotesPlugin(
               }
             };`
     },
+    config(config: UserConfig, env: ConfigEnv) {
+      // need to include remotes in the optimizeDeps.exclude
+      if (options.mode === 'development') {
+        let excludeRemotes: string[] = []
+        for (const providedRemote of providedRemotes) {
+          excludeRemotes.push(providedRemote[0])
+        }
+        if (
+          config !== undefined &&
+          config.optimizeDeps !== undefined &&
+          config.optimizeDeps.exclude !== undefined
+        ) {
+          excludeRemotes = excludeRemotes.concat(config.optimizeDeps.exclude)
+        }
 
-    transform(code: string, id: string) {
-      if (id === '\0virtual:__federation__') {
+        Object.assign(config, { optimizeDeps: { exclude: excludeRemotes } })
+      }
+    },
+    transform(
+      this: TransformPluginContext,
+      code: string,
+      id: string,
+      ssr?: boolean | undefined
+    ) {
+      if (options.mode !== 'development' && id === '\0virtual:__federation__') {
         return code.replace(
           getModuleMarker('shareScope'),
           sharedScopeCode(parsedOptions.shared).join(',')
