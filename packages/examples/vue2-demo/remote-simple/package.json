@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite --port 5011 --strictPort",
     "build": "vite build",
-    "serve": "kill-port --port 5011 & vite preview --port 5011 --strictPort",
+    "serve": "vite preview --port 5011 --strictPort",
     "test": "echo test $name",
     "debug": "set DEBUG=vite:deps && vite build"
   },

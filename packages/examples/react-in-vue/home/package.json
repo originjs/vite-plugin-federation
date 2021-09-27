@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "serve": "kill-port --port 5001 & vite preview --port 5001 --strictPort"
+    "serve": "vite preview --port 5001 --strictPort"
   },
   "dependencies": {
     "react": "^17.0.0",
