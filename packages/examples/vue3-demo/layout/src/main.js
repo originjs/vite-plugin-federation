@@ -1,5 +1,5 @@
 import { createApp, defineAsyncComponent } from "vue";
-// import store from './store';
+import store from './store';
 import Layout from "./Layout.vue";
 
 const Content = defineAsyncComponent(() => import("home/Content"));
@@ -22,5 +22,5 @@ app.component("css-modules-button-element", CssButton);
 app.component("counter-element", CommonCounter);
 
 
-// app.use(store);
+app.use(store);
 app.mount("#root");

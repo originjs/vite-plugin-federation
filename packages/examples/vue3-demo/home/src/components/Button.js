@@ -6,6 +6,7 @@ const button = {
       "button",
       {
         id: "btn-remote",
+        onClick: () => { this.$store.state.cartItems++ }
       },
       "Hello Remote Button"
     );

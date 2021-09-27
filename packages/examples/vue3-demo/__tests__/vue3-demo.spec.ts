@@ -12,3 +12,9 @@ test('remote button', async () => {
   ).toBe('Hello Remote Button')
 })
 
+test('check vuex data', async () => {
+  expect(
+    await page.textContent('#cart-item')
+  ).toBe('items: 5')
+})
+
