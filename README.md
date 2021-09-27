@@ -1,3 +1,4 @@
+English | [简体中文](./README-zh.md)
 # vite-plugin-federation
 
 <p align="center">
