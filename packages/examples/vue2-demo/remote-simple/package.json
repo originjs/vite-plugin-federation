@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --port 5011 --strictPort",
+    "dev": "vite --port 5001 --strictPort",
     "build": "vite build",
-    "serve": "vite preview --port 5011 --strictPort",
+    "serve": "vite preview --port 5001 --strictPort",
     "test": "echo test $name",
     "debug": "set DEBUG=vite:deps && vite build"
   },

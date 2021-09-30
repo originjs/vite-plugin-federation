@@ -58,7 +58,9 @@ beforeAll(async () => {
           )
         }
       })
-
+      if (testName === 'vue2-demo') {
+        await execa('yarn', { cwd: rootDir, stdio: 'inherit' })
+      }
       execa('yarn', ['serve'], { cwd: rootDir, stdio: 'inherit' })
       await execa('yarn', ['build'], { cwd: rootDir, stdio: 'inherit' })
 
@@ -79,7 +81,7 @@ beforeAll(async () => {
     // a timeout with an exception that hides the real error in the console.
     await page.close()
   }
-}, 30000)
+}, 60000)
 
 afterAll(async () => {
   global.page?.off('console', onConsole)
