@@ -1,4 +1,4 @@
-import { Plugin, UserConfig, ConfigEnv } from 'vite'
+import { Plugin, UserConfig, ConfigEnv, ViteDevServer } from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { exposesPlugin } from './exposes'
 import { remotesPlugin } from './remotes'
@@ -82,7 +82,11 @@ export default function federation(
       // only run when builder is vite,rollup doesnt have hook named `config`
       builderInfo.builder = 'vite'
     },
-
+    configureServer(server: ViteDevServer) {
+      for (const pluginHook of pluginList) {
+        pluginHook.configureServer?.call(this, server)
+      }
+    },
     buildStart(inputOptions) {
       for (const pluginHook of pluginList) {
         pluginHook.buildStart?.call(this, inputOptions)
