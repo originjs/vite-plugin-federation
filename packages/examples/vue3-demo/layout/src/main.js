@@ -2,24 +2,26 @@ import { createApp, defineAsyncComponent } from "vue";
 import store from './store';
 import Layout from "./Layout.vue";
 
-const Content = defineAsyncComponent(() => import("home/Content"));
-const Button = defineAsyncComponent(() => import("home/Button"));
+const HomeContent = defineAsyncComponent(() => import("home/Content"));
+const HomeButton = defineAsyncComponent(() => import("home/Button"));
 
-const CommonCounter = defineAsyncComponent(() => import("common-lib/CommonCounter"));
-const CommonHeader = defineAsyncComponent(() => import("common-lib/CommonHeader"));
+const CommonLibCounter = defineAsyncComponent(() => import("common-lib/CommonCounter"));
+const CommonLibHeader = defineAsyncComponent(() => import("common-lib/CommonHeader"));
 
-const CssButton = defineAsyncComponent(() => import("css-modules/Button"));
+const CssModuleButton = defineAsyncComponent(() => import("css-modules/Button"));
 
 
 const app = createApp(Layout);
 
-app.component("header-element", CommonHeader);
 
-app.component("content-element", Content);
-app.component("button-element", Button);
-app.component("css-modules-button-element", CssButton);
 
-app.component("counter-element", CommonCounter);
+app.component("home-content", HomeContent);
+app.component("home-button", HomeButton);
+
+app.component("css-modules-button", CssModuleButton);
+
+app.component("common-lib-element", CommonLibHeader);
+app.component("common-lib-counter", CommonLibCounter);
 
 
 app.use(store);

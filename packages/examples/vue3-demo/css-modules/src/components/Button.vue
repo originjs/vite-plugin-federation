@@ -1,6 +1,6 @@
 <template>
-  <div id="home-unusedbutton">
-    <h1>{{ title }}</h1>
+  <div id="css-modules-div">
+    <h1 :class="$style.powderblue">{{ title }}</h1>
     <button :class="$style.button" @click="title = title + '!'">Button with style</button>
   </div>
 </template>
@@ -10,14 +10,18 @@
 export default {
   data: function () {
     return {
-      title: 'I need styles!'
+      title: ''
     }
   }
 }
 </script>
 <style module>
+.powderblue {
+  color: powderblue
+}
+
 .button {
-  background-color: #4caf50; /* Green */
+  background-color: powderblue;
   border: none;
   color: white;
   padding: 15px 32px;

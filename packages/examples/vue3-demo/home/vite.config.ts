@@ -14,7 +14,7 @@ export default defineConfig({
         './Button': './src/components/Button.js',
         './UnusedButton': './src/components/UnusedButton.vue',
       },
-      shared: ['vue']
+      shared: ["vue","vuex"]
     })
   ],
   build: {

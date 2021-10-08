@@ -1,7 +1,7 @@
 <template>
   <div id="home-unusedbutton">
     <h1>{{ title }}</h1>
-    <button :class="$style.button" @click="title = title + '!'">Unused Remote Button</button>
+    <button :class="$style.button" @click="title = title + '!'">Unused Layout Button</button>
   </div>
 </template>
 
@@ -17,7 +17,7 @@ export default {
 
 <style module>
 .button {
-    background-color: red;
+    background-color: #4CAF50; /* Green */
     border: none;
     color: white;
     padding: 15px 32px;

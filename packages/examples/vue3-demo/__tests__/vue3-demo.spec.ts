@@ -9,12 +9,12 @@ test('should have no 404s', () => {
 test('remote button', async () => {
   expect(
     await page.textContent('#btn-remote')
-  ).toBe('Hello Remote Button')
+  ).toBe('Hello Layout Button')
 })
 
 test('check vuex data', async () => {
   expect(
     await page.textContent('#cart-item')
-  ).toBe('items: 5')
+  ).toBe('cartItems from vuex: 5')
 })
 

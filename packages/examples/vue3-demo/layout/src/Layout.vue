@@ -1,45 +1,38 @@
 <template>
-  <div class="layout-app">
-    <!-- host app HOST-->
-    <div class="app-label">
-      # Hosting App [HOST]
-    </div>
-    <img src="./logo.png" width="30" />
-    <h1>Layout App 1</h1>
-    <div class="remote-component">
-      <!-- remote-component REMOTE -->
-      <div class="app-label">
-        #remote-component [REMOTE]
-      </div>
-      <header-element />
-      <content-element />
-      <button-element />
-      <css-modules-button-element/>
-      <counter-element />
-    </div>
-  </div>
+  <Content />
+  <Button />
+  <UnusedButton />
+  <hr />
+  <home-content />
+  <home-button />
+  <hr />
+  <css-modules-button />
+  <hr />
+  <common-lib-element />
+  <common-lib-counter />
 </template>
 
 <script>
-export default {};
+import Content from "./components/Content.vue";
+import Button from "./components/Button.js";
+import UnusedButton from "./components/UnusedButton.vue";
+export default {  components: {
+    Content,
+    Button,
+    UnusedButton,
+  },};
 </script>
 
 <style scoped>
 img {
   width: 200px;
 }
-.remote-component {
-  border: 1px solid blue;
-  padding: 10px;
+.h1 {
+  border: 5px solid red !important;
+  padding: 1px !important;
 }
-.layout-app {
-  border: 1px solid green;
+.section {
+  border: 1px solid black;
   padding: 10px;
-}
-.app-label {
-  padding: 5px 2px;
-  font-style: italic;
-  font-size: 20px;
-  color: gray;
 }
 </style>
