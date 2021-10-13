@@ -11,7 +11,7 @@
     "serve": "lerna run serve --parallel --loglevel=silent",
     "stop": "kill-port --port 5000,5001"
   },
-  "license": "MulanPSL2",
+  "license": "MulanPSL-2.0",
   "devDependencies": {
     "@originjs/vite-plugin-federation": "link:../../lib",
     "http-server": "^13.0.1",

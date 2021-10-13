@@ -23,7 +23,7 @@
     "plugins"
   ],
   "author": "@originjs",
-  "license": "MulanPSL2",
+  "license": "MulanPSL-2.0",
   "bugs": {
     "url": "https://github.com/originjs/vite-plugin-federation/issues"
   },
