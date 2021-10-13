@@ -1,3 +1,21 @@
+# [1.0.0](https://github.com/originjs/vite-plugin-federation/compare/v0.0.3...v1.0.0) (2021-10-13)
+
+
+### Bug Fixes
+
+* eliminate circular dependencies ([bb93481](https://github.com/originjs/vite-plugin-federation/commit/bb9348130951952955cae2dbb90a7b2be5a5e906))
+* remove unnecessary function ([e58d78a](https://github.com/originjs/vite-plugin-federation/commit/e58d78ae60d9a6f344edf4f502ad2d85181c1e2c))
+
+
+### Features
+
+* add dev mode support ([96edf43](https://github.com/originjs/vite-plugin-federation/commit/96edf43b1ea637b3f5c178431eade5c0b2a08277))
+* federation in vite dev mode ([bae2ad6](https://github.com/originjs/vite-plugin-federation/commit/bae2ad65329b25cd97e1c1121b7c6b1214e7d1e0))
+* support requiredVersion of shared ([5a3f76c](https://github.com/originjs/vite-plugin-federation/commit/5a3f76c9fe8fd4cd47cc0a946856d36139bad9df))
+* support shareScope of shared ([a5e27c3](https://github.com/originjs/vite-plugin-federation/commit/a5e27c30657c5664f7e18a1f1c8e2862a408a9bf))
+
+
+
 ## [0.0.3](https://github.com/originjs/vite-plugin-federation/compare/v0.0.1...v0.0.3) (2021-09-09)
 
 
