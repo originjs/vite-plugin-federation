@@ -10,8 +10,7 @@ export default defineConfig({
       name: 'remote-simple',
       filename: 'remoteEntry.js',
       remotes: {
-        'remote-simple': 'http://localhost:5011/remoteEntry.js',
-        'demo-simple': 'http://localhost:5012/remoteEntry.js'
+        'remote-simple': 'http://localhost:5001/remoteEntry.js'
       },
       shared: ['vue']
     })
@@ -19,8 +18,8 @@ export default defineConfig({
   // Dependencies that are forcibly excluded in a pre-build
   optimizeDeps: {
     // ...
-    // ×¥È¡Ô¤¹¹½¨µÄÒÀÀµÏîµÄÈë¿Úµã£¬Ö¸¶¨×Ô¶¨ÒåÌõÄ¿¡ª¡ª¸ÃÖµĞèÒª×ñÑ­ fast-glob Ä£Ê½ £¬»òÕßÊÇÏà¶ÔÓÚ vite ÏîÄ¿¸ùµÄÄ£Ê½Êı×é¡£Õâ½«¸²¸ÇµôÄ¬ÈÏÌõÄ¿ÍÆ¶Ï¡£
-    // ÎŞ·¨×¥È¡Ô¶³ÌÈë¿Ú
+    // æŠ“å–é¢„æ„å»ºçš„ä¾èµ–é¡¹çš„å…¥å£ç‚¹ï¼ŒæŒ‡å®šè‡ªå®šä¹‰æ¡ç›®â€”â€”è¯¥å€¼éœ€è¦éµå¾ª fast-glob æ¨¡å¼ ï¼Œæˆ–è€…æ˜¯ç›¸å¯¹äº vite é¡¹ç›®æ ¹çš„æ¨¡å¼æ•°ç»„ã€‚è¿™å°†è¦†ç›–æ‰é»˜è®¤æ¡ç›®æ¨æ–­ã€‚
+    // æ— æ³•æŠ“å–è¿œç¨‹å…¥å£
     // entries: ['index.html','http://localhost:5011/remoteEntry.js'],
     // exclude: ['remote-simple'],
     // exclude: ['remote-simple/*'],

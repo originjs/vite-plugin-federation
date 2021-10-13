@@ -1,5 +1,5 @@
 <template>
-  <button :class="$style.button" v-on:click="count++">
+  <button :class="$style.button" id="btn-remote" v-on:click="count++">
     <slot>remote-simple's Button: {{ count }}</slot>
   </button>
 </template>
