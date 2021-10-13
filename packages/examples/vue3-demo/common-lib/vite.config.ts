@@ -15,7 +15,7 @@ export default defineConfig({
       },
       shared: {
         vue: {
-          requiredVersion:'^1.0.0'
+          requiredVersion:'^3.0.0'
         }
       }
     })

@@ -8,7 +8,7 @@ const button = {
             {
                 id: "btn-remote",
                 style: {
-                    'background-color': 'red',
+                    'background-color': '#4CAF50',
                     'border': 'none',
                     'color': 'white',
                     'padding': '15px 32px',
@@ -21,7 +21,7 @@ const button = {
                     this.$store.state.cartItems++
                 }
             },
-            "Hello Remote Button"
+            "Hello Layout Button"
         );
     },
 };

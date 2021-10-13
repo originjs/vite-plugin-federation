@@ -2,13 +2,15 @@ import { UserConfig, ConfigEnv } from 'vite'
 import {
   ConfigTypeSet,
   RemotesConfig,
+  SharedRuntimeInfo,
   VitePluginFederationOptions
 } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
-import { parseOptions, getModuleMarker } from './utils'
+import { ViteDevServer } from '../types/viteDevServer'
+import { parseOptions, getModuleMarker, normalizePath } from './utils'
 import { IMPORT_ALIAS, parsedOptions } from './public'
 
 export let providedRemotes
@@ -31,46 +33,61 @@ export function remotesPlugin(
   for (const item of providedRemotes) {
     remotes.push({ id: item[0], config: item[1] })
   }
+  let devProvideShared
+  parsedOptions.devShared = devProvideShared = parseOptions(
+    options.shared || {},
+    () => ({
+      import: true,
+      shareScope: 'default'
+    }),
+    (value) => {
+      value.import = value.import ?? true
+      value.shareScope = value.shareScope || 'default'
+      return value
+    }
+  ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
+  const devSharedNames = new Set<string>()
+  devProvideShared.forEach((value) => devSharedNames.add(value[0]))
+  let viteDevServer: ViteDevServer
+  let browserHash: string | undefined
 
   return {
     name: 'originjs:remotes',
     virtualFile: {
       __federation__: `
-            const remotesMap = {
-              ${remotes
-                .map(
-                  (remote) =>
-                    `${JSON.stringify(remote.id)}: () => ${
-                      options.mode === 'development' ? 'import' : IMPORT_ALIAS
-                    }(${JSON.stringify(remote.config.external[0])})`
-                )
-                .join(',\n  ')}
-            };
-            const processModule = (mod) => {
-              if (mod && mod.__useDefault) {
-                return mod.default;
-              }
-              return mod;
-            }
-          
-            const shareScope = {
-              ${
-                options.mode === 'development'
-                  ? ''
-                  : getModuleMarker('shareScope')
-              }
-            };
-            const initMap = {};
-            export default {
-              ensure: async (remoteId) => {
-                const remote = await remotesMap[remoteId]();
-                if (!initMap[remoteId]) {
-                  remote.init(shareScope);
-                  initMap[remoteId] = true;
-                }
-                return remote;
-              }
-            };`
+const remotesMap = {
+  ${remotes
+    .map(
+      (remote) =>
+        `${JSON.stringify(remote.id)}: () => ${
+          options.mode === 'development' ? 'import' : IMPORT_ALIAS
+        }(${JSON.stringify(remote.config.external[0])})`
+    )
+    .join(',\n  ')}
+};
+const processModule = (mod) => {
+  if (mod && mod.__useDefault) {
+    return mod.default;
+  }
+  return mod;
+}
+
+const shareScope = {
+  ${getModuleMarker('shareScope')}
+};
+
+const initMap = {};
+           
+export default {
+  ensure: async (remoteId) => {
+    const remote = await remotesMap[remoteId]();
+    if (!initMap[remoteId]) {
+      remote.init(shareScope);
+      initMap[remoteId] = true;
+    }
+    return remote;
+  }
+};`
     },
     config(config: UserConfig, env: ConfigEnv) {
       // need to include remotes in the optimizeDeps.exclude
@@ -90,17 +107,54 @@ export function remotesPlugin(
         Object.assign(config, { optimizeDeps: { exclude: excludeRemotes } })
       }
     },
-    transform(
+
+    configureServer(server: ViteDevServer) {
+      // get moduleGraph for dev mode dynamic reference
+      viteDevServer = server
+    },
+    async transform(
       this: TransformPluginContext,
       code: string,
       id: string,
       ssr?: boolean | undefined
     ) {
-      if (options.mode !== 'development' && id === '\0virtual:__federation__') {
-        return code.replace(
-          getModuleMarker('shareScope'),
-          sharedScopeCode(parsedOptions.shared).join(',')
-        )
+      if (
+        options.mode === 'development' &&
+        (browserHash === undefined || browserHash.length === 0)
+      ) {
+        browserHash = viteDevServer._optimizeDepsMetadata?.browserHash
+        const optimized = viteDevServer._optimizeDepsMetadata?.optimized
+
+        if (optimized !== undefined) {
+          for (const arr of devProvideShared) {
+            const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
+            const packageJsonPath = `${
+              optimized[arr[0]].src?.split(regExp)[0]
+            }node_modules/${arr[0]}/package.json`
+            try {
+              arr[1].version = (await import(packageJsonPath)).version
+              arr[1].version.length
+            } catch (e) {
+              this.error(
+                `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
+              )
+            }
+          }
+        }
+      }
+
+      if (id === '\0virtual:__federation__') {
+        if (options.mode !== 'development') {
+          return code.replace(
+            getModuleMarker('shareScope'),
+            sharedScopeCode(parsedOptions.shared).join(',')
+          )
+        } else {
+          return code.replace(
+            getModuleMarker('shareScope'),
+            devSharedScopeCode(parsedOptions.devShared, browserHash).join(',')
+          )
+        }
       }
       if (remotes.length === 0 || id.includes('node_modules')) {
         return null
@@ -180,5 +234,80 @@ export function remotesPlugin(
       })
     }
     return res
+  }
+
+  function devSharedScopeCode(
+    shared: (string | ConfigTypeSet)[],
+    viteVersion: string | undefined
+  ): string[] {
+    const hostname = resolveHostname(viteDevServer.config.server.host)
+    const protocol = viteDevServer.config.server.https ? 'https' : 'http'
+    const port = viteDevServer.config.server.port ?? 5000
+    const regExp = new RegExp(
+      `${normalizePath(viteDevServer.config.root)}[/\\\\]`
+    )
+    let cacheDir = viteDevServer.config.cacheDir
+    cacheDir = `${
+      cacheDir === null || cacheDir === void 0
+        ? 'node_modules/.vite'
+        : normalizePath(cacheDir).split(regExp)[1]
+    }`
+    const res: string[] = []
+    const displayField = new Set<string>()
+    displayField.add('version')
+    displayField.add('shareScope')
+    if (shared.length) {
+      shared.forEach((arr) => {
+        const sharedName = arr[0]
+        const obj = arr[1]
+        let str = ''
+        if (typeof obj === 'object') {
+          Object.entries(obj).forEach(([key, value]) => {
+            if (displayField.has(key))
+              str += `${key}:${JSON.stringify(value)}, \n`
+          })
+          str += `get: ()=> import('${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?v=${viteVersion}') `
+          res.push(`'${sharedName}':{${str}}\n`)
+        }
+      })
+    }
+    return res
+  }
+
+  interface Hostname {
+    // undefined sets the default behaviour of server.listen
+    host: string | undefined
+    // resolve to localhost when possible
+    name: string
+  }
+
+  function resolveHostname(
+    optionsHost: string | boolean | undefined
+  ): Hostname {
+    let host: string | undefined
+    if (
+      optionsHost === undefined ||
+      optionsHost === false ||
+      optionsHost === 'localhost'
+    ) {
+      // Use a secure default
+      host = '127.0.0.1'
+    } else if (optionsHost === true) {
+      // If passed --host in the CLI without arguments
+      host = undefined // undefined typically means 0.0.0.0 or :: (listen on all IPs)
+    } else {
+      host = optionsHost
+    }
+
+    // Set host name to localhost when possible, unless the user explicitly asked for '127.0.0.1'
+    const name =
+      (optionsHost !== '127.0.0.1' && host === '127.0.0.1') ||
+      host === '0.0.0.0' ||
+      host === '::' ||
+      host === undefined
+        ? 'localhost'
+        : host
+
+    return { host, name }
   }
 }

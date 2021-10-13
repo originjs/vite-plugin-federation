@@ -1,7 +1,6 @@
 <template>
-  <h1>Red</h1>
-  <p id='cart-item'>items: {{cartCount}}</p>
   <div :class="$style.red">{{ title }}</div>
+  <p id='cart-item' :class="$style.red">cartItems from vuex: {{cartCount}}</p>
   <div :class="[$style.red, $style.bold]">Red and bold</div>
 </template>
 <script>

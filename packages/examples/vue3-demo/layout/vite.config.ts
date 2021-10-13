@@ -4,6 +4,11 @@ import federation from "@originjs/vite-plugin-federation";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server:{
+    // host: "192.168.56.1",
+    // port: 5100
+  },
+  cacheDir: "node_modules/.cacheDir",
   plugins: [
     vue(),
     federation({
@@ -14,7 +19,7 @@ export default defineConfig({
         "common-lib": "http://localhost:5002/remoteEntry.js",
         "css-modules":"http://localhost:5003/remoteEntry.js"
       },
-      shared: ["vue"]
+      shared: ["vue","vuex"]
     })
   ],
   build: {

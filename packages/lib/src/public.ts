@@ -19,5 +19,6 @@ export const builderInfo = {
 export const parsedOptions = {
   exposes: [] as (string | ConfigTypeSet)[],
   remotes: [] as (string | ConfigTypeSet)[],
-  shared: [] as (string | ConfigTypeSet)[]
+  shared: [] as (string | ConfigTypeSet)[],
+  devShared: [] as (string | ConfigTypeSet)[]
 }
