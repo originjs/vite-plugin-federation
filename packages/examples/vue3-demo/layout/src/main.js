@@ -4,6 +4,7 @@ import Layout from "./Layout.vue";
 
 const HomeContent = defineAsyncComponent(() => import("home/Content"));
 const HomeButton = defineAsyncComponent(() => import("home/Button"));
+const HomeImages = defineAsyncComponent(() => import("home/Images"));
 
 const CommonLibCounter = defineAsyncComponent(() => import("common-lib/CommonCounter"));
 const CommonLibHeader = defineAsyncComponent(() => import("common-lib/CommonHeader"));
@@ -17,6 +18,7 @@ const app = createApp(Layout);
 
 app.component("home-content", HomeContent);
 app.component("home-button", HomeButton);
+app.component("home-images", HomeImages);
 
 app.component("css-modules-button", CssModuleButton);
 
