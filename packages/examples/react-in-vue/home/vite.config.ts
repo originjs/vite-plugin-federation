@@ -13,5 +13,10 @@ export default defineConfig({
         "./Button": "./src/Button.jsx",
       }
     })
-  ]
+  ],
+  build: {
+    target:'es2020',
+    minify: false,
+    cssCodeSplit: false
+  }
 })
