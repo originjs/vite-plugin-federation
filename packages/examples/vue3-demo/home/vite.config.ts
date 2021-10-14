@@ -12,14 +12,16 @@ export default defineConfig({
       exposes: {
         './Content': './src/components/Content.vue',
         './Button': './src/components/Button.js',
+        './Images': './src/components/Images.vue',
         './UnusedButton': './src/components/UnusedButton.vue',
       },
       shared: ["vue","vuex"]
     })
   ],
   build: {
+    assetsInlineLimit: 40960,
     target:'es2020',
-    minify: false,
+    minify: true,
     cssCodeSplit: false,
     rollupOptions: {
       output: {

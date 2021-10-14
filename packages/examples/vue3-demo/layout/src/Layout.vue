@@ -3,6 +3,7 @@
   <Button />
   <UnusedButton />
   <hr />
+  <home-images />
   <home-content />
   <home-button />
   <hr />

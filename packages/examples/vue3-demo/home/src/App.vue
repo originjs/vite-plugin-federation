@@ -1,6 +1,8 @@
 <template>
   <div>
     <h3>Main App</h3>
+    <Images />
+    <hr />
     <Content />
     <Button />
     <UnusedButton />
@@ -8,15 +10,18 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent } from "vue";
+import { ref } from "vue";
 import Content from "./components/Content.vue";
 import Button from "./components/Button.js";
 import UnusedButton from "./components/UnusedButton.vue";
+import Images from "./components/Images.vue";
+
 export default {
   components: {
     Content,
     Button,
     UnusedButton,
+    Images
   },
   setup() {
     const count = ref(0);
@@ -33,9 +38,6 @@ export default {
 </script>
 
 <style scoped>
-img {
-  width: 200px;
-}
 h1 {
   font-family: Arial, Helvetica, sans-serif;
 }
