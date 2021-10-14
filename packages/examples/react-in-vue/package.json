@@ -7,13 +7,13 @@
     "layout"
   ],
   "scripts": {
-    "build": "lerna run build --loglevel=error",
-    "serve": "lerna run serve --parallel --loglevel=silent",
+    "build": "pnpm run build -r --filter ./",
+    "serve": "pnpm run serve --parallel --filter ./",
     "stop": "kill-port --port 5000,5001"
   },
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "link:../../lib",
-    "kill-port": "^1.6.1",
-    "lerna": "^4.0.0"
+    "@originjs/vite-plugin-federation": "workspace:*",
+    "http-server": "^13.0.1",
+    "kill-port": "^1.6.1"
   }
 }
