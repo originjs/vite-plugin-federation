@@ -51,7 +51,7 @@ export function sharedPlugin(
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
       const sharedInfo = ${getModuleMarker('sharedInfo', 'var')}
       let errorMessage = [];
-      async function importShared(name,shareScope) {
+      async function importShared(name,shareScope = 'default') {
         if (errorMessage.length) {
           errorMessage = []
         }
@@ -295,9 +295,13 @@ export function sharedPlugin(
           //  rename chunk
           bundle[expectFileNameOrPath] = bundle[fileNameOrPath]
           bundle[expectFileNameOrPath].fileName = expectFileNameOrPath
+          sharedProp.chunk = bundle[expectFileNameOrPath]
           delete bundle[fileNameOrPath]
           importReplaceMap.set(filePath, expectFilePath)
           sharedProp.fileName = expectFileName
+        } else {
+          sharedProp.chunk =
+            bundle[builderInfo.builder === ROLLUP ? fileName : filePath]
         }
         sharedProp.filePath =
           '/' +
@@ -361,8 +365,12 @@ export function sharedPlugin(
             JSON.stringify(obj)
           )
         }
+        // add dynamic import
         const FN_IMPORT = getModuleMarker('import', 'fn')
-        EXPOSES_CHUNK_SET.forEach((chunk) => {
+        const needDynamicImportChunk = [...provideShared]
+          .map((item) => item[1].chunk)
+          .concat(EXPOSES_CHUNK_SET)
+        needDynamicImportChunk.forEach((chunk) => {
           if (chunk.code) {
             let lastImport: any = null
             const ast = this.parse(chunk.code)
@@ -395,9 +403,14 @@ export function sharedPlugin(
               .map(([key, value]) => {
                 let str = ''
                 value.specifiers?.forEach((space) => {
-                  str += `const ${space.local.name} = (await ${FN_IMPORT}('${key}','${value.sharedItem.shareScope}'))['${space.imported.name}'] \n`
+                  str += `,${space.imported.name}:${space.local.name}`
                 })
-                return str
+                const sharedScope = value.sharedItem.shareScope
+                return `const {${str.substring(
+                  1
+                )}} = await ${FN_IMPORT}('${key}'${
+                  sharedScope === 'default' ? '' : `,'${sharedScope}'`
+                });`
               })
               .join('')
             if (lastImport) {
