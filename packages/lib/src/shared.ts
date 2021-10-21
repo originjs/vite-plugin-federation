@@ -367,10 +367,19 @@ export function sharedPlugin(
         }
         // add dynamic import
         const FN_IMPORT = getModuleMarker('import', 'fn')
-        const needDynamicImportChunk = [...provideShared]
+        const needDynamicImportChunks = [...provideShared]
           .map((item) => item[1].chunk)
           .concat(EXPOSES_CHUNK_SET)
-        needDynamicImportChunk.forEach((chunk) => {
+        EXPOSES_CHUNK_SET.forEach((exposeChunk) => {
+          const needDynamicImport =
+            exposeChunk.type === 'chunk' &&
+            exposeChunk.imports.length >= 1 &&
+            Reflect.ownKeys(exposeChunk.modules).length === 0
+          if (needDynamicImport) {
+            needDynamicImportChunks.push(bundle[exposeChunk.imports[0]])
+          }
+        })
+        needDynamicImportChunks.forEach((chunk) => {
           if (chunk.code) {
             let lastImport: any = null
             const ast = this.parse(chunk.code)
