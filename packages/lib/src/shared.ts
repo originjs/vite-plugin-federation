@@ -380,7 +380,7 @@ export function sharedPlugin(
         function findNeedChunks(
           chunk: OutputChunk | OutputAsset | RenderedChunk
         ): void {
-          if (chunk.type === 'chunk') {
+          if (chunk?.type === 'chunk') {
             chunk.imports?.forEach((importTarget) => {
               findNeedChunks(bundle[importTarget])
             })
@@ -430,14 +430,16 @@ export function sharedPlugin(
                   }${space.local.name}`
                 })
                 const sharedScope = value.sharedItem.shareScope
-                return `const {${str.substring(
-                  1
-                )}} = await ${FN_IMPORT}('${key}'${
-                  sharedScope === 'default' ? '' : `,'${sharedScope}'`
-                });`
+                if (str) {
+                  return `const {${str.substring(
+                    1
+                  )}} = await ${FN_IMPORT}('${key}'${
+                    sharedScope === 'default' ? '' : `,'${sharedScope}'`
+                  });`
+                }
               })
               .join('')
-            if (lastImport) {
+            if (PLACEHOLDER_VAR) {
               //  append code after lastImport
               magicString.prepend(
                 `\n import ${FN_IMPORT} from './${FN_IMPORT}.js'\n`
