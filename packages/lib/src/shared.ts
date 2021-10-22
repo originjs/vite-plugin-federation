@@ -16,7 +16,7 @@ import {
   VitePluginFederationOptions,
   SharedRuntimeInfo
 } from 'types'
-import { RenderedChunk } from 'rollup'
+import { OutputAsset, OutputChunk, RenderedChunk } from 'rollup'
 
 export let provideShared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
 
@@ -367,18 +367,29 @@ export function sharedPlugin(
         }
         // add dynamic import
         const FN_IMPORT = getModuleMarker('import', 'fn')
-        const needDynamicImportChunks = [...provideShared]
-          .map((item) => item[1].chunk)
-          .concat(EXPOSES_CHUNK_SET)
+        const needDynamicImportChunks = new Set(
+          [...provideShared]
+            .map((item) => item[1].chunk)
+            .concat(EXPOSES_CHUNK_SET)
+        )
         EXPOSES_CHUNK_SET.forEach((exposeChunk) => {
-          const needDynamicImport =
-            exposeChunk.type === 'chunk' &&
-            exposeChunk.imports.length >= 1 &&
-            Reflect.ownKeys(exposeChunk.modules).length === 0
-          if (needDynamicImport) {
-            needDynamicImportChunks.push(bundle[exposeChunk.imports[0]])
-          }
+          findNeedChunks(exposeChunk)
         })
+
+        // eslint-disable-next-line no-inner-declarations
+        function findNeedChunks(
+          chunk: OutputChunk | OutputAsset | RenderedChunk
+        ): void {
+          if (chunk.type === 'chunk') {
+            chunk.imports?.forEach((importTarget) => {
+              findNeedChunks(bundle[importTarget])
+            })
+            if (!needDynamicImportChunks.has(chunk)) {
+              needDynamicImportChunks.add(chunk)
+            }
+          }
+        }
+
         needDynamicImportChunks.forEach((chunk) => {
           if (chunk.code) {
             let lastImport: any = null
@@ -412,7 +423,11 @@ export function sharedPlugin(
               .map(([key, value]) => {
                 let str = ''
                 value.specifiers?.forEach((space) => {
-                  str += `,${space.imported.name}:${space.local.name}`
+                  str += `,${
+                    space.imported.name === space.local.name
+                      ? ''
+                      : `${space.imported.name}:`
+                  }${space.local.name}`
                 })
                 const sharedScope = value.sharedItem.shareScope
                 return `const {${str.substring(
