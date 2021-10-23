@@ -5,8 +5,7 @@ import {
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
   parsedOptions,
-  ROLLUP,
-  VITE
+  ROLLUP
 } from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
@@ -139,7 +138,9 @@ export function sharedPlugin(
       }
       if (provideShared.length && isRemote) {
         this.emitFile({
-          fileName: '__rf_fn__import.js',
+          fileName: `${
+            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }__rf_fn__import.js`,
           type: 'chunk',
           id: '__rf_fn__import',
           preserveSignature: 'strict'
@@ -335,18 +336,6 @@ export function sharedPlugin(
           .map((item) => `'${item[0]}':'${item[1].filePath}'`)
           .join(',')}}`
         if (sharedImport) {
-          // modify shareImport generate dir,only vite need
-          if (builderInfo.builder === VITE) {
-            const fileDir = path.dirname(
-              Array.from(EXPOSES_CHUNK_SET)[0].fileName
-            )
-            sharedImport.fileName = `${fileDir}${path.sep}${sharedImport.fileName}`
-            // replace fn_import dynamic semver path
-            sharedImport.code = sharedImport.code?.replace(
-              `${sharedImport.dynamicImports[0]}`,
-              `./${path.basename(sharedImport.dynamicImports[0])}`
-            )
-          }
           sharedImport.code = sharedImport.code?.replace(
             getModuleMarker('moduleMap', 'var'),
             moduleMapCode

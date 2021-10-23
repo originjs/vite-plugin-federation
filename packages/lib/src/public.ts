@@ -14,7 +14,8 @@ export const ROLLUP = 'rollup'
 export const VITE = 'vite'
 export const builderInfo = {
   builder: 'rollup',
-  version: ''
+  version: '',
+  assetsDir: ''
 }
 export const parsedOptions = {
   exposes: [] as (string | ConfigTypeSet)[],
