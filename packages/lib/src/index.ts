@@ -81,6 +81,7 @@ export default function federation(
 
       // only run when builder is vite,rollup doesnt have hook named `config`
       builderInfo.builder = 'vite'
+      builderInfo.assetsDir = config?.build?.assetsDir ?? 'assets'
     },
     configureServer(server: ViteDevServer) {
       for (const pluginHook of pluginList) {

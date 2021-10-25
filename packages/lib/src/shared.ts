@@ -5,8 +5,7 @@ import {
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
   parsedOptions,
-  ROLLUP,
-  VITE
+  ROLLUP
 } from './public'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
@@ -16,7 +15,7 @@ import {
   VitePluginFederationOptions,
   SharedRuntimeInfo
 } from 'types'
-import { RenderedChunk } from 'rollup'
+import { OutputAsset, OutputChunk, RenderedChunk } from 'rollup'
 
 export let provideShared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
 
@@ -51,7 +50,7 @@ export function sharedPlugin(
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
       const sharedInfo = ${getModuleMarker('sharedInfo', 'var')}
       let errorMessage = [];
-      async function importShared(name,shareScope) {
+      async function importShared(name,shareScope = 'default') {
         if (errorMessage.length) {
           errorMessage = []
         }
@@ -139,7 +138,9 @@ export function sharedPlugin(
       }
       if (provideShared.length && isRemote) {
         this.emitFile({
-          fileName: '__rf_fn__import.js',
+          fileName: `${
+            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }__rf_fn__import.js`,
           type: 'chunk',
           id: '__rf_fn__import',
           preserveSignature: 'strict'
@@ -295,9 +296,13 @@ export function sharedPlugin(
           //  rename chunk
           bundle[expectFileNameOrPath] = bundle[fileNameOrPath]
           bundle[expectFileNameOrPath].fileName = expectFileNameOrPath
+          sharedProp.chunk = bundle[expectFileNameOrPath]
           delete bundle[fileNameOrPath]
           importReplaceMap.set(filePath, expectFilePath)
           sharedProp.fileName = expectFileName
+        } else {
+          sharedProp.chunk =
+            bundle[builderInfo.builder === ROLLUP ? fileName : filePath]
         }
         sharedProp.filePath =
           '/' +
@@ -331,18 +336,6 @@ export function sharedPlugin(
           .map((item) => `'${item[0]}':'${item[1].filePath}'`)
           .join(',')}}`
         if (sharedImport) {
-          // modify shareImport generate dir,only vite need
-          if (builderInfo.builder === VITE) {
-            const fileDir = path.dirname(
-              Array.from(EXPOSES_CHUNK_SET)[0].fileName
-            )
-            sharedImport.fileName = `${fileDir}${path.sep}${sharedImport.fileName}`
-            // replace fn_import dynamic semver path
-            sharedImport.code = sharedImport.code?.replace(
-              `${sharedImport.dynamicImports[0]}`,
-              `./${path.basename(sharedImport.dynamicImports[0])}`
-            )
-          }
           sharedImport.code = sharedImport.code?.replace(
             getModuleMarker('moduleMap', 'var'),
             moduleMapCode
@@ -361,8 +354,32 @@ export function sharedPlugin(
             JSON.stringify(obj)
           )
         }
+        // add dynamic import
         const FN_IMPORT = getModuleMarker('import', 'fn')
-        EXPOSES_CHUNK_SET.forEach((chunk) => {
+        const needDynamicImportChunks = new Set(
+          [...provideShared]
+            .map((item) => item[1].chunk)
+            .concat(EXPOSES_CHUNK_SET)
+        )
+        EXPOSES_CHUNK_SET.forEach((exposeChunk) => {
+          findNeedChunks(exposeChunk)
+        })
+
+        // eslint-disable-next-line no-inner-declarations
+        function findNeedChunks(
+          chunk: OutputChunk | OutputAsset | RenderedChunk
+        ): void {
+          if (chunk?.type === 'chunk') {
+            chunk.imports?.forEach((importTarget) => {
+              findNeedChunks(bundle[importTarget])
+            })
+            if (!needDynamicImportChunks.has(chunk)) {
+              needDynamicImportChunks.add(chunk)
+            }
+          }
+        }
+
+        needDynamicImportChunks.forEach((chunk) => {
           if (chunk.code) {
             let lastImport: any = null
             const ast = this.parse(chunk.code)
@@ -395,12 +412,23 @@ export function sharedPlugin(
               .map(([key, value]) => {
                 let str = ''
                 value.specifiers?.forEach((space) => {
-                  str += `const ${space.local.name} = (await ${FN_IMPORT}('${key}','${value.sharedItem.shareScope}'))['${space.imported.name}'] \n`
+                  str += `,${
+                    space.imported.name === space.local.name
+                      ? ''
+                      : `${space.imported.name}:`
+                  }${space.local.name}`
                 })
-                return str
+                const sharedScope = value.sharedItem.shareScope
+                if (str) {
+                  return `const {${str.substring(
+                    1
+                  )}} = await ${FN_IMPORT}('${key}'${
+                    sharedScope === 'default' ? '' : `,'${sharedScope}'`
+                  });`
+                }
               })
               .join('')
-            if (lastImport) {
+            if (PLACEHOLDER_VAR) {
               //  append code after lastImport
               magicString.prepend(
                 `\n import ${FN_IMPORT} from './${FN_IMPORT}.js'\n`
