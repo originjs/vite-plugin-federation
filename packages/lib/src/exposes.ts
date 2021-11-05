@@ -1,20 +1,20 @@
 import * as path from 'path'
 import {
-  parseOptions,
   getModuleMarker,
-  removeNonLetter,
+  isSameFilepath,
   normalizePath,
-  isSameFilepath
+  parseOptions,
+  removeNonLetter
 } from './utils'
 import {
-  EXTERNALS,
-  IMPORT_ALIAS,
   DYNAMIC_LOADING_CSS,
   DYNAMIC_LOADING_CSS_PREFIX,
-  SHARED,
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
-  parsedOptions
+  EXTERNALS,
+  IMPORT_ALIAS,
+  parsedOptions,
+  SHARED
 } from './public'
 import { AcornNode, InputOptions, MinimalPluginContext } from 'rollup'
 import { VitePluginFederationOptions } from 'types'

@@ -1,15 +1,16 @@
-import { Plugin, UserConfig, ConfigEnv, ViteDevServer } from 'vite'
+import { ConfigEnv, Plugin, UserConfig, ViteDevServer } from 'vite'
 import virtual from '@rollup/plugin-virtual'
-import { exposesPlugin } from './exposes'
 import { remotesPlugin } from './remotes'
-import { sharedPlugin } from './shared'
 import { VitePluginFederationOptions } from '../types'
 import {
-  IMPORT_ALIAS_REGEXP,
+  builderInfo,
   DEFAULT_ENTRY_FILENAME,
-  builderInfo
+  IMPORT_ALIAS_REGEXP
 } from './public'
 import { PluginHooks } from '../types/pluginHooks'
+import { ModuleInfo } from 'rollup'
+import { sharedPlugin } from './shared'
+import { exposesPlugin } from './exposes'
 
 export default function federation(
   options: VitePluginFederationOptions
@@ -60,7 +61,7 @@ export default function federation(
       // Register default plugins
       registerPlugins('rollup')
 
-      _options.preserveEntrySignatures = 'strict'
+      // _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
         _options.input = { index: _options.input }
       }
@@ -118,6 +119,11 @@ export default function federation(
         }
       }
       return code
+    },
+    moduleParsed(moduleInfo: ModuleInfo): void {
+      for (const pluginHook of pluginList) {
+        pluginHook.moduleParsed?.call(this, moduleInfo)
+      }
     },
 
     outputOptions(outputOptions) {

@@ -4,18 +4,16 @@ import {
   builderInfo,
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
-  parsedOptions,
-  ROLLUP
+  parsedOptions
 } from './public'
-import MagicString from 'magic-string'
-import { walk } from 'estree-walker'
-import path from 'path'
 import {
   ConfigTypeSet,
-  VitePluginFederationOptions,
-  SharedRuntimeInfo
+  SharedRuntimeInfo,
+  VitePluginFederationOptions
 } from 'types'
-import { OutputAsset, OutputChunk, RenderedChunk } from 'rollup'
+import { walk } from 'estree-walker'
+import MagicString from 'magic-string'
+import * as path from 'path'
 
 export let provideShared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
 
@@ -48,54 +46,53 @@ export function sharedPlugin(
     virtualFile: {
       __rf_fn__import: `
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
-      const sharedInfo = ${getModuleMarker('sharedInfo', 'var')}
-      let errorMessage = [];
+      const moduleCache = Object.create(null);
       async function importShared(name,shareScope = 'default') {
-        if (errorMessage.length) {
-          errorMessage = []
-        }
-        const providerModule = await getProviderSharedModule(name,shareScope);
-        if (providerModule) {
-          return providerModule
-        } else {
-          const consumerModule = await getConsumerSharedModule(name);
-          if(consumerModule){
-            return consumerModule
-          }else {
-            throw Error(errorMessage.join(','))
-          }
-        }
+        return moduleCache[name] ? new Promise((r) => r(moduleCache[name])) : getProviderSharedModule(name, shareScope);
+      }
+      async function __federation_import(name){
+        return import(name);
       }
       async function getProviderSharedModule(name,shareScope) {
+        let module = null;
         if (globalThis?.__rf_var__shared?.[shareScope]?.[name]) {
           const dep = globalThis.__rf_var__shared[shareScope][name];
-          if (sharedInfo[name]?.requiredVersion) {
+          if (moduleMap[name]?.requiredVersion) {
             // judge version satisfy
             const satisfies = await import('semver/functions/satisfies');
             const fn = satisfies.default||satisfies
-            if (fn(dep.version, sharedInfo[name].requiredVersion)) {
-              return dep.get()
+            if (fn(dep.version, moduleMap[name].requiredVersion)) {
+               module = await dep.get();
             } else {
-              errorMessage.push(\`provider support \${name}(\${dep.version}) is not satisfied requiredVersion(\${sharedInfo[name].requiredVersion})\`)
+              console.log(\`provider support \${name}(\${dep.version}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})\`)
             }
           } else {
-            return dep.get() 
+            module = await dep.get(); 
           }
         }
-      }
-      async function getConsumerSharedModule(name) {
-        if (sharedInfo[name]?.import) {
-          return import(moduleMap[name])
-        } else {
-          errorMessage.push(\`consumer config import=false,so cant use callback shared module\`)
+        if(module){
+          moduleCache[name] = module;
+          return module;
+        }else{
+          return getConsumerSharedModule(name, shareScope);
         }
       }
-      export {importShared as default};
+      async function getConsumerSharedModule(name , shareScope) {
+        if (moduleMap[name]?.import) {
+          const module = await moduleMap[name].get()
+          moduleCache[name] = module;
+          return module;
+        } else {
+          console.error(\`consumer config import=false,so cant use callback shared module\`)
+        }
+      }
+      export {importShared};
       `
     },
     options(inputOptions) {
       isHost = !!parsedOptions.remotes.length
       isRemote = !!parsedOptions.exposes.length
+
       if (sharedNames.size) {
         // remove item which is both in external and shared
         inputOptions.external = (inputOptions.external as [])?.filter(
@@ -103,16 +100,10 @@ export function sharedPlugin(
             return !sharedNames.has(item)
           }
         )
-        // add shared content into input
-        sharedNames.forEach((shareName) => {
-          inputOptions.input![`${getModuleMarker(shareName, 'input')}`] =
-            shareName
-          if (Array.isArray(inputOptions.external)) {
-            inputOptions.external.push(
-              getModuleMarker(`\${${shareName}}`, 'shareScope')
-            )
-          }
-        })
+        // sharedNames.forEach((shareName) => {
+        //     inputOptions.input![`${getModuleMarker(shareName, 'input')}`] =
+        //         shareName
+        // })
       }
       return inputOptions
     },
@@ -145,6 +136,15 @@ export function sharedPlugin(
           id: '__rf_fn__import',
           preserveSignature: 'strict'
         })
+      }
+    },
+
+    async buildEnd() {
+      for (const sharedInfo of provideShared) {
+        if (!sharedInfo[1].id) {
+          const resolved = await this.resolve(sharedInfo[0])
+          sharedInfo[1].id = resolved?.id
+        }
       }
     },
 
@@ -206,11 +206,10 @@ export function sharedPlugin(
 
       // adjust the map order according to priority
       provideShared.sort((a, b) => {
-        const aIndex = provideShared.findIndex((value) => value[0] === a[0])
-        const bIndex = provideShared.findIndex((value) => value[0] === b[0])
+        const aIndex = priority.findIndex((value) => value === a[0])
+        const bIndex = priority.findIndex((value) => value === b[0])
         return aIndex - bIndex
       })
-
       // only active when manualChunks is function,array not to solve
       if (typeof outputOption.manualChunks === 'function') {
         outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
@@ -226,219 +225,87 @@ export function sharedPlugin(
       }
       return outputOption
     },
-
     generateBundle: function (options, bundle) {
-      // Find out the real shared file
-      let sharedImport: RenderedChunk | undefined
-      for (const fileName in bundle) {
-        const chunk = bundle[fileName]
-        if (chunk.type === 'chunk' && chunk.isEntry) {
-          const sharedName = chunk.name.match(/(?<=__rf_input__).*/)?.[0]
-          if (sharedName) {
-            let filePath = ''
-            if (Object.keys(chunk.modules).length) {
-              filePath = chunk.fileName
-            } else {
-              if (chunk.imports.length === 1) {
-                filePath = chunk.imports[0]
-              } else if (chunk.imports.length > 1) {
-                filePath =
-                  chunk.imports.find(
-                    (item) => bundle[item].name === sharedName
-                  ) ?? ''
-              }
-            }
-            const fileName = path.basename(filePath)
-            const fileDir = path.dirname(filePath)
-            const sharedProp = provideShared.find(
-              (item) => sharedName === item[0]
-            )?.[1]
-            if (sharedProp) {
-              sharedProp.fileName = fileName
-              sharedProp.fileDir = fileDir
-              sharedProp.filePath = filePath
-            }
-          } else {
-            // record the __rf_fn_import chunk
-            if (chunk.name === getModuleMarker('import', 'fn')) {
-              sharedImport = chunk
-            }
+      for (const file in bundle) {
+        const chunk = bundle[file]
+        if (chunk.type === 'chunk') {
+          const find = provideShared.find(
+            (sharedInfo) => sharedInfo[0] === chunk.name
+          )
+          if (find) {
+            find[1].fileName = chunk.fileName
+            find[1].chunk = chunk
           }
         }
       }
-
-      const importReplaceMap = new Map()
-      // rename file and remove unnecessary file
-      provideShared.forEach((arr) => {
-        const sharedName = arr[0]
-        const sharedProp = arr[1]
-        const { fileName, fileDir, filePath } = sharedProp
-        if (filePath && !fileName.startsWith('__rf_input')) {
-          const expectName = `__rf_input__${sharedName}`
-          let expectFileName = ''
-          // find expectName
-          for (const file in bundle) {
-            if (bundle[file].name === expectName) {
-              expectFileName = path.basename(bundle[file].fileName)
-              break
-            }
-          }
-          expectFileName = expectFileName ? expectFileName : `${expectName}.js`
-          // rollup fileName
-          const expectFilePath = `${fileDir}/${expectFileName}`
-          // fileName or filePath,vite is filePath,rollup is filename
-          const expectFileNameOrPath =
-            builderInfo.builder === ROLLUP ? expectFileName : expectFilePath
-          const fileNameOrPath =
-            builderInfo.builder === ROLLUP ? fileName : filePath
-          // delete non-used chunk
-          delete bundle[expectFileNameOrPath]
-          //  rename chunk
-          bundle[expectFileNameOrPath] = bundle[fileNameOrPath]
-          bundle[expectFileNameOrPath].fileName = expectFileNameOrPath
-          sharedProp.chunk = bundle[expectFileNameOrPath]
-          delete bundle[fileNameOrPath]
-          importReplaceMap.set(filePath, expectFilePath)
-          sharedProp.fileName = expectFileName
-        } else {
-          sharedProp.chunk =
-            bundle[builderInfo.builder === ROLLUP ? fileName : filePath]
-        }
-        sharedProp.filePath =
-          '/' +
-          `${sharedProp.fileDir}/${sharedProp.fileName}`.replace(/^\.?\//, '')
-        importReplaceMap.set(
-          getModuleMarker(`\${${sharedName}}`, 'shareScope'),
-          `./${sharedProp.fileName}`
-        )
-      })
-
-      // replace every chunk import
-      importReplaceMap.forEach((value, key) => {
-        for (const fileKey in bundle) {
-          const chunk = bundle[fileKey]
-          if (chunk.type === 'chunk') {
-            const importIndexOf = chunk.imports.indexOf(key)
-            if (importIndexOf >= 0) {
-              chunk.imports[importIndexOf] = value
-              chunk.code = chunk.code.replace(
-                path.basename(key),
-                path.basename(value)
-              )
-            }
-            chunk.code = chunk.code.replace(key, value)
-          }
-        }
-      })
-
       if (EXPOSES_CHUNK_SET.size && provideShared.length) {
-        const moduleMapCode = `{${[...provideShared]
-          .map((item) => `'${item[0]}':'${item[1].filePath}'`)
-          .join(',')}}`
-        if (sharedImport) {
-          sharedImport.code = sharedImport.code?.replace(
-            getModuleMarker('moduleMap', 'var'),
-            moduleMapCode
-          )
-          const obj = {}
-          // only need little field
-          provideShared.forEach(
-            (value) =>
-              (obj[value[0]] = {
-                import: value[1].import,
-                requiredVersion: value[1].requiredVersion
-              })
-          )
-          sharedImport.code = sharedImport.code?.replace(
-            getModuleMarker('sharedInfo', 'var'),
-            JSON.stringify(obj)
-          )
-        }
-        // add dynamic import
-        const FN_IMPORT = getModuleMarker('import', 'fn')
-        const needDynamicImportChunks = new Set(
-          [...provideShared]
-            .map((item) => item[1].chunk)
-            .concat(EXPOSES_CHUNK_SET)
+        const sharedChunks = provideShared.map(
+          (sharedInfo) => sharedInfo[1].chunk
         )
-        EXPOSES_CHUNK_SET.forEach((exposeChunk) => {
-          findNeedChunks(exposeChunk)
-        })
-
-        // eslint-disable-next-line no-inner-declarations
-        function findNeedChunks(
-          chunk: OutputChunk | OutputAsset | RenderedChunk
-        ): void {
-          if (chunk?.type === 'chunk') {
-            chunk.imports?.forEach((importTarget) => {
-              findNeedChunks(bundle[importTarget])
-            })
-            if (!needDynamicImportChunks.has(chunk)) {
-              needDynamicImportChunks.add(chunk)
-            }
-          }
-        }
-
-        needDynamicImportChunks.forEach((chunk) => {
-          if (chunk.code) {
-            let lastImport: any = null
+        const needShardImportChunks = [...EXPOSES_CHUNK_SET].concat(
+          sharedChunks
+        )
+        const names = provideShared.map((sharedInfo) => sharedInfo[1].fileName)
+        for (const chunk of needShardImportChunks) {
+          const flag = chunk?.imports.some((importName) =>
+            names.some(
+              (item) => path.basename(item) === path.basename(importName)
+            )
+          )
+          if (flag && chunk.code) {
             const ast = this.parse(chunk.code)
-            const importMap = new Map()
-            const magicString = new MagicString(chunk.code!)
+            const magicString = new MagicString(chunk.code)
+            let modify = false
             walk(ast, {
               enter(node: any) {
-                if (node.type === 'ImportDeclaration') {
-                  const fileName = path.basename(node.source.value)
-                  const sharedItem = provideShared.find(
-                    (arr) => arr[1].fileName === fileName
+                if (
+                  node.type === 'ImportDeclaration' &&
+                  names.some((item) =>
+                    item.endsWith(path.basename(node.source.value))
                   )
-                  const sharedName = sharedItem?.[0]
-                  if (sharedName) {
-                    importMap.set(sharedName, {
-                      source: node.source.value,
-                      specifiers: node.specifiers,
-                      sharedItem: sharedItem?.[1]
-                    })
-                    //  replace import with empty
-                    magicString.overwrite(node.start, node.end, '')
+                ) {
+                  const find = provideShared.find((sharedInfo) =>
+                    sharedInfo[1].fileName.endsWith(
+                      path.basename(node.source.value)
+                    )
+                  )
+                  const declaration: (string | never)[] = []
+                  node.specifiers?.forEach((specify) => {
+                    declaration.push(
+                      `${
+                        specify.imported?.name
+                          ? `${
+                              specify.imported.name === specify.local.name
+                                ? specify.local.name
+                                : `${specify.imported.name}:${specify.local.name}`
+                            }`
+                          : `default:${specify.local.name}`
+                      }`
+                    )
+                  })
+                  if (declaration.length) {
+                    magicString.overwrite(
+                      node.start,
+                      node.end,
+                      `const {${declaration.join(',')}} = await importShared('${
+                        find?.[0]
+                      }')`
+                    )
+                    modify = true
                   }
-                  // record the last import to insert dynamic import code
-                  lastImport = node
                 }
               }
             })
-            //  generate variable declare
-            const PLACEHOLDER_VAR = [...importMap.entries()]
-              .map(([key, value]) => {
-                let str = ''
-                value.specifiers?.forEach((space) => {
-                  str += `,${
-                    space.imported.name === space.local.name
-                      ? ''
-                      : `${space.imported.name}:`
-                  }${space.local.name}`
-                })
-                const sharedScope = value.sharedItem.shareScope
-                if (str) {
-                  return `const {${str.substring(
-                    1
-                  )}} = await ${FN_IMPORT}('${key}'${
-                    sharedScope === 'default' ? '' : `,'${sharedScope}'`
-                  });`
-                }
-              })
-              .join('')
-            if (PLACEHOLDER_VAR) {
-              //  append code after lastImport
+            if (modify) {
               magicString.prepend(
-                `\n import ${FN_IMPORT} from './${FN_IMPORT}.js'\n`
+                `import {importShared} from './__rf_fn__import.js'\n`
               )
-              magicString.appendRight(lastImport.end, PLACEHOLDER_VAR)
+              chunk.code = magicString.toString()
             }
-            chunk.code = magicString.toString()
           }
-        })
+        }
       }
     }
   }
+  // }
 }
