@@ -2,11 +2,7 @@ import { ConfigEnv, Plugin, UserConfig, ViteDevServer } from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { remotesPlugin } from './remotes'
 import { VitePluginFederationOptions } from '../types'
-import {
-  builderInfo,
-  DEFAULT_ENTRY_FILENAME,
-  IMPORT_ALIAS_REGEXP
-} from './public'
+import { builderInfo, DEFAULT_ENTRY_FILENAME } from './public'
 import { PluginHooks } from '../types/pluginHooks'
 import { ModuleInfo } from 'rollup'
 import { sharedPlugin } from './shared'
@@ -144,14 +140,6 @@ export default function federation(
     generateBundle: function (_options, bundle, isWrite) {
       for (const pluginHook of pluginList) {
         pluginHook.generateBundle?.call(this, _options, bundle, isWrite)
-      }
-
-      //  replace import_alias => import to ignore vite preload
-      for (const fileKey in bundle) {
-        const chunk = bundle[fileKey]
-        if (chunk.type === 'chunk') {
-          chunk.code = chunk.code.replace(IMPORT_ALIAS_REGEXP, 'import')
-        }
       }
     }
   }

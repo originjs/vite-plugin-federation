@@ -1,10 +1,10 @@
 {
-  "name": "simple-react",
+  "name": "simple-react-esm",
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "host",
-    "remote"
+    "host-esm",
+    "remote-esm"
   ],
   "license": "MIT",
   "scripts": {

@@ -12,7 +12,6 @@ import {
   EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
   EXTERNALS,
-  IMPORT_ALIAS,
   parsedOptions,
   SHARED
 } from './public'
@@ -49,7 +48,7 @@ export function exposesPlugin(
     EXPOSES_MAP.set(item[0], exposeFilepath)
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
-      return ${IMPORT_ALIAS}('${exposeFilepath}')
+      return __federation_import('${exposeFilepath}')
     },`
   }
 
@@ -70,7 +69,10 @@ export function exposesPlugin(
       const element = document.head.appendChild(document.createElement('link'))
       element.href = curUrl + cssFilePath
       element.rel = 'stylesheet'
-    }
+    };
+    async function __federation_import(name) {
+        return import(name);
+    };
     export const get =(module) => {
         return moduleMap[module]();
     };

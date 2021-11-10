@@ -1,7 +1,7 @@
 {
   "packages": [
-    "host",
-    "remote"
+    "host-systemjs",
+    "remote-systemjs"
   ],
   "version": "0.0.0",
   "npmClient": "yarn",

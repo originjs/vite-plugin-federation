@@ -245,62 +245,169 @@ export function sharedPlugin(
         const needShardImportChunks = [...EXPOSES_CHUNK_SET].concat(
           sharedChunks
         )
-        const names = provideShared.map((sharedInfo) => sharedInfo[1].fileName)
+        const names = provideShared.map((sharedInfo) => {
+          return { file: sharedInfo[1].fileName, name: sharedInfo[0] }
+        })
         for (const chunk of needShardImportChunks) {
-          const flag = chunk?.imports.some((importName) =>
+          const flag = chunk?.imports.find((importName) =>
             names.some(
-              (item) => path.basename(item) === path.basename(importName)
+              (item) => path.basename(item.file) === path.basename(importName)
             )
           )
           if (flag && chunk.code) {
             const ast = this.parse(chunk.code)
             const magicString = new MagicString(chunk.code)
             let modify = false
-            walk(ast, {
-              enter(node: any) {
-                if (
-                  node.type === 'ImportDeclaration' &&
-                  names.some((item) =>
-                    item.endsWith(path.basename(node.source.value))
-                  )
-                ) {
-                  const find = provideShared.find((sharedInfo) =>
-                    sharedInfo[1].fileName.endsWith(
-                      path.basename(node.source.value)
-                    )
-                  )
-                  const declaration: (string | never)[] = []
-                  node.specifiers?.forEach((specify) => {
-                    declaration.push(
-                      `${
-                        specify.imported?.name
-                          ? `${
-                              specify.imported.name === specify.local.name
-                                ? specify.local.name
-                                : `${specify.imported.name}:${specify.local.name}`
+            // the processing varies according to the format
+            switch (options.format) {
+              case 'es':
+                {
+                  walk(ast, {
+                    enter(node: any) {
+                      if (
+                        node.type === 'ImportDeclaration' &&
+                        names.some((item) =>
+                          item.file.endsWith(path.basename(node.source.value))
+                        )
+                      ) {
+                        const find = provideShared.find((sharedInfo) =>
+                          sharedInfo[1].fileName.endsWith(
+                            path.basename(node.source.value)
+                          )
+                        )
+                        const declaration: (string | never)[] = []
+                        node.specifiers?.forEach((specify) => {
+                          declaration.push(
+                            `${
+                              specify.imported?.name
+                                ? `${
+                                    specify.imported.name === specify.local.name
+                                      ? specify.local.name
+                                      : `${specify.imported.name}:${specify.local.name}`
+                                  }`
+                                : `default:${specify.local.name}`
                             }`
-                          : `default:${specify.local.name}`
-                      }`
-                    )
+                          )
+                        })
+                        if (declaration.length) {
+                          magicString.overwrite(
+                            node.start,
+                            node.end,
+                            `const {${declaration.join(
+                              ','
+                            )}} = await importShared('${find?.[0]}')`
+                          )
+                          modify = true
+                        }
+                      }
+                    }
                   })
-                  if (declaration.length) {
-                    magicString.overwrite(
-                      node.start,
-                      node.end,
-                      `const {${declaration.join(',')}} = await importShared('${
-                        find?.[0]
-                      }')`
+                  if (modify) {
+                    magicString.prepend(
+                      `import {importShared} from './__rf_fn__import.js'\n`
                     )
-                    modify = true
+                    chunk.code = magicString.toString()
                   }
                 }
-              }
-            })
-            if (modify) {
-              magicString.prepend(
-                `import {importShared} from './__rf_fn__import.js'\n`
-              )
-              chunk.code = magicString.toString()
+                break
+              case 'system':
+                {
+                  walk(ast, {
+                    enter(node: any) {
+                      const expression = node.body[0]?.expression
+                      if (
+                        expression?.callee?.object?.name === 'System' &&
+                        expression.callee.property?.name === 'register'
+                      ) {
+                        const args = expression.arguments
+                        if (
+                          args[0].type === 'ArrayExpression' &&
+                          args[0].elements?.length > 0
+                        ) {
+                          const importIndex: any[] = []
+                          chunk.imports.forEach((importName, index) => {
+                            const equal = names.find(
+                              (item) =>
+                                path.basename(item.file) ===
+                                path.basename(importName)
+                            )
+                            if (equal) {
+                              importIndex.push({
+                                index: index,
+                                name: equal.name
+                              })
+                            }
+                          })
+                          if (
+                            importIndex.length &&
+                            args[1]?.type === 'FunctionExpression'
+                          ) {
+                            const functionExpression = args[1]
+                            // const moduleAlias = functionExpression?.params[1];
+                            const returnStatement =
+                              functionExpression?.body?.body.find(
+                                (item) => item.type === 'ReturnStatement'
+                              )
+                            // insert __federation_import variable
+                            magicString.prependLeft(
+                              returnStatement.start,
+                              'var __federation_import;\n'
+                            )
+                            const setters =
+                              returnStatement.argument.properties.find(
+                                (property) => property.key.name === 'setters'
+                              )
+                            // insert __federation_import setter
+                            magicString.appendRight(
+                              setters.value.elements[chunk.imports.length - 1]
+                                .end,
+                              `,function (module){__federation_import=module.importShared}`
+                            )
+                            const execute =
+                              returnStatement.argument.properties.find(
+                                (property) => property.key.name === 'execute'
+                              )
+                            const insertPos = execute.value.body.body[0].start
+                            importIndex.forEach((item) => {
+                              // insert federation shared import lib
+                              const varName = `__federation_${item.name}`
+                              magicString.prependLeft(
+                                insertPos,
+                                `var  ${varName} = await __federation_import('${item.name}');\n`
+                              )
+                              // replace it with sharedImport
+                              setters.value.elements[
+                                item.index
+                              ].body.body.forEach((setFn) => {
+                                magicString.appendLeft(
+                                  insertPos,
+                                  `${setFn.expression.left.name} = ${varName}.${setFn.expression.right.property.name};\n`
+                                )
+                              })
+                            })
+                            // add async flag to execute function
+                            magicString.prependLeft(
+                              execute.value.start,
+                              ' async '
+                            )
+                            // add sharedImport import declaration
+                            magicString.appendRight(
+                              args[0].end - 1,
+                              `,'./__rf_fn__import.js'`
+                            )
+                            modify = true
+                          }
+                        }
+                      }
+                      // only need to process once
+                      this.skip()
+                    }
+                  })
+                  if (modify) {
+                    chunk.code = magicString.toString()
+                  }
+                }
+                break
             }
           }
         }
