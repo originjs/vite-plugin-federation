@@ -6,7 +6,7 @@ const Button1 = React.lazy(() => import('remote_app/Button1'))
 const App = () => {
   return (
     <React.Suspense fallback="Loading App...">
-      <h1>Rollup Host</h1>
+      <h1>Rollup Host ESM</h1>
       <Button />
       <Button1 />
     </React.Suspense>

@@ -1,11 +1,11 @@
 {
-  "name": "host",
+  "name": "remote-systemjs",
   "version": "1.0.0",
   "main": "dist",
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
-    "serve": "http-server . -p 5000 --cors='*'"
+    "serve": "http-server ./dist -p 5001 --cors='*'"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
