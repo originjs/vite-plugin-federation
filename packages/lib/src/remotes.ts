@@ -11,7 +11,7 @@ import { AcornNode, TransformPluginContext } from 'rollup'
 import { PluginHooks } from '../types/pluginHooks'
 import { ViteDevServer } from '../types/viteDevServer'
 import { getModuleMarker, normalizePath, parseOptions } from './utils'
-import { builderInfo, IMPORT_ALIAS, parsedOptions } from './public'
+import { builderInfo, parsedOptions } from './public'
 import { provideShared } from './shared'
 import * as path from 'path'
 
@@ -62,7 +62,7 @@ const remotesMap = {
     .map(
       (remote) =>
         `${JSON.stringify(remote.id)}: () => ${
-          options.mode === 'development' ? 'import' : IMPORT_ALIAS
+          options.mode === 'development' ? 'import' : '__federation_import'
         }(${JSON.stringify(remote.config.external[0])})`
     )
     .join(',\n  ')}
