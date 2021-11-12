@@ -31,9 +31,13 @@ export function remotesPlugin(
       shareScope: item.shareScope || options.shareScope || 'default'
     })
   )
-  const remotes: { id: string; config: RemotesConfig }[] = []
+  const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
   for (const item of providedRemotes) {
-    remotes.push({ id: item[0], config: item[1] })
+    remotes.push({
+      id: item[0],
+      regexp: new RegExp(`^${item[0]}/.+?`),
+      config: item[1]
+    })
   }
   let devProvideShared
   parsedOptions.devShared = devProvideShared = parseOptions(
@@ -52,7 +56,6 @@ export function remotesPlugin(
   devProvideShared.forEach((value) => devSharedNames.add(value[0]))
   let viteDevServer: ViteDevServer
   let browserHash: string | undefined
-
   return {
     name: 'originjs:remotes',
     virtualFile: {
@@ -219,12 +222,10 @@ export default {
           if (node.type === 'ImportExpression') {
             if (node.source && node.source.value) {
               const moduleId = node.source.value
-              const remote = remotes.find((r) => moduleId.startsWith(r.id))
-
+              const remote = remotes.find((r) => r.regexp.test(moduleId))
               if (remote) {
                 requiresRuntime = true
                 const modName = `.${moduleId.slice(remote.id.length)}`
-
                 magicString.overwrite(
                   node.start,
                   node.end,
