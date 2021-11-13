@@ -300,17 +300,24 @@ export function sharedPlugin(
             {
               walk(ast, {
                 enter(node: any) {
-                  const expression = node.body[0]?.expression
-                  if (
-                    expression?.callee?.object?.name === 'System' &&
-                    expression.callee.property?.name === 'register'
-                  ) {
+                  const expression =
+                    node.body.length === 1
+                      ? node.body[0]?.expression
+                      : node.body.find(
+                          (item) =>
+                            item.type === 'ExpressionStatement' &&
+                            item.expression?.callee?.object?.name ===
+                              'System' &&
+                            item.expression.callee.property?.name === 'register'
+                        )?.expression
+                  if (expression) {
                     const args = expression.arguments
                     if (
                       args[0].type === 'ArrayExpression' &&
                       args[0].elements?.length > 0
                     ) {
                       const importIndex: any[] = []
+                      let removeLast = false
                       chunk.imports.forEach((importName, index) => {
                         const baseName = path.basename(importName)
                         if (sharedFileReg.test(baseName)) {
@@ -318,6 +325,9 @@ export function sharedPlugin(
                             index: index,
                             name: baseName.match(pickSharedNameReg)?.[0]
                           })
+                          if (index === chunk.imports.length - 1) {
+                            removeLast = true
+                          }
                         }
                       })
                       if (
@@ -338,10 +348,13 @@ export function sharedPlugin(
                           returnStatement.argument.properties.find(
                             (property) => property.key.name === 'setters'
                           )
+                        const settersElements = setters.value.elements
                         // insert __federation_import setter
                         magicString.appendRight(
-                          setters.value.elements[chunk.imports.length - 1].end,
-                          `,function (module){__federation_import=module.importShared}`
+                          setters.end - 1,
+                          `${
+                            removeLast ? '' : ','
+                          }function (module){__federation_import=module.importShared}`
                         )
                         const execute =
                           returnStatement.argument.properties.find(
@@ -349,6 +362,20 @@ export function sharedPlugin(
                           )
                         const insertPos = execute.value.body.body[0].start
                         importIndex.forEach((item) => {
+                          // remove unnecessary setters and import
+                          const last = item.index === settersElements.length - 1
+                          magicString.remove(
+                            settersElements[item.index].start,
+                            last
+                              ? settersElements[item.index].end
+                              : settersElements[item.index + 1].start - 1
+                          )
+                          magicString.remove(
+                            args[0].elements[item.index].start,
+                            last
+                              ? args[0].elements[item.index].end
+                              : args[0].elements[item.index + 1].start - 1
+                          )
                           // insert federation shared import lib
                           const varName = `__federation_${item.name}`
                           magicString.prependLeft(
@@ -370,7 +397,9 @@ export function sharedPlugin(
                         // add sharedImport import declaration
                         magicString.appendRight(
                           args[0].end - 1,
-                          `,'./__federation_fn_import.js'`
+                          `${
+                            removeLast ? '' : ','
+                          }'./__federation_fn_import.js'`
                         )
                         modify = true
                       }

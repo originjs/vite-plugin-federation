@@ -41,7 +41,7 @@ export function exposesPlugin(
     item[1].id = exposeFilepath
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
-      return import('${item[1].id}')
+      return __federation_import('\${__federation_expose_${item[0]}}')
     },`
   }
 

@@ -9,11 +9,17 @@ import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
 import { ViteDevServer } from '../types/viteDevServer'
-import { getModuleMarker, normalizePath, parseOptions } from './utils'
+import {
+  getModuleMarker,
+  normalizePath,
+  parseOptions,
+  removeNonLetter
+} from './utils'
 import { builderInfo, parsedOptions } from './public'
 import { provideShared } from './shared'
 import * as path from 'path'
 import { PluginHooks } from '../types/pluginHooks'
+import { provideExposes } from './exposes'
 
 export let providedRemotes
 
@@ -163,6 +169,29 @@ export default {
             preserveSignature: 'allow-extension'
           })
         }
+      }
+
+      for (const expose of provideExposes) {
+        if (!expose[1].emitFile) {
+          expose[1].emitFile = this.emitFile({
+            type: 'chunk',
+            id: expose[1].id,
+            fileName: `${
+              builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+            }__federation_expose_${removeNonLetter(expose[0])}.js`,
+            name: `__federation_expose_${removeNonLetter(expose[0])}`,
+            preserveSignature: 'allow-extension'
+          })
+        }
+      }
+      if (id === '\0virtual:__remoteEntryHelper__') {
+        for (const expose of provideExposes) {
+          code = code.replace(
+            `\${__federation_expose_${expose[0]}}`,
+            `./${path.basename(this.getFileName(expose[1].emitFile))}`
+          )
+        }
+        return code
       }
 
       if (id === '\0virtual:__federation__') {
