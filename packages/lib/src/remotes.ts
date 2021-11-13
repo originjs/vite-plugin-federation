@@ -8,12 +8,12 @@ import {
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
-import { PluginHooks } from '../types/pluginHooks'
 import { ViteDevServer } from '../types/viteDevServer'
 import { getModuleMarker, normalizePath, parseOptions } from './utils'
 import { builderInfo, parsedOptions } from './public'
 import { provideShared } from './shared'
 import * as path from 'path'
+import { PluginHooks } from '../types/pluginHooks'
 
 export let providedRemotes
 
@@ -158,7 +158,7 @@ export default {
             id: sharedInfo[0],
             fileName: `${
               builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-            }${sharedInfo[0]}.js`,
+            }__federation_shared_${sharedInfo[0]}.js`,
             name: sharedInfo[0],
             preserveSignature: 'allow-extension'
           })
@@ -178,7 +178,7 @@ export default {
           )
         }
       }
-      if (id === '\0virtual:__rf_fn__import') {
+      if (id === '\0virtual:__federation_fn_import') {
         const moduleMapCode = provideShared
           .map(
             (sharedInfo) =>

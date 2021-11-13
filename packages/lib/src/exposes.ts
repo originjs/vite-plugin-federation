@@ -1,15 +1,9 @@
 import * as path from 'path'
+import { getModuleMarker, normalizePath, parseOptions } from './utils'
 import {
-  getModuleMarker,
-  isSameFilepath,
-  normalizePath,
-  parseOptions,
-  removeNonLetter
-} from './utils'
-import {
+  builderInfo,
   DYNAMIC_LOADING_CSS,
   DYNAMIC_LOADING_CSS_PREFIX,
-  EXPOSES_CHUNK_SET,
   EXPOSES_MAP,
   EXTERNALS,
   parsedOptions,
@@ -27,7 +21,6 @@ export function exposesPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   let moduleMap = ''
-  const replaceMap = new Map()
   parsedOptions.exposes = provideExposes = parseOptions(
     options.exposes,
     (item) => ({
@@ -43,14 +36,16 @@ export function exposesPlugin(
   for (const item of provideExposes) {
     const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
     EXTERNALS.push(moduleName)
-    //EXTERNALS.push(item[0])
     const exposeFilepath = normalizePath(path.resolve(item[1].import))
     EXPOSES_MAP.set(item[0], exposeFilepath)
+    item[1].id = exposeFilepath
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
-      return __federation_import('${exposeFilepath}')
+      return import('${item[1].id}')
     },`
   }
+
+  let remoteEntryChunk
 
   return {
     name: 'originjs:exposes',
@@ -105,17 +100,6 @@ export function exposesPlugin(
       | undefined {
       // Split expose & shared module to separate chunks
       _options.preserveEntrySignatures = 'strict'
-      if (typeof _options.input === 'string') {
-        _options.input = { index: _options.input }
-      }
-      EXPOSES_MAP.forEach((value, key) => {
-        _options.input![removeNonLetter(key)] = value
-      })
-      EXTERNALS.forEach((item) => {
-        if (Array.isArray(_options.external)) {
-          _options.external.push(item)
-        }
-      })
       return null
     },
 
@@ -123,7 +107,9 @@ export function exposesPlugin(
       // if we don't expose any modules, there is no need to emit file
       if (provideExposes.length > 0) {
         this.emitFile({
-          fileName: options.filename,
+          fileName: `${
+            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }${options.filename}`,
           type: 'chunk',
           id: '__remoteEntryHelper__',
           preserveSignature: 'strict'
@@ -131,16 +117,8 @@ export function exposesPlugin(
       }
     },
     renderChunk(code, chunk, _) {
-      if (chunk.type === 'chunk' && chunk.isEntry) {
-        EXPOSES_MAP.forEach((value) => {
-          if (
-            chunk.facadeModuleId != null &&
-            isSameFilepath(chunk.facadeModuleId, value)
-          ) {
-            replaceMap.set(value, `./${chunk.fileName}`)
-            EXPOSES_CHUNK_SET.add(chunk)
-          }
-        })
+      if (chunk.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
+        remoteEntryChunk = chunk
       }
       return null
     },
@@ -148,7 +126,6 @@ export function exposesPlugin(
       const moduleCssFileMap = getChunkCssRelation(bundle)
 
       // replace import absolute path to chunk's fileName in remoteEntry.js
-      let remoteEntryChunk
       for (const file in bundle) {
         const chunk = bundle[file]
         if (chunk.type === 'chunk' && chunk.isEntry) {
@@ -160,20 +137,11 @@ export function exposesPlugin(
       // placeholder replace
       if (remoteEntryChunk) {
         const item = remoteEntryChunk
-        // accurately replace import absolute path to relative path
-        replaceMap.forEach((value, key) => {
-          item.code = item.code.replace(new RegExp(key + '\\b', 'g'), value)
-        })
-
         // replace __f__dynamic_loading_css__ to dynamicLoadingCss
         moduleCssFileMap.forEach((value, key) => {
           item.code = item.code.replace(
-            `("${DYNAMIC_LOADING_CSS_PREFIX}./${key}")`,
-            `("${value}")`
-          )
-          item.code = item.code.replace(
-            `('${DYNAMIC_LOADING_CSS_PREFIX}./${key}')`,
-            `('${value}')`
+            `${DYNAMIC_LOADING_CSS_PREFIX}${key}`,
+            `./${path.basename(value)}`
           )
         })
 
@@ -226,7 +194,7 @@ export function exposesPlugin(
     for (const file in bundle) {
       let name = getOriginalFileName(file)
       if (cssFileMap.get(name) != null && path.extname(file) !== '.css') {
-        moduleCssFileMap.set(file, cssFileMap.get(name))
+        moduleCssFileMap.set(bundle[file].facadeModuleId, cssFileMap.get(name))
         continue
       }
 
@@ -238,7 +206,7 @@ export function exposesPlugin(
       ) {
         name = getOriginalFileName(chunk.imports[0])
         if (cssFileMap.get(name) != null) {
-          moduleCssFileMap.set(file, cssFileMap.get(name))
+          moduleCssFileMap.set(chunk.facadeModuleId, cssFileMap.get(name))
         }
       }
     }
@@ -247,7 +215,7 @@ export function exposesPlugin(
     if (moduleCssFileMap.size === 0) {
       for (const file in bundle) {
         cssFileMap.forEach(function (css) {
-          moduleCssFileMap.set(file, css)
+          moduleCssFileMap.set(bundle[file].facadeModuleId, css)
         })
       }
     }
