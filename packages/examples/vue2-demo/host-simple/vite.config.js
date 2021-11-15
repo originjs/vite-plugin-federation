@@ -10,12 +10,12 @@ export default defineConfig({
       name: 'remote-simple',
       filename: 'remoteEntry.js',
       remotes: {
-        'remote-simple': 'http://localhost:5001/remoteEntry.js'
+        'remote-simple': 'http://localhost:5001/assets/remoteEntry.js'
       },
       shared: ['vue']
     })
   ],
-  server: {force: true},
+  server: { force: true },
   build: {
     target: 'es2020',
     minify: false,

@@ -1,27 +1,32 @@
 import { defineConfig } from 'vite'
-import { createVuePlugin } from 'vite-plugin-vue2'
+import vue from '@vitejs/plugin-vue'
 import federation from '@originjs/vite-plugin-federation'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    createVuePlugin(),
+    vue(),
     federation({
-      name: 'remote-simple',
+      name: 'common-lib',
       filename: 'remoteEntry.js',
       exposes: {
-        './remote-simple-button': './src/components/Button.vue',
-        './remote-simple-section': './src/components/Section.vue'
+        './CommonCounter': './src/components/CommonCounter.vue',
+        './CommonHeader': './src/components/CommonHeader.vue'
       },
-      shared: ['vue']
+      shared: {
+        vue: {
+          requiredVersion: '^3.0.0'
+        }
+      }
     })
   ],
   build: {
-    target: 'es2020',
+    target: 'esnext',
     minify: false,
     cssCodeSplit: true,
     rollupOptions: {
       output: {
+        format: 'system',
         minifyInternalExports: false
       }
     }

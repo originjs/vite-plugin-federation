@@ -1,0 +1,11 @@
+{
+  "packages": [
+    "home",
+    "common-lib",
+    "layout",
+    "css-modules"
+  ],
+  "version": "1.0.0",
+  "npmClient": "yarn",
+  "useWorkspaces": true
+}

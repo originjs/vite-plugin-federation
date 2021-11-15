@@ -132,7 +132,15 @@ export default function federation(
 
     renderChunk(code, chunkInfo, _options) {
       for (const pluginHook of pluginList) {
-        pluginHook.renderChunk?.call(this, code, chunkInfo, _options)
+        const result = pluginHook.renderChunk?.call(
+          this,
+          code,
+          chunkInfo,
+          _options
+        )
+        if (result) {
+          return result
+        }
       }
       return null
     },

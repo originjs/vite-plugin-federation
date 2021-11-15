@@ -8,12 +8,18 @@ import {
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
-import { PluginHooks } from '../types/pluginHooks'
 import { ViteDevServer } from '../types/viteDevServer'
-import { getModuleMarker, normalizePath, parseOptions } from './utils'
+import {
+  getModuleMarker,
+  normalizePath,
+  parseOptions,
+  removeNonLetter
+} from './utils'
 import { builderInfo, parsedOptions } from './public'
 import { provideShared } from './shared'
 import * as path from 'path'
+import { PluginHooks } from '../types/pluginHooks'
+import { provideExposes } from './exposes'
 
 export let providedRemotes
 
@@ -158,11 +164,34 @@ export default {
             id: sharedInfo[0],
             fileName: `${
               builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-            }${sharedInfo[0]}.js`,
+            }__federation_shared_${sharedInfo[0]}.js`,
             name: sharedInfo[0],
             preserveSignature: 'allow-extension'
           })
         }
+      }
+
+      for (const expose of provideExposes) {
+        if (!expose[1].emitFile) {
+          expose[1].emitFile = this.emitFile({
+            type: 'chunk',
+            id: expose[1].id,
+            fileName: `${
+              builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+            }__federation_expose_${removeNonLetter(expose[0])}.js`,
+            name: `__federation_expose_${removeNonLetter(expose[0])}`,
+            preserveSignature: 'allow-extension'
+          })
+        }
+      }
+      if (id === '\0virtual:__remoteEntryHelper__') {
+        for (const expose of provideExposes) {
+          code = code.replace(
+            `\${__federation_expose_${expose[0]}}`,
+            `./${path.basename(this.getFileName(expose[1].emitFile))}`
+          )
+        }
+        return code
       }
 
       if (id === '\0virtual:__federation__') {
@@ -178,7 +207,7 @@ export default {
           )
         }
       }
-      if (id === '\0virtual:__rf_fn__import') {
+      if (id === '\0virtual:__federation_fn_import') {
         const moduleMapCode = provideShared
           .map(
             (sharedInfo) =>

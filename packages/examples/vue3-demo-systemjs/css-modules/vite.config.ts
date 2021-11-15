@@ -1,27 +1,35 @@
 import { defineConfig } from 'vite'
-import { createVuePlugin } from 'vite-plugin-vue2'
+import vue from '@vitejs/plugin-vue'
 import federation from '@originjs/vite-plugin-federation'
+import autoprefixer from 'autoprefixer'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  css: {
+    modules: {
+      scopeBehaviour: 'local',
+      localsConvention: 'camelCase'
+    },
+    postcss: { plugins: [autoprefixer()] }
+  },
   plugins: [
-    createVuePlugin(),
+    vue(),
     federation({
-      name: 'remote-simple',
+      name: 'css-modules',
       filename: 'remoteEntry.js',
       exposes: {
-        './remote-simple-button': './src/components/Button.vue',
-        './remote-simple-section': './src/components/Section.vue'
+        './Button': './src/components/Button.vue'
       },
       shared: ['vue']
     })
   ],
   build: {
-    target: 'es2020',
-    minify: false,
+    target: 'esnext',
+    minify: true,
     cssCodeSplit: true,
     rollupOptions: {
       output: {
+        format: 'system',
         minifyInternalExports: false
       }
     }
