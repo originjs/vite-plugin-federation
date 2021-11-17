@@ -1,3 +1,19 @@
+## [1.0.3](https://github.com/originjs/vite-plugin-federation/compare/v1.0.2...v1.0.3) (2021-11-17)
+
+
+### Bug Fixes
+
+* Build error when format is systemjs and minify:true is set ([4ff5523](https://github.com/originjs/vite-plugin-federation/commit/4ff552320ee91b9012ba6b76b09f2c860646fb08))
+* dynamic import incorrectly judged as remote component ([#94](https://github.com/originjs/vite-plugin-federation/issues/94)) ([1160a6c](https://github.com/originjs/vite-plugin-federation/commit/1160a6cc13d063574af8a4927fb0b13a07605d11))
+* shared is invalid when format is systemjs ([d700be2](https://github.com/originjs/vite-plugin-federation/commit/d700be223c32fcd25089d5e5b1fcd5be299281e7))
+
+
+### Features
+
+* support `format:systemjs` for rollup and vite ([ea273bb](https://github.com/originjs/vite-plugin-federation/commit/ea273bbbac44acf723d2dc6d550279585a066642))
+
+
+
 ## [1.0.2](https://github.com/originjs/vite-plugin-federation/compare/v1.0.1...v1.0.2) (2021-11-09)
 
 
