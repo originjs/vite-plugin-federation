@@ -169,7 +169,7 @@ Github CI 构建，非工程必备：
 
 ## 开发模式
 
-因为 Vite 在 development 模式下是基于 esbuild，所以我们单独提供了对 development 模式的支持，可以在远程模块部署的情况下，利用 Vite 的高性能开发能力。
+因为 Vite 在 development 模式下是基于 esbuild，所以我们单独提供了对 development 模式的支持，可以在远程模块部署的情况下，利用 Vite 的高性能开发能力。但是需要注意只有Host支持dev模式，Remote暂时只支持build模式
 
 
 

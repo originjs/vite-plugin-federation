@@ -167,7 +167,7 @@ Github CI build, not engineering required:
 
 ## Development mode
 
-Since Vite is esbuild-based in development mode, we provide separate support for the development mode to leverage Vite’s high-performance development capabilities in the case of remote module deployment.
+Since Vite is esbuild-based in development mode, we provide separate support for the development mode to leverage Vite’s high-performance development capabilities in the case of remote module deployment. And note that only Host supports the dev mode and Remote supports only build mode
 
 ### FAQ
 
