@@ -1,3 +1,12 @@
+## [1.0.4](https://github.com/originjs/vite-plugin-federation/compare/v1.0.3...v1.0.4) (2021-11-18)
+
+
+### Bug Fixes
+
+* dev mode throw error ([#96](https://github.com/originjs/vite-plugin-federation/issues/96)) ([3a37701](https://github.com/originjs/vite-plugin-federation/commit/3a377015ae0e09d650fbef4a2de1178bcd17a5c1))
+
+
+
 ## [1.0.3](https://github.com/originjs/vite-plugin-federation/compare/v1.0.2...v1.0.3) (2021-11-17)
 
 
