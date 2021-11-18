@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { createVuePlugin } from 'vite-plugin-vue2'
 import federation from '@originjs/vite-plugin-federation'
+import path from 'path/posix'
 
 // https://vitejs.dev/config/
 export default defineConfig({

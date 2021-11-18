@@ -1,4 +1,3 @@
-import fs from 'fs-extra'
 import { resolve } from 'path'
 import execa from 'execa'
 import { Page } from 'playwright-chromium'
