@@ -41,7 +41,7 @@ export default defineConfig({
       },
       remotes:{
           foo: 'remote_foo'
-      }
+      },
       shared: ['vue']
     })
   ],
