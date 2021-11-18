@@ -1,11 +1,11 @@
-import { PluginHooks } from '../types/pluginHooks'
+import { PluginHooks } from '../../types/pluginHooks'
 import {
   findDependencies,
   getModuleMarker,
   isSameFilepath,
   parseOptions
-} from './utils'
-import { builderInfo, EXPOSES_MAP, parsedOptions } from './public'
+} from '../utils'
+import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
 import {
   ConfigTypeSet,
   SharedRuntimeInfo,
@@ -14,17 +14,14 @@ import {
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import * as path from 'path'
-import { provideExposes } from './exposes'
-
-export let provideShared: (string | (ConfigTypeSet & SharedRuntimeInfo))[]
 
 const sharedFileReg = /^__federation_shared_.+\.js$/
 const pickSharedNameReg = /(?<=^__federation_shared_).+(?=\.js$)/
 
-export function sharedPlugin(
+export function prodSharedPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
-  parsedOptions.shared = provideShared = parseOptions(
+  parsedOptions.prodShared = parseOptions(
     options.shared || {},
     () => ({
       import: true,
@@ -37,7 +34,7 @@ export function sharedPlugin(
     }
   ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
   const sharedNames = new Set<string>()
-  provideShared.forEach((value) => sharedNames.add(value[0]))
+  parsedOptions.prodShared.forEach((value) => sharedNames.add(value[0]))
   const exposesModuleIdSet = new Set()
   EXPOSES_MAP.forEach((value) => {
     exposesModuleIdSet.add(`${value}.js`)
@@ -46,7 +43,7 @@ export function sharedPlugin(
   let isRemote
 
   return {
-    name: 'originjs:shared',
+    name: 'originjs:shared-production',
     virtualFile: {
       __federation_fn_import: `
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
@@ -94,8 +91,8 @@ export function sharedPlugin(
       `
     },
     options(inputOptions) {
-      isHost = !!parsedOptions.remotes.length
-      isRemote = !!parsedOptions.exposes.length
+      isHost = !!parsedOptions.prodRemote.length
+      isRemote = !!parsedOptions.prodExpose.length
 
       if (sharedNames.size) {
         // remove item which is both in external and shared
@@ -104,16 +101,12 @@ export function sharedPlugin(
             return !sharedNames.has(item)
           }
         )
-        // sharedNames.forEach((shareName) => {
-        //     inputOptions.input![`${getModuleMarker(shareName, 'input')}`] =
-        //         shareName
-        // })
       }
       return inputOptions
     },
 
     async buildStart() {
-      for (const arr of provideShared) {
+      for (const arr of parsedOptions.prodShared) {
         const id = await this.resolveId(arr[0])
         arr[1].id = id
         if (isHost && !arr[1].version) {
@@ -131,7 +124,7 @@ export function sharedPlugin(
           }
         }
       }
-      if (provideShared.length && isRemote) {
+      if (parsedOptions.prodShared.length && isRemote) {
         this.emitFile({
           fileName: `${
             builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
@@ -144,7 +137,7 @@ export function sharedPlugin(
     },
 
     async buildEnd() {
-      for (const sharedInfo of provideShared) {
+      for (const sharedInfo of parsedOptions.prodShared) {
         if (!sharedInfo[1].id) {
           const resolved = await this.resolve(sharedInfo[0])
           sharedInfo[1].id = resolved?.id
@@ -156,13 +149,13 @@ export function sharedPlugin(
       const that = this
       const priority: string[] = []
       const depInShared = new Map()
-      provideShared.forEach((value) => {
+      parsedOptions.prodShared.forEach((value) => {
         const shareName = value[0]
         // pick every shared moduleId
         const usedSharedModuleIds = new Set<string>()
         const sharedModuleIds = new Map<string, string>()
         // exclude itself
-        provideShared
+        parsedOptions.prodShared
           .filter((item) => item[0] !== shareName)
           .forEach((item) => sharedModuleIds.set(item[1].id, item[0]))
         depInShared.set(shareName, usedSharedModuleIds)
@@ -209,7 +202,7 @@ export function sharedPlugin(
       }
 
       // adjust the map order according to priority
-      provideShared.sort((a, b) => {
+      parsedOptions.prodShared.sort((a, b) => {
         const aIndex = priority.findIndex((value) => value === a[0])
         const bIndex = priority.findIndex((value) => value === b[0])
         return aIndex - bIndex
@@ -220,7 +213,7 @@ export function sharedPlugin(
           apply(target, thisArg, argArray) {
             const id = argArray[0]
             //  if id is in shared dependencies, return id ,else return vite function value
-            const find = provideShared.find((arr) =>
+            const find = parsedOptions.prodShared.find((arr) =>
               arr[1].dependencies.has(id)
             )
             return find ? find[0] : target(argArray[0], argArray[1])
@@ -232,12 +225,12 @@ export function sharedPlugin(
     renderChunk: function (code, chunk, options) {
       //   process shared chunk
       const sharedFlag = sharedFileReg.test(path.basename(chunk.fileName))
-      const exposesFlag = provideExposes.some((expose) =>
+      const exposesFlag = parsedOptions.prodExpose.some((expose) =>
         isSameFilepath(expose[1].id, chunk.facadeModuleId as string)
       )
       const needSharedImport =
         isRemote &&
-        provideShared.length > 0 &&
+        parsedOptions.prodShared.length > 0 &&
         chunk.type === 'chunk' &&
         (sharedFlag || exposesFlag) &&
         chunk.imports.some((importName) =>

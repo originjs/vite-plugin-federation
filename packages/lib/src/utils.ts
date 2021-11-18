@@ -1,4 +1,11 @@
-import { Exposes, Remotes, Shared, ConfigTypeSet } from '../types'
+import {
+  Exposes,
+  Remotes,
+  Shared,
+  ConfigTypeSet,
+  VitePluginFederationOptions,
+  SharedRuntimeInfo
+} from '../types'
 import * as path from 'path'
 import { PluginContext } from 'rollup'
 
@@ -26,6 +33,55 @@ export function findDependencies(
       usedSharedModuleIds.add(sharedModuleIds.get(id) as string)
     }
   }
+}
+
+export function parseSharedOptions(
+  options: VitePluginFederationOptions
+): (string | (ConfigTypeSet & SharedRuntimeInfo))[] {
+  return parseOptions(
+    options.shared || {},
+    () => ({
+      import: true,
+      shareScope: 'default'
+    }),
+    (value) => {
+      value.import = value.import ?? true
+      value.shareScope = value.shareScope || 'default'
+      return value
+    }
+  ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
+}
+
+export function parseExposeOptions(
+  options: VitePluginFederationOptions
+): (string | ConfigTypeSet)[] {
+  return parseOptions(
+    options.exposes,
+    (item) => ({
+      import: item,
+      name: undefined
+    }),
+    (item) => ({
+      import: Array.isArray(item.import) ? item.import : [item.import],
+      name: item.name || undefined
+    })
+  )
+}
+
+export function parseRemoteOptions(
+  options: VitePluginFederationOptions
+): (string | ConfigTypeSet)[] {
+  return parseOptions(
+    options.remotes ? options.remotes : {},
+    (item) => ({
+      external: Array.isArray(item) ? item : [item],
+      shareScope: options.shareScope || 'default'
+    }),
+    (item) => ({
+      external: Array.isArray(item.external) ? item.external : [item.external],
+      shareScope: item.shareScope || options.shareScope || 'default'
+    })
+  )
 }
 
 export function parseOptions(

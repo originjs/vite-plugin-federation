@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { getModuleMarker, normalizePath, parseOptions } from './utils'
+import { getModuleMarker, normalizePath, parseExposeOptions } from '../utils'
 import {
   builderInfo,
   DYNAMIC_LOADING_CSS,
@@ -8,32 +8,20 @@ import {
   EXTERNALS,
   parsedOptions,
   SHARED
-} from './public'
+} from '../public'
 import { AcornNode, InputOptions, MinimalPluginContext } from 'rollup'
 import { VitePluginFederationOptions } from 'types'
-import { PluginHooks } from '../types/pluginHooks'
+import { PluginHooks } from '../../types/pluginHooks'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 
-export let provideExposes
-
-export function exposesPlugin(
+export function prodExposePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   let moduleMap = ''
-  parsedOptions.exposes = provideExposes = parseOptions(
-    options.exposes,
-    (item) => ({
-      import: item,
-      name: undefined
-    }),
-    (item) => ({
-      import: Array.isArray(item.import) ? item.import : [item.import],
-      name: item.name || undefined
-    })
-  )
+  parsedOptions.prodExpose = parseExposeOptions(options)
   // exposes module
-  for (const item of provideExposes) {
+  for (const item of parsedOptions.prodExpose) {
     const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
     EXTERNALS.push(moduleName)
     const exposeFilepath = normalizePath(path.resolve(item[1].import))
@@ -48,7 +36,7 @@ export function exposesPlugin(
   let remoteEntryChunk
 
   return {
-    name: 'originjs:exposes',
+    name: 'originjs:expose-production',
     virtualFile: {
       // code generated for remote
       __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
@@ -99,13 +87,13 @@ export function exposesPlugin(
       | null
       | undefined {
       // Split expose & shared module to separate chunks
-      _options.preserveEntrySignatures = 'strict'
+      // _options.preserveEntrySignatures = 'strict'
       return null
     },
 
     buildStart(inputOptions) {
       // if we don't expose any modules, there is no need to emit file
-      if (provideExposes.length > 0) {
+      if (parsedOptions.prodExpose.length > 0) {
         this.emitFile({
           fileName: `${
             builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''

@@ -1,12 +1,15 @@
 import { ConfigEnv, Plugin, UserConfig, ViteDevServer } from 'vite'
 import virtual from '@rollup/plugin-virtual'
-import { remotesPlugin } from './remotes'
+import { prodRemotePlugin } from './prod/remote-production'
 import { VitePluginFederationOptions } from '../types'
-import { builderInfo, DEFAULT_ENTRY_FILENAME } from './public'
+import { builderInfo, DEFAULT_ENTRY_FILENAME, parsedOptions } from './public'
 import { PluginHooks } from '../types/pluginHooks'
 import { ModuleInfo } from 'rollup'
-import { sharedPlugin } from './shared'
-import { exposesPlugin } from './exposes'
+import { prodSharedPlugin } from './prod/shared-production'
+import { prodExposePlugin } from './prod/expose-production'
+import { devSharedPlugin } from './dev/shared-development'
+import { devRemotePlugin } from './dev/remote-development'
+import { devExposePlugin } from './dev/expose-development'
 
 export default function federation(
   options: VitePluginFederationOptions
@@ -15,27 +18,35 @@ export default function federation(
     ? options.filename
     : DEFAULT_ENTRY_FILENAME
 
-  let pluginList: PluginHooks[]
+  let pluginList: PluginHooks[] = []
   let virtualMod
+  let registerCount = 0
 
   function registerPlugins(mode: string) {
-    // Prevent duplicate registration of plugins
-    if (options.mode === 'development' || options.mode === 'production') {
-      return
-    }
-
-    options.mode = mode ? mode : options.mode
-    if (options.mode === 'development') {
-      pluginList = [remotesPlugin(options)]
-    } else if (options.mode === 'production' || options.mode === 'rollup') {
+    if (mode === 'development') {
       pluginList = [
-        sharedPlugin(options),
-        exposesPlugin(options),
-        remotesPlugin(options)
+        devSharedPlugin(options),
+        devExposePlugin(options),
+        devRemotePlugin(options)
+      ]
+    } else if (mode === 'production') {
+      pluginList = [
+        prodSharedPlugin(options),
+        prodExposePlugin(options),
+        prodRemotePlugin(options)
       ]
     } else {
       pluginList = []
     }
+    builderInfo.isHost = !!(
+      parsedOptions.prodRemote.length || parsedOptions.devRemote.length
+    )
+    builderInfo.isRemote = !!(
+      parsedOptions.prodExpose.length || parsedOptions.devExpose.length
+    )
+    builderInfo.isShared = !!(
+      parsedOptions.prodShared.length || parsedOptions.devShared.length
+    )
 
     let virtualFiles = {}
     pluginList.forEach((plugin) => {
@@ -54,10 +65,11 @@ export default function federation(
     enforce: 'post',
     // apply:'build',
     options(_options) {
-      // Register default plugins
-      registerPlugins('rollup')
+      // rollup doesnt has options.mode
+      if (!registerCount++) {
+        registerPlugins((options.mode = options.mode ?? 'production'))
+      }
 
-      // _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
         _options.input = { index: _options.input }
       }
@@ -71,12 +83,14 @@ export default function federation(
       return _options
     },
     config(config: UserConfig, env: ConfigEnv) {
-      registerPlugins(env.mode)
+      options.mode = env.mode
+      registerPlugins(options.mode)
+      registerCount++
       for (const pluginHook of pluginList) {
         pluginHook.config?.call(this, config, env)
       }
 
-      // only run when builder is vite,rollup doesnt have hook named `config`
+      // only run when builder is vite,rollup doesnt has hook named `config`
       builderInfo.builder = 'vite'
       builderInfo.assetsDir = config?.build?.assetsDir ?? 'assets'
     },
