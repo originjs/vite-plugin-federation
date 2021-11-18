@@ -13,3 +13,10 @@ declare interface Optimized {
   src: string
   needsInterop: boolean
 }
+
+export interface Hostname {
+  // undefined sets the default behaviour of server.listen
+  host: string | undefined
+  // resolve to localhost when possible
+  name: string
+}
