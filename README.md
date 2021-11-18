@@ -38,7 +38,7 @@ export default defineConfig({
       },
       remotes:{
           foo: 'remote_foo'
-      }
+      },
       shared: ['vue']
     })
   ],
@@ -115,7 +115,7 @@ exposes: {
     '. /remote-simple-button': '. /src/components/Button.vue',
         '. /remote-simple-section': '. /src/components/Section.vue'
 },
-  ```
+```
 ### remotes
 The remote module entry file referenced as a local module
   ```js
@@ -163,5 +163,65 @@ Github CI build, not engineering required:
 
 - playwright-chromium
 
+
+
+## Development mode
+
+Since Vite is esbuild-based in development mode, we provide separate support for the development mode to leverage Vite’s high-performance development capabilities in the case of remote module deployment.
+
+### FAQ
+
+#### The component of the remote module can not be displayed properly. The console displays“[Vue warn]: Invalid VNode type: Symbol() (symbol)”
+
+The loading of the respective `Vue`by local and remote modules causes the problem of referencing multiple `Vue`.
+
+Solutions：
+
+Keep the local module relatively consistent with the dependent version shared in the remote module.
+
+remote module's `vite.config.ts`
+
+```ts
+federation({
+  name: 'common-lib',
+  filename: 'remoteEntry.js',
+  exposes: {
+	'./CommonCounter': './src/components/CommonCounter.vue',
+	'./CommonHeader': './src/components/CommonHeader.vue'
+  },
+  shared: {
+	vue: {
+	  requiredVersion:'^2.0.0' // If you force the version to be too low, delete or modify it to ^ 3.0.0
+	}
+  }
+})
+```
+
+
+
+####The remote module failed to load the share of the local module, for example`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
+
+Reason: Vite has auto fetch logic for `IP` and Port when starting the service, no full fetch logic has been found in the `Plugin`, and in some cases a fetch failure may occur.
+
+Solutions：
+
+Explicitly declaring IP, Port, `cacheDir` in the local module ensures that our `Plugin` can correctly fetch and pass the dependent addresses.
+
+Local module's `vite.config.ts`
+
+```ts
+export default defineConfig({
+  server:{
+    https: "http",
+    host: "192.168.56.1",
+    port: 5100,
+  },
+  cacheDir: "node_modules/.cacheDir",
+}
+```
+
+
+
 ## Wiki
+
 [Design framework](https://github.com/originjs/vite-plugin-federation/wiki)

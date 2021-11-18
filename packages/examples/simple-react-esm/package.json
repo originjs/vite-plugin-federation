@@ -1,0 +1,21 @@
+{
+  "name": "simple-react-esm",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "host-esm",
+    "remote-esm"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "pnpm run build -r --filter ./",
+    "serve": "pnpm run serve --parallel --filter ./",
+    "stop": "kill-port --port 5000,5001"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "workspace:*",
+    "http-server": "^13.0.1",
+    "kill-port": "^1.6.1"
+  }
+}
+

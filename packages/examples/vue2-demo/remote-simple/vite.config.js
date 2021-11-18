@@ -11,7 +11,7 @@ export default defineConfig({
       filename: 'remoteEntry.js',
       exposes: {
         './remote-simple-button': './src/components/Button.vue',
-        './remote-simple-section': './src/components/Section.vue',
+        './remote-simple-section': './src/components/Section.vue'
       },
       shared: ['vue']
     })

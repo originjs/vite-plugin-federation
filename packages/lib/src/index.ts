@@ -1,15 +1,12 @@
-import { Plugin, UserConfig, ConfigEnv, ViteDevServer } from 'vite'
+import { ConfigEnv, Plugin, UserConfig, ViteDevServer } from 'vite'
 import virtual from '@rollup/plugin-virtual'
-import { exposesPlugin } from './exposes'
 import { remotesPlugin } from './remotes'
-import { sharedPlugin } from './shared'
 import { VitePluginFederationOptions } from '../types'
-import {
-  IMPORT_ALIAS_REGEXP,
-  DEFAULT_ENTRY_FILENAME,
-  builderInfo
-} from './public'
+import { builderInfo, DEFAULT_ENTRY_FILENAME } from './public'
 import { PluginHooks } from '../types/pluginHooks'
+import { ModuleInfo } from 'rollup'
+import { sharedPlugin } from './shared'
+import { exposesPlugin } from './exposes'
 
 export default function federation(
   options: VitePluginFederationOptions
@@ -60,7 +57,7 @@ export default function federation(
       // Register default plugins
       registerPlugins('rollup')
 
-      _options.preserveEntrySignatures = 'strict'
+      // _options.preserveEntrySignatures = 'strict'
       if (typeof _options.input === 'string') {
         _options.input = { index: _options.input }
       }
@@ -81,6 +78,7 @@ export default function federation(
 
       // only run when builder is vite,rollup doesnt have hook named `config`
       builderInfo.builder = 'vite'
+      builderInfo.assetsDir = config?.build?.assetsDir ?? 'assets'
     },
     configureServer(server: ViteDevServer) {
       for (const pluginHook of pluginList) {
@@ -118,6 +116,11 @@ export default function federation(
       }
       return code
     },
+    moduleParsed(moduleInfo: ModuleInfo): void {
+      for (const pluginHook of pluginList) {
+        pluginHook.moduleParsed?.call(this, moduleInfo)
+      }
+    },
 
     outputOptions(outputOptions) {
       outputOptions.manualChunks = outputOptions.manualChunks || {}
@@ -129,7 +132,15 @@ export default function federation(
 
     renderChunk(code, chunkInfo, _options) {
       for (const pluginHook of pluginList) {
-        pluginHook.renderChunk?.call(this, code, chunkInfo, _options)
+        const result = pluginHook.renderChunk?.call(
+          this,
+          code,
+          chunkInfo,
+          _options
+        )
+        if (result) {
+          return result
+        }
       }
       return null
     },
@@ -137,14 +148,6 @@ export default function federation(
     generateBundle: function (_options, bundle, isWrite) {
       for (const pluginHook of pluginList) {
         pluginHook.generateBundle?.call(this, _options, bundle, isWrite)
-      }
-
-      //  replace import_alias => import to ignore vite preload
-      for (const fileKey in bundle) {
-        const chunk = bundle[fileKey]
-        if (chunk.type === 'chunk') {
-          chunk.code = chunk.code.replace(IMPORT_ALIAS_REGEXP, 'import')
-        }
       }
     }
   }

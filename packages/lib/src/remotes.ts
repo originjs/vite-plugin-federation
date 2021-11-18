@@ -1,4 +1,4 @@
-import { UserConfig, ConfigEnv } from 'vite'
+import { ConfigEnv, UserConfig } from 'vite'
 import {
   ConfigTypeSet,
   RemotesConfig,
@@ -8,10 +8,18 @@ import {
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
-import { PluginHooks } from '../types/pluginHooks'
 import { ViteDevServer } from '../types/viteDevServer'
-import { parseOptions, getModuleMarker, normalizePath } from './utils'
-import { IMPORT_ALIAS, parsedOptions } from './public'
+import {
+  getModuleMarker,
+  normalizePath,
+  parseOptions,
+  removeNonLetter
+} from './utils'
+import { builderInfo, parsedOptions } from './public'
+import { provideShared } from './shared'
+import * as path from 'path'
+import { PluginHooks } from '../types/pluginHooks'
+import { provideExposes } from './exposes'
 
 export let providedRemotes
 
@@ -29,9 +37,13 @@ export function remotesPlugin(
       shareScope: item.shareScope || options.shareScope || 'default'
     })
   )
-  const remotes: { id: string; config: RemotesConfig }[] = []
+  const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
   for (const item of providedRemotes) {
-    remotes.push({ id: item[0], config: item[1] })
+    remotes.push({
+      id: item[0],
+      regexp: new RegExp(`^${item[0]}/.+?`),
+      config: item[1]
+    })
   }
   let devProvideShared
   parsedOptions.devShared = devProvideShared = parseOptions(
@@ -50,7 +62,6 @@ export function remotesPlugin(
   devProvideShared.forEach((value) => devSharedNames.add(value[0]))
   let viteDevServer: ViteDevServer
   let browserHash: string | undefined
-
   return {
     name: 'originjs:remotes',
     virtualFile: {
@@ -60,7 +71,7 @@ const remotesMap = {
     .map(
       (remote) =>
         `${JSON.stringify(remote.id)}: () => ${
-          options.mode === 'development' ? 'import' : IMPORT_ALIAS
+          options.mode === 'development' ? 'import' : '__federation_import'
         }(${JSON.stringify(remote.config.external[0])})`
     )
     .join(',\n  ')}
@@ -75,6 +86,10 @@ const processModule = (mod) => {
 const shareScope = {
   ${getModuleMarker('shareScope')}
 };
+
+async function __federation_import(name){
+  return import(name);
+}
 
 const initMap = {};
            
@@ -142,12 +157,48 @@ export default {
           }
         }
       }
+      for (const sharedInfo of provideShared) {
+        if (!sharedInfo[1].emitFile) {
+          sharedInfo[1].emitFile = this.emitFile({
+            type: 'chunk',
+            id: sharedInfo[0],
+            fileName: `${
+              builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+            }__federation_shared_${sharedInfo[0]}.js`,
+            name: sharedInfo[0],
+            preserveSignature: 'allow-extension'
+          })
+        }
+      }
+
+      for (const expose of provideExposes) {
+        if (!expose[1].emitFile) {
+          expose[1].emitFile = this.emitFile({
+            type: 'chunk',
+            id: expose[1].id,
+            fileName: `${
+              builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+            }__federation_expose_${removeNonLetter(expose[0])}.js`,
+            name: `__federation_expose_${removeNonLetter(expose[0])}`,
+            preserveSignature: 'allow-extension'
+          })
+        }
+      }
+      if (id === '\0virtual:__remoteEntryHelper__') {
+        for (const expose of provideExposes) {
+          code = code.replace(
+            `\${__federation_expose_${expose[0]}}`,
+            `./${path.basename(this.getFileName(expose[1].emitFile))}`
+          )
+        }
+        return code
+      }
 
       if (id === '\0virtual:__federation__') {
         if (options.mode !== 'development') {
           return code.replace(
             getModuleMarker('shareScope'),
-            sharedScopeCode(parsedOptions.shared).join(',')
+            sharedScopeCode.call(this, parsedOptions.shared).join(',')
           )
         } else {
           return code.replace(
@@ -155,6 +206,26 @@ export default {
             devSharedScopeCode(parsedOptions.devShared, browserHash).join(',')
           )
         }
+      }
+      if (id === '\0virtual:__federation_fn_import') {
+        const moduleMapCode = provideShared
+          .map(
+            (sharedInfo) =>
+              `'${
+                sharedInfo[0]
+              }':{get:()=>__federation_import('./${path.basename(
+                this.getFileName(sharedInfo[1].emitFile)
+              )}'),import:${sharedInfo[1].import}${
+                sharedInfo[1].requiredVersion
+                  ? `,requiredVersion:'${sharedInfo[1].requiredVersion}'`
+                  : ''
+              }}`
+          )
+          .join(',')
+        return code.replace(
+          getModuleMarker('moduleMap', 'var'),
+          `{${moduleMapCode}}`
+        )
       }
       if (remotes.length === 0 || id.includes('node_modules')) {
         return null
@@ -180,12 +251,10 @@ export default {
           if (node.type === 'ImportExpression') {
             if (node.source && node.source.value) {
               const moduleId = node.source.value
-              const remote = remotes.find((r) => moduleId.startsWith(r.id))
-
+              const remote = remotes.find((r) => r.regexp.test(moduleId))
               if (remote) {
                 requiresRuntime = true
                 const modName = `.${moduleId.slice(remote.id.length)}`
-
                 magicString.overwrite(
                   node.start,
                   node.end,
@@ -210,7 +279,10 @@ export default {
     }
   }
 
-  function sharedScopeCode(shared: (string | ConfigTypeSet)[]): string[] {
+  function sharedScopeCode(
+    this: TransformPluginContext,
+    shared: (string | ConfigTypeSet)[]
+  ): string[] {
     const res: string[] = []
     const displayField = new Set<string>()
     displayField.add('version')
@@ -225,9 +297,8 @@ export default {
             if (displayField.has(key))
               str += `${key}:${JSON.stringify(value)}, \n`
           })
-          str += `get: ()=> ${IMPORT_ALIAS}('${getModuleMarker(
-            `\${${sharedName}}`,
-            'shareScope'
+          str += `get: ()=> __federation_import('./${path.basename(
+            this.getFileName(obj.emitFile)
           )}')`
           res.push(`'${sharedName}':{${str}}`)
         }

@@ -2,6 +2,8 @@
  * The following code is adapted from https://github.com/webpack/webpack/types.d.ts
  * MIT License https://github.com/webpack/webpack/LICENSE
  */
+import { RenderedChunk } from 'rollup'
+
 export default function federation(options: VitePluginFederationOptions): Plugin
 
 declare interface VitePluginFederationOptions {
@@ -90,6 +92,7 @@ declare interface SharedRuntimeInfo {
   fileName: string
   fileDir: string
   filePath: string
+  chunk: RenderedChunk
 }
 
 /**

@@ -131,7 +131,8 @@ vue2 为例
 ### shared
 本地模块和远程模块共享的依赖。本地模块需配置所有使用到的远端模块的依赖；远端模块需要配置对外提供的组件的依赖。
 > 配置信息
-####  `import: boolean`
+>
+> ####  `import: boolean`
 
 默认为 `true` ，是否加入shared共享该模块，仅对 `remote` 端生效，`remote` 开启该配置后，会减少部分打包时间，因为不需要打包部分` shared`，但是一旦 `host` 端没有可用的 `shared` 模块，会直接报错，因为没有可用的回退模块
 #### `shareScope: string`
@@ -166,5 +167,65 @@ Github CI 构建，非工程必备：
 
 - playwright-chromium
 
+## 开发模式
+
+因为 Vite 在 development 模式下是基于 esbuild，所以我们单独提供了对 development 模式的支持，可以在远程模块部署的情况下，利用 Vite 的高性能开发能力。
+
+
+
+### FAQ
+
+#### 远程模块的某个组件无法正常显示，控制台显示“[Vue warn]: Invalid VNode type: Symbol() (symbol)”
+
+本地模块和远端模块加载各自的 vue 会导致引用多个 vue 的问题。
+
+解决：
+
+保持本地模块与远程模块中共享的依赖版本相对一致。
+
+远程模块的 vite.config.ts
+
+```ts
+federation({
+  name: 'common-lib',
+  filename: 'remoteEntry.js',
+  exposes: {
+	'./CommonCounter': './src/components/CommonCounter.vue',
+	'./CommonHeader': './src/components/CommonHeader.vue'
+  },
+  shared: {
+	vue: {
+	  requiredVersion:'^2.0.0' // shared 强制使用了过低的版本，删除或修改为 ^3.0.0 即可
+	}
+  }
+})
+```
+
+
+
+#### 远程模块加载本地模块的共享以来失败，例如`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
+
+原因：Vite 在启动服务时对于 IP、Port 有自动获取逻辑，在 Plugin 中还没有找到完全对应的获取逻辑，在部分情况下可能会出现获取失败。
+
+解决：
+
+在本地模块显式到声明 IP、Port、cacheDir，保证我们的 Plugin 可以正确的获取和传递依赖的地址。
+
+本地模块的 vite.config.ts
+
+```ts
+export default defineConfig({
+  server:{
+    https: "http",
+    host: "192.168.56.1",
+    port: 5100,
+  },
+  cacheDir: "node_modules/.cacheDir",
+}
+```
+
+
+
 ## Wiki
+
 [设计架构](https://github.com/originjs/vite-plugin-federation/wiki)

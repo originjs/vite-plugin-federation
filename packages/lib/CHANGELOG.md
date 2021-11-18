@@ -1,3 +1,46 @@
+## [1.0.3](https://github.com/originjs/vite-plugin-federation/compare/v1.0.2...v1.0.3) (2021-11-17)
+
+
+### Bug Fixes
+
+* Build error when format is systemjs and minify:true is set ([4ff5523](https://github.com/originjs/vite-plugin-federation/commit/4ff552320ee91b9012ba6b76b09f2c860646fb08))
+* dynamic import incorrectly judged as remote component ([#94](https://github.com/originjs/vite-plugin-federation/issues/94)) ([1160a6c](https://github.com/originjs/vite-plugin-federation/commit/1160a6cc13d063574af8a4927fb0b13a07605d11))
+* shared is invalid when format is systemjs ([d700be2](https://github.com/originjs/vite-plugin-federation/commit/d700be223c32fcd25089d5e5b1fcd5be299281e7))
+
+
+### Features
+
+* support `format:systemjs` for rollup and vite ([ea273bb](https://github.com/originjs/vite-plugin-federation/commit/ea273bbbac44acf723d2dc6d550279585a066642))
+
+
+
+## [1.0.2](https://github.com/originjs/vite-plugin-federation/compare/v1.0.1...v1.0.2) (2021-11-09)
+
+
+### Bug Fixes
+* typo is readme
+
+### Refactors
++ try to resolve the import failure (#89)
+
+
+## [1.0.1](https://github.com/originjs/vite-plugin-federation/compare/v1.0.0...v1.0.1) (2021-10-25)
+
+
+### Bug Fixes
+
+* dynamic import failed ([#86](https://github.com/originjs/vite-plugin-federation/issues/86)) ([3755727](https://github.com/originjs/vite-plugin-federation/commit/37557275b0e5d663aebf4453f9d6f71db8d66e6a))
+* shared will also add __rf_import__ dynamic import([3755727](https://github.com/originjs/vite-plugin-federation/commit/37557275b0e5d663aebf4453f9d6f71db8d66e6a))
+* missing semver to judge version of shared([3755727](https://github.com/originjs/vite-plugin-federation/commit/37557275b0e5d663aebf4453f9d6f71db8d66e6a))
+
+
+### Features
+* recursive analysis shared dependency to dynamic import([3755727](https://github.com/originjs/vite-plugin-federation/commit/37557275b0e5d663aebf4453f9d6f71db8d66e6a))
+* remove unnecessary imports([3755727](https://github.com/originjs/vite-plugin-federation/commit/37557275b0e5d663aebf4453f9d6f71db8d66e6a))
+* use emitFile.fileName option instead of file name changes in the output stage([3755727](https://github.com/originjs/vite-plugin-federation/commit/37557275b0e5d663aebf4453f9d6f71db8d66e6a))
+
+
+
 # [1.0.0](https://github.com/originjs/vite-plugin-federation/compare/v0.0.3...v1.0.0) (2021-10-13)
 
 
