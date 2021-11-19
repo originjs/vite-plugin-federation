@@ -20,7 +20,6 @@
     "test:e2e": "jest --runInBand --config ./jest.e2e.config.js"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^20.0.0",
     "@types/jest": "^27.0.1",
     "@types/node": "^15.12.2",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
