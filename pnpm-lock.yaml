@@ -442,6 +442,377 @@ importers:
       rollup: 2.60.0
       vite: 2.6.7
 
+  packages/temp:
+    specifiers: {}
+
+  packages/temp/basic-host-remote:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      http-server: ^13.0.1
+      kill-port: ^1.6.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      http-server: 13.0.2
+      kill-port: 1.6.1
+
+  packages/temp/basic-host-remote/rollup-host:
+    specifiers:
+      rollup: ^2.60.0
+    devDependencies:
+      rollup: 2.60.0
+
+  packages/temp/basic-host-remote/rollup-remote:
+    specifiers:
+      rollup: ^2.60.0
+    devDependencies:
+      rollup: 2.60.0
+
+  packages/temp/react-in-vue:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^1.6.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 1.6.1
+
+  packages/temp/react-in-vue/home:
+    specifiers:
+      '@vitejs/plugin-react-refresh': ^1.3.6
+      react: ^17.0.0
+      react-dom: ^17.0.0
+      vite: ^2.5.0
+    dependencies:
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    devDependencies:
+      '@vitejs/plugin-react-refresh': 1.3.6
+      vite: 2.6.7
+
+  packages/temp/react-in-vue/layout:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      react: ^16.13.0
+      react-dom: ^16.13.0
+      vite: ^2.5.0
+      vue: ^3.1.5
+    dependencies:
+      '@vue/compiler-sfc': 3.2.20
+      react: 16.14.0
+      react-dom: 16.14.0_react@16.14.0
+      vue: 3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      vite: 2.6.7
+
+  packages/temp/simple-react-esm:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      http-server: ^13.0.1
+      kill-port: ^1.6.1
+      semver: ^7.3.5
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      http-server: 13.0.2
+      kill-port: 1.6.1
+      semver: 7.3.5
+
+  packages/temp/simple-react-esm/host-esm:
+    specifiers:
+      '@babel/core': ^7.14.8
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.14.5
+      '@rollup/plugin-babel': ^5.3.0
+      '@rollup/plugin-commonjs': ^20.0.0
+      '@rollup/plugin-node-resolve': 8.4.0
+      '@rollup/plugin-replace': ^3.0.0
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^2.60.0
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.15.8
+      '@babel/preset-env': 7.14.8_@babel+core@7.15.8
+      '@babel/preset-react': 7.14.5_@babel+core@7.15.8
+      '@rollup/plugin-babel': 5.3.0_@babel+core@7.15.8+rollup@2.60.0
+      '@rollup/plugin-commonjs': 20.0.0_rollup@2.60.0
+      '@rollup/plugin-node-resolve': 8.4.0_rollup@2.60.0
+      '@rollup/plugin-replace': 3.0.0_rollup@2.60.0
+      rollup: 2.60.0
+
+  packages/temp/simple-react-esm/remote-esm:
+    specifiers:
+      '@babel/core': ^7.14.8
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.14.5
+      '@rollup/plugin-babel': ^5.3.0
+      '@rollup/plugin-commonjs': ^20.0.0
+      '@rollup/plugin-node-resolve': 8.4.0
+      '@rollup/plugin-replace': ^3.0.0
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^2.60.0
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.15.8
+      '@babel/preset-env': 7.14.8_@babel+core@7.15.8
+      '@babel/preset-react': 7.14.5_@babel+core@7.15.8
+      '@rollup/plugin-babel': 5.3.0_@babel+core@7.15.8+rollup@2.60.0
+      '@rollup/plugin-commonjs': 20.0.0_rollup@2.60.0
+      '@rollup/plugin-node-resolve': 8.4.0_rollup@2.60.0
+      '@rollup/plugin-replace': 3.0.0_rollup@2.60.0
+      rollup: 2.60.0
+
+  packages/temp/simple-react-systemjs:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      http-server: ^13.0.1
+      kill-port: ^1.6.1
+      semver: ^7.3.5
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      http-server: 13.0.2
+      kill-port: 1.6.1
+      semver: 7.3.5
+
+  packages/temp/simple-react-systemjs/host-systemjs:
+    specifiers:
+      '@babel/core': ^7.14.8
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.14.5
+      '@rollup/plugin-babel': ^5.3.0
+      '@rollup/plugin-commonjs': ^20.0.0
+      '@rollup/plugin-node-resolve': 8.4.0
+      '@rollup/plugin-replace': ^3.0.0
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^2.60.0
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.15.8
+      '@babel/preset-env': 7.14.8_@babel+core@7.15.8
+      '@babel/preset-react': 7.14.5_@babel+core@7.15.8
+      '@rollup/plugin-babel': 5.3.0_@babel+core@7.15.8+rollup@2.60.0
+      '@rollup/plugin-commonjs': 20.0.0_rollup@2.60.0
+      '@rollup/plugin-node-resolve': 8.4.0_rollup@2.60.0
+      '@rollup/plugin-replace': 3.0.0_rollup@2.60.0
+      rollup: 2.60.0
+
+  packages/temp/simple-react-systemjs/remote-systemjs:
+    specifiers:
+      '@babel/core': ^7.14.8
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.14.5
+      '@rollup/plugin-babel': ^5.3.0
+      '@rollup/plugin-commonjs': ^20.0.0
+      '@rollup/plugin-node-resolve': 8.4.0
+      '@rollup/plugin-replace': ^3.0.0
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^2.60.0
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.15.8
+      '@babel/preset-env': 7.14.8_@babel+core@7.15.8
+      '@babel/preset-react': 7.14.5_@babel+core@7.15.8
+      '@rollup/plugin-babel': 5.3.0_@babel+core@7.15.8+rollup@2.60.0
+      '@rollup/plugin-commonjs': 20.0.0_rollup@2.60.0
+      '@rollup/plugin-node-resolve': 8.4.0_rollup@2.60.0
+      '@rollup/plugin-replace': 3.0.0_rollup@2.60.0
+      rollup: 2.60.0
+
+  packages/temp/vue2-demo:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^1.6.1
+      semver: ^7.3.5
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 1.6.1
+      semver: 7.3.5
+
+  packages/temp/vue2-demo/host-simple:
+    specifiers:
+      vite: ^2.5.1
+      vite-plugin-vue2: ^1.8.1
+      vue: ^2.6.14
+      vue-template-compiler: ^2.6.14
+    dependencies:
+      vue: 2.6.14
+      vue-template-compiler: 2.6.14
+    devDependencies:
+      vite: 2.6.7
+      vite-plugin-vue2: 1.8.2_c9940e08cb14c75f54d25e7ad6ede6ad
+
+  packages/temp/vue2-demo/remote-simple:
+    specifiers:
+      vite: ^2.5.1
+      vite-plugin-vue2: ^1.8.1
+      vue: ^2.6.14
+      vue-template-compiler: ^2.6.14
+    dependencies:
+      vue: 2.6.14
+      vue-template-compiler: 2.6.14
+    devDependencies:
+      vite: 2.6.7
+      vite-plugin-vue2: 1.8.2_c9940e08cb14c75f54d25e7ad6ede6ad
+
+  packages/temp/vue3-demo-esm:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^1.6.1
+      semver: ^7.3.5
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 1.6.1
+      semver: 7.3.5
+
+  packages/temp/vue3-demo-esm/common-lib:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      vite: ^2.5.0
+      vue: ^3.1.5
+    dependencies:
+      vue: 3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      vite: 2.6.7
+
+  packages/temp/vue3-demo-esm/css-modules:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      autoprefixer: ^10.3.2
+      postcss: ^8.3.0
+      vite: ^2.5.0
+      vue: ^3.1.5
+    dependencies:
+      vue: 3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      autoprefixer: 10.3.7_postcss@8.3.9
+      postcss: 8.3.9
+      vite: 2.6.7
+
+  packages/temp/vue3-demo-esm/home:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      vite: ^2.5.0
+      vue: ^3.1.5
+      vuex: ^4.0.2
+    dependencies:
+      vue: 3.2.20
+      vuex: 4.0.2_vue@3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      vite: 2.6.7
+
+  packages/temp/vue3-demo-esm/layout:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      vite: ^2.5.0
+      vue: ^3.1.5
+      vuex: ^4.0.2
+    dependencies:
+      vue: 3.2.20
+      vuex: 4.0.2_vue@3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      vite: 2.6.7
+
+  packages/temp/vue3-demo-systemjs:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^1.6.1
+      semver: ^7.3.5
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 1.6.1
+      semver: 7.3.5
+
+  packages/temp/vue3-demo-systemjs/common-lib:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      vite: ^2.5.0
+      vue: ^3.1.5
+    dependencies:
+      vue: 3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      vite: 2.6.7
+
+  packages/temp/vue3-demo-systemjs/css-modules:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      autoprefixer: ^10.3.2
+      postcss: ^8.3.0
+      vite: ^2.5.0
+      vue: ^3.1.5
+    dependencies:
+      vue: 3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      autoprefixer: 10.3.7_postcss@8.3.9
+      postcss: 8.3.9
+      vite: 2.6.7
+
+  packages/temp/vue3-demo-systemjs/home:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      vite: ^2.5.0
+      vue: ^3.1.5
+      vuex: ^4.0.2
+    dependencies:
+      vue: 3.2.20
+      vuex: 4.0.2_vue@3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      vite: 2.6.7
+
+  packages/temp/vue3-demo-systemjs/layout:
+    specifiers:
+      '@vitejs/plugin-vue': ^1.3.0
+      '@vue/compiler-sfc': ^3.1.5
+      vite: ^2.5.0
+      vue: ^3.1.5
+      vuex: ^4.0.2
+    dependencies:
+      vue: 3.2.20
+      vuex: 4.0.2_vue@3.2.20
+    devDependencies:
+      '@vitejs/plugin-vue': 1.9.3_vite@2.6.7
+      '@vue/compiler-sfc': 3.2.20
+      vite: 2.6.7
+
 packages:
 
   /@babel/code-frame/7.12.11:
