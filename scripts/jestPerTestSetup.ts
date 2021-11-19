@@ -45,7 +45,7 @@ beforeAll(async () => {
     if (testName) {
       rootDir = resolve(__dirname, '../packages/temp', testName)
       if (testName === 'vue2-demo') {
-        await execa('pnpm', ['install', '--prefer-offline'], {
+        await execa('pnpm', ['install'], {
           cwd: rootDir,
           stdio: 'inherit'
         })
