@@ -44,6 +44,9 @@ beforeAll(async () => {
     // start a vite server in that directory.
     if (testName) {
       rootDir = resolve(__dirname, '../packages/temp', testName)
+      if (testName === 'vue2-demo') {
+        await execa('pnpm', ['install'], { cwd: rootDir, stdio: 'inherit' })
+      }
       execa('pnpm', ['run', 'serve'], { cwd: rootDir, stdio: 'inherit' })
       await execa('pnpm', ['run', 'build'], { cwd: rootDir, stdio: 'inherit' })
 
