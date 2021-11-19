@@ -256,7 +256,7 @@ importers:
   packages/examples/vue2-demo/host-simple:
     specifiers:
       vite: ^2.5.1
-      vite-plugin-vue2: ^1.8.1
+      vite-plugin-vue2: ^1.9.0
       vue: ^2.6.14
       vue-template-compiler: ^2.6.14
     dependencies:
@@ -264,12 +264,12 @@ importers:
       vue-template-compiler: 2.6.14
     devDependencies:
       vite: 2.6.7
-      vite-plugin-vue2: 1.8.2_c9940e08cb14c75f54d25e7ad6ede6ad
+      vite-plugin-vue2: 1.9.0_c9940e08cb14c75f54d25e7ad6ede6ad
 
   packages/examples/vue2-demo/remote-simple:
     specifiers:
       vite: ^2.5.1
-      vite-plugin-vue2: ^1.8.1
+      vite-plugin-vue2: ^1.9.0
       vue: ^2.6.14
       vue-template-compiler: ^2.6.14
     dependencies:
@@ -277,7 +277,7 @@ importers:
       vue-template-compiler: 2.6.14
     devDependencies:
       vite: 2.6.7
-      vite-plugin-vue2: 1.8.2_c9940e08cb14c75f54d25e7ad6ede6ad
+      vite-plugin-vue2: 1.9.0_c9940e08cb14c75f54d25e7ad6ede6ad
 
   packages/examples/vue3-demo-esm:
     specifiers:
@@ -650,7 +650,7 @@ importers:
   packages/temp/vue2-demo/host-simple:
     specifiers:
       vite: ^2.5.1
-      vite-plugin-vue2: ^1.8.1
+      vite-plugin-vue2: ^1.9.0
       vue: ^2.6.14
       vue-template-compiler: ^2.6.14
     dependencies:
@@ -658,12 +658,12 @@ importers:
       vue-template-compiler: 2.6.14
     devDependencies:
       vite: 2.6.7
-      vite-plugin-vue2: 1.8.2_c9940e08cb14c75f54d25e7ad6ede6ad
+      vite-plugin-vue2: 1.9.0_c9940e08cb14c75f54d25e7ad6ede6ad
 
   packages/temp/vue2-demo/remote-simple:
     specifiers:
       vite: ^2.5.1
-      vite-plugin-vue2: ^1.8.1
+      vite-plugin-vue2: ^1.9.0
       vue: ^2.6.14
       vue-template-compiler: ^2.6.14
     dependencies:
@@ -671,7 +671,7 @@ importers:
       vue-template-compiler: 2.6.14
     devDependencies:
       vite: 2.6.7
-      vite-plugin-vue2: 1.8.2_c9940e08cb14c75f54d25e7ad6ede6ad
+      vite-plugin-vue2: 1.9.0_c9940e08cb14c75f54d25e7ad6ede6ad
 
   packages/temp/vue3-demo-esm:
     specifiers:
@@ -7987,8 +7987,8 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vite-plugin-vue2/1.8.2_c9940e08cb14c75f54d25e7ad6ede6ad:
-    resolution: {integrity: sha512-qQXLH+yVn5o7cq+KJULyty4OxWKQ3lsvrYx8QkLO78LsM+/r1gEytfcXiqewnvgP7eTkJ5Pd/kHbfDce1Pim/w==}
+  /vite-plugin-vue2/1.9.0_c9940e08cb14c75f54d25e7ad6ede6ad:
+    resolution: {integrity: sha512-4vmcoiOmOTGjRnA0hk8tHYqk96ZxRpe4AmeCqJJ8jQuNo+SDF1zXPyhxAUIK1tuK354No77WVHHIimVvZQuvIA==}
     peerDependencies:
       vite: ^2.0.0-beta.23
       vue-template-compiler: ^2.2.0
@@ -8010,7 +8010,7 @@ packages:
       magic-string: 0.25.7
       prettier: 2.4.1
       querystring: 0.2.1
-      rollup: 2.58.0
+      rollup: 2.60.0
       slash: 3.0.0
       source-map: 0.7.3
       vite: 2.6.7

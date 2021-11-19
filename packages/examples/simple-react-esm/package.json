@@ -6,7 +6,7 @@
     "host-esm",
     "remote-esm"
   ],
-  "license": "MIT",
+  "license": "MulanPSL-2.0",
   "scripts": {
     "build": "pnpm run build -r --filter ./",
     "serve": "pnpm run serve --parallel --filter ./",

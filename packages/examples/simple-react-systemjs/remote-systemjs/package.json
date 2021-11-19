@@ -2,7 +2,7 @@
   "name": "remote-systemjs",
   "version": "1.0.0",
   "main": "dist",
-  "license": "MIT",
+  "license": "MulanPSL-2.0",
   "scripts": {
     "build": "rollup -c",
     "serve": "http-server ./dist -p 5001 --cors='*'"

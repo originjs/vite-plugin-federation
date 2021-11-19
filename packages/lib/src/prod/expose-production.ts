@@ -9,7 +9,7 @@ import {
   parsedOptions,
   SHARED
 } from '../public'
-import { AcornNode, InputOptions, MinimalPluginContext } from 'rollup'
+import { AcornNode } from 'rollup'
 import { VitePluginFederationOptions } from 'types'
 import { PluginHooks } from '../../types/pluginHooks'
 import MagicString from 'magic-string'
@@ -78,20 +78,13 @@ export function prodExposePlugin(
     }`
     },
 
-    options(
-      this: MinimalPluginContext,
-      _options: InputOptions
-    ):
-      | Promise<InputOptions | null | undefined>
-      | InputOptions
-      | null
-      | undefined {
+    options() {
       // Split expose & shared module to separate chunks
       // _options.preserveEntrySignatures = 'strict'
       return null
     },
 
-    buildStart(inputOptions) {
+    buildStart() {
       // if we don't expose any modules, there is no need to emit file
       if (parsedOptions.prodExpose.length > 0) {
         this.emitFile({
@@ -104,7 +97,7 @@ export function prodExposePlugin(
         })
       }
     },
-    renderChunk(code, chunk, _) {
+    renderChunk(code, chunk) {
       if (chunk.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
         remoteEntryChunk = chunk
       }

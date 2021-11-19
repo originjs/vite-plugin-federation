@@ -1,4 +1,4 @@
-import { ConfigEnv, UserConfig } from 'vite'
+import { UserConfig } from 'vite'
 import {
   ConfigTypeSet,
   RemotesConfig,
@@ -69,7 +69,7 @@ export default {
   }
 };`
     },
-    config(config: UserConfig, env: ConfigEnv) {
+    config(config: UserConfig) {
       // need to include remotes in the optimizeDeps.exclude
       let excludeRemotes: string[] = []
       for (const providedRemote of parsedOptions.devRemote) {
