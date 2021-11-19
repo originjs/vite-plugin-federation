@@ -47,7 +47,7 @@ jobs:
       - name: Install deps
         run: pnpm install
 
-      - name: Build vite
+      - name: Build vite-plugin-federation
         run: pnpm run build
 
       - name: Test build
