@@ -17,40 +17,67 @@ jobs:
         node_version: [12, 14, 16]
         include:
           - os: macos-latest
-            node_version: 14
+            node_version: 16
+          - os: windows-latest
+            node_version: 16
       fail-fast: false
 
-    name: 'Build&Test: node-${{ matrix.node_version }}, ${{ matrix.os }}'
+    name: "Build&Test: node-${{ matrix.node_version }}, ${{ matrix.os }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6
+      
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
 
       - name: Set node version to ${{ matrix.node_version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node_version }}
+          cache: "pnpm"
 
-      - name: Get yarn cache directory
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Install deps
+        run: pnpm install
 
-      - name: Set dependencies cache
-        uses: actions/cache@v2
+      - name: Build vite-plugin-federation
+        run: pnpm run build
+
+      - name: Test build
+        run: pnpm run test
+
+  lint:
+    runs-on: ubuntu-latest
+    name: "Lint: node-16, ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v2
         with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('yarn.lock') }}
-            ${{ runner.os }}-${{ matrix.node_version }}-
+          fetch-depth: 0
 
-      - name: Versions
-        run: yarn versions
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: Set node version to 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: "pnpm"
 
-      - name: Build
-        run: yarn build
+      - name: Install deps
+        run: pnpm install
 
-      - name: Test
-        run: yarn test
+      - name: Prepare
+        run: pnpm run build
+      - name: Lint
+        run: pnpm run lint

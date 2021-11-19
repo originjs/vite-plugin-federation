@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "vite --port 5000 --strictPort",
     "build": "vite build",
-    "serve": "vite preview --port 5000 --strictPort",
-    "test": "echo test $name"
+    "serve": "vite preview --port 5000 --strictPort"
   },
   "devDependencies": {
     "vite": "^2.5.1",

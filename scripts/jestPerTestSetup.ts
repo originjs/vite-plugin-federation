@@ -1,4 +1,3 @@
-import fs from 'fs-extra'
 import { resolve } from 'path'
 import execa from 'execa'
 import { Page } from 'playwright-chromium'
@@ -44,25 +43,15 @@ beforeAll(async () => {
     // if this is a test placed under examples/xxx/__tests__
     // start a vite server in that directory.
     if (testName) {
-      const playgroundRoot = resolve(__dirname, '../packages/examples')
-      const srcDir = resolve(playgroundRoot, testName)
-      rootDir = resolve(__dirname, '../temp/example', testName)
-      await fs.copy(srcDir, rootDir, {
-        dereference: true,
-        filter(file) {
-          file = slash(file)
-          return (
-            !file.includes('__tests__') &&
-            !file.includes('node_modules') &&
-            !file.match(/dist(\/|$)/)
-          )
-        }
-      })
+      rootDir = resolve(__dirname, '../packages/temp', testName)
       if (testName === 'vue2-demo') {
-        await execa('yarn', { cwd: rootDir, stdio: 'inherit' })
+        await execa('pnpm', ['install'], {
+          cwd: rootDir,
+          stdio: 'inherit'
+        })
       }
-      execa('yarn', ['serve'], { cwd: rootDir, stdio: 'inherit' })
-      await execa('yarn', ['build'], { cwd: rootDir, stdio: 'inherit' })
+      execa('pnpm', ['run', 'serve'], { cwd: rootDir, stdio: 'inherit' })
+      await execa('pnpm', ['run', 'build'], { cwd: rootDir, stdio: 'inherit' })
 
       const port = 5000
       // use resolved port/base from server
@@ -87,7 +76,7 @@ afterAll(async () => {
   global.page?.off('console', onConsole)
   await global.page?.close()
   skipError = true
-  await execa('yarn', ['stop'], { cwd: rootDir, stdio: 'inherit' })
+  await execa('pnpm', ['run', 'stop'], { cwd: rootDir, stdio: 'inherit' })
 
   if (err) {
     throw err

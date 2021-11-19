@@ -1,4 +1,4 @@
-import federation from "@originjs/vite-plugin-federation";
+import federation from '@originjs/vite-plugin-federation';
 
 export default {
   input: "src/index.js",

@@ -17,5 +17,13 @@ module.exports = async () => {
 
   await fs.mkdirp(DIR)
   await fs.writeFile(path.join(DIR, 'wsEndpoint'), browserServer.wsEndpoint())
-  await fs.remove(path.resolve(__dirname, '../temp'))
+  const tempDir = path.resolve(__dirname, '../packages/temp')
+  await fs.remove(tempDir)
+  await fs.copy(path.resolve(__dirname, '../packages/examples'), tempDir, {
+    dereference: false,
+    filter(file) {
+      file = file.replace(/\\/g, '/')
+      return !file.includes('__tests__') && !file.match(/dist(\/|$)/)
+    }
+  })
 }
