@@ -111,9 +111,8 @@ export function prodSharedPlugin(
         arr[1].id = id
         if (isHost && !arr[1].version) {
           const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
-          const packageJsonPath = `${id?.split(regExp)[0]}node_modules/${
-            arr[0]
-          }/package.json`
+          const packageJsonPath = `${id?.split(regExp)[0]}node_modules/${arr[0]
+            }/package.json`
           try {
             arr[1].version = (await import(packageJsonPath)).version
             arr[1].version.length
@@ -126,9 +125,8 @@ export function prodSharedPlugin(
       }
       if (parsedOptions.prodShared.length && isRemote) {
         this.emitFile({
-          fileName: `${
-            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-          }__federation_fn_import.js`,
+          fileName: `${builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+            }__federation_fn_import.js`,
           type: 'chunk',
           id: '__federation_fn_import',
           preserveSignature: 'strict'
@@ -256,14 +254,12 @@ export function prodSharedPlugin(
                       const declaration: (string | never)[] = []
                       node.specifiers?.forEach((specify) => {
                         declaration.push(
-                          `${
-                            specify.imported?.name
-                              ? `${
-                                  specify.imported.name === specify.local.name
-                                    ? specify.local.name
-                                    : `${specify.imported.name}:${specify.local.name}`
-                                }`
-                              : `default:${specify.local.name}`
+                          `${specify.imported?.name
+                            ? `${specify.imported.name === specify.local.name
+                              ? specify.local.name
+                              : `${specify.imported.name}:${specify.local.name}`
+                            }`
+                            : `default:${specify.local.name}`
                           }`
                         )
                       })
@@ -297,12 +293,12 @@ export function prodSharedPlugin(
                     node.body.length === 1
                       ? node.body[0]?.expression
                       : node.body.find(
-                          (item) =>
-                            item.type === 'ExpressionStatement' &&
-                            item.expression?.callee?.object?.name ===
-                              'System' &&
-                            item.expression.callee.property?.name === 'register'
-                        )?.expression
+                        (item) =>
+                          item.type === 'ExpressionStatement' &&
+                          item.expression?.callee?.object?.name ===
+                          'System' &&
+                          item.expression.callee.property?.name === 'register'
+                      )?.expression
                   if (expression) {
                     const args = expression.arguments
                     if (
@@ -345,8 +341,7 @@ export function prodSharedPlugin(
                         // insert __federation_import setter
                         magicString.appendRight(
                           setters.end - 1,
-                          `${
-                            removeLast ? '' : ','
+                          `${removeLast ? '' : ','
                           }function (module){__federation_import=module.importShared}`
                         )
                         const execute =
@@ -380,7 +375,7 @@ export function prodSharedPlugin(
                             (setFn) => {
                               magicString.appendLeft(
                                 insertPos,
-                                `${setFn.expression.left.name} = ${varName}.${setFn.expression.right.property.name};\n`
+                                `${setFn.expression.left.name} = ${varName}.${setFn.expression.right.property.name ?? setFn.expression.right.property.value};\n`
                               )
                             }
                           )
@@ -390,8 +385,7 @@ export function prodSharedPlugin(
                         // add sharedImport import declaration
                         magicString.appendRight(
                           args[0].end - 1,
-                          `${
-                            removeLast ? '' : ','
+                          `${removeLast ? '' : ','
                           }'./__federation_fn_import.js'`
                         )
                         modify = true

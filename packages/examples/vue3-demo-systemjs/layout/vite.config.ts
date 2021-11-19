@@ -29,6 +29,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         format: 'system',
+        entryFileNames: 'assets/[name].js',
         minifyInternalExports: false
       }
     }
