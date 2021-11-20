@@ -68,7 +68,7 @@ export function prodSharedPlugin(
               console.log(\`provider support \${name}(\${dep.version}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})\`)
             }
           } else {
-            module = await dep.get(); 
+            module = await dep.get();
           }
         }
         if(module){
@@ -184,6 +184,10 @@ export function prodSharedPlugin(
             priority.push(key)
           }
         } else {
+          if (!orderByDepCount[i]) {
+            continue;
+          }
+
           for (const entries of orderByDepCount[i].entries()) {
             addDep(entries, priority, depInShared)
           }
