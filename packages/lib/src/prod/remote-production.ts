@@ -76,7 +76,7 @@ export default {
               id: sharedInfo[0],
               fileName: `${
                 builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-              }__federation_shared_${sharedInfo[0]}.js`,
+              }__federation_shared_${removeNonLetter(sharedInfo[0])}.js`,
               name: sharedInfo[0],
               preserveSignature: 'allow-extension'
             })
@@ -87,9 +87,9 @@ export default {
           const moduleMapCode = parsedOptions.prodShared
             .map(
               (sharedInfo) =>
-                `'${
+                `'${removeNonLetter(
                   sharedInfo[0]
-                }':{get:()=>__federation_import('./${path.basename(
+                )}':{get:()=>__federation_import('./${path.basename(
                   this.getFileName(sharedInfo[1].emitFile)
                 )}'),import:${sharedInfo[1].import}${
                   sharedInfo[1].requiredVersion
@@ -198,7 +198,7 @@ export default {
     displayField.add('shareScope')
     if (shared.length) {
       shared.forEach((arr) => {
-        const sharedName = arr[0]
+        const sharedName = removeNonLetter(arr[0])
         const obj = arr[1]
         let str = ''
         if (typeof obj === 'object') {

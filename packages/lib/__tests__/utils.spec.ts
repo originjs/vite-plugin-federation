@@ -11,8 +11,8 @@ test('remove nonLetter', () => {
   const includeDash = 'user-name'
   const all = 'U"s-e@r#n$a%m^e&*(),./;[]{}'
   expect(removeNonLetter(includeUnderline)).toMatch('user_name')
-  expect(removeNonLetter(includeDash)).toMatch('userName')
-  expect(removeNonLetter(all)).toMatch('USERNAME')
+  expect(removeNonLetter(includeDash)).toMatch('user-name')
+  expect(removeNonLetter(all)).toMatch('US-e@rNAME')
 })
 
 test('get moduleMarker', () => {

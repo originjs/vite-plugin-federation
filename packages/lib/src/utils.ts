@@ -126,7 +126,7 @@ export function parseOptions(
 }
 
 export function removeNonLetter(str: string): string {
-  const wordRegexp = new RegExp('\\w+')
+  const wordRegexp = new RegExp('[0-9a-zA-Z-_@]+')
   let needUpperCase = false
   let ret = ''
   for (const c of str) {
