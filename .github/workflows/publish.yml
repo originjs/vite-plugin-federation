@@ -15,12 +15,19 @@ jobs:
         with:
           node-version: '14'
           registry-url: 'https://registry.npmjs.org'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6
+
       - name: Install dependencies
-        run: yarn
+        run: pnpm install
+
       - name: Build
-        run: yarn build
+        run: pnpm build
+
       - name: Test
-        run: yarn test
+        run: pnpm test
 
       - name: Create Release for Tag
         id: release_tag

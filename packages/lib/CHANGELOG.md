@@ -1,3 +1,17 @@
+## [1.0.5](https://github.com/originjs/vite-plugin-federation/compare/v1.0.4...v1.0.5) (2021-11-22)
+
+
+### Bug Fixes
+
+* shared import fails if shared library name contains '@' or '/'(serve mode) ([#100](https://github.com/originjs/vite-plugin-federation/issues/100)) ([fb989e9](https://github.com/originjs/vite-plugin-federation/commit/fb989e94301ce8dc3b87bca603c3759cd86714b1))
+
+
+### Features
+
+* switch to pnpm ([#98](https://github.com/originjs/vite-plugin-federation/issues/98)) ([3ec352a](https://github.com/originjs/vite-plugin-federation/commit/3ec352a1f62b833fac5bd2e03bf7e7cd6e2ad387))
+
+
+
 ## [1.0.4](https://github.com/originjs/vite-plugin-federation/compare/v1.0.3...v1.0.4) (2021-11-18)
 
 
