@@ -175,22 +175,21 @@ export function prodSharedPlugin(
         orderByDepCount[value.size].set(key, value)
       })
 
-      // dependency nothing is first
-      for (let i = 0; i < orderByDepCount.length; i++) {
-        if (i === 0) {
-          for (const key of orderByDepCount[i].keys()) {
-            priority.push(key)
-          }
-        } else {
-          if (!orderByDepCount[i]) {
-            continue;
-          }
-
-          for (const entries of orderByDepCount[i].entries()) {
-            addDep(entries, priority, depInShared)
-          }
+      // dependency nothing is first,handle index = 0
+      if (orderByDepCount[0]) {
+        for (const key of orderByDepCount[0].keys()) {
+          priority.push(key)
         }
       }
+
+      // handle index >= 1
+      orderByDepCount
+        .filter((item, index) => item && index >= 1)
+        .forEach((item) => {
+          for (const entry of item.entries()) {
+            addDep(entry, priority, depInShared)
+          }
+        })
 
       function addDep([key, value], priority, depInShared) {
         for (const dep of value) {
