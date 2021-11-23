@@ -146,6 +146,10 @@ export function prodSharedPlugin(
     },
 
     outputOptions: function (outputOption) {
+      // remove rollup generated empty imports,like import './filename.js'
+      outputOption.hoistTransitiveImports = false
+
+      // sort shared dep
       const that = this
       const priority: string[] = []
       const depInShared = new Map()
