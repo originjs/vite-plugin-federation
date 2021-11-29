@@ -29,7 +29,7 @@ export function prodExposePlugin(
     item[1].id = exposeFilepath
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
-      return __federation_import('\${__federation_expose_${item[0]}}')
+      return __federation_import('\${__federation_expose_${item[0]}}').then(module=>()=>module)
     },`
   }
 
@@ -60,20 +60,14 @@ export function prodExposePlugin(
         return moduleMap[module]();
     };
     export const init =(shareScope) => {
-      globalThis['__rf_var__shared'] = globalThis['__rf_var__shared'] || {};
+      globalThis.__federation_shared__= globalThis.__federation_shared__|| {};
       Object.entries(shareScope).forEach(([key, value]) => {
-        globalThis['${getModuleMarker(
-          'shared',
-          'var'
-        )}'][value.shareScope] = globalThis['${getModuleMarker(
-        'shared',
-        'var'
-      )}'][value.shareScope] || {};
-        const global = globalThis['${getModuleMarker(
-          'shared',
-          'var'
-        )}'][value.shareScope];
-        global[key] = global[key] || value;
+        const versionKey = Object.keys(value)[0];
+        const versionValue = Object.values(value)[0];
+        const scope = versionValue.scope || 'default'
+        globalThis.__federation_shared__[scope] = globalThis.__federation_shared__[scope] || {};
+        const shared= globalThis.__federation_shared__[scope];
+        (shared[key] = shared[key]||{})[versionKey] = versionValue;
       });
     }`
     },
@@ -195,7 +189,7 @@ export function prodExposePlugin(
     // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
     if (moduleCssFileMap.size === 0) {
       for (const file in bundle) {
-        cssFileMap.forEach(function (css) {
+        cssFileMap.forEach(function(css) {
           moduleCssFileMap.set(bundle[file].facadeModuleId, css)
         })
       }
