@@ -56,19 +56,21 @@ export function prodSharedPlugin(
       }
       async function getProviderSharedModule(name,shareScope) {
         let module = null;
-        if (globalThis?.__rf_var__shared?.[shareScope]?.[name]) {
-          const dep = globalThis.__rf_var__shared[shareScope][name];
+        if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
+          const versionObj = globalThis.__federation_shared__[shareScope][name];
+          const versionKey = Object.keys(versionObj)[0];
+          const versionValue = Object.values(versionObj)[0];
           if (moduleMap[name]?.requiredVersion) {
             // judge version satisfy
             const semver= await import('semver');
             const fn = semver.satisfies;
-            if (fn(dep.version, moduleMap[name].requiredVersion)) {
-               module = await dep.get();
+            if (fn(versionKey, moduleMap[name].requiredVersion)) {
+               module = await versionValue.metaGet();
             } else {
-              console.log(\`provider support \${name}(\${dep.version}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})\`)
+              console.log(\`provider support \${name}(\${versionKey}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})\`)
             }
           } else {
-            module = await dep.get();
+            module = await versionValue.metaGet();
           }
         }
         if(module){

@@ -1,8 +1,4 @@
-import {
-  ConfigTypeSet,
-  RemotesConfig,
-  VitePluginFederationOptions
-} from 'types'
+import { RemotesConfig, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
@@ -30,31 +26,23 @@ export function prodRemotePlugin(
       __federation__: `
 const remotesMap = {
   ${remotes
-    .map(
-      (remote) =>
-        `${JSON.stringify(remote.id)}: () => ${
-          options.mode === 'development' ? 'import' : '__federation_import'
-        }(${JSON.stringify(remote.config.external[0])})`
-    )
-    .join(',\n  ')}
+        .map(
+          (remote) =>
+            `${JSON.stringify(remote.id)}: () => ${
+              options.mode === 'development' ? 'import' : '__federation_import'
+            }(${JSON.stringify(remote.config.external[0])})`
+        )
+        .join(',\n  ')}
 };
-const processModule = (mod) => {
-  if (mod && mod.__useDefault) {
-    return mod.default;
-  }
-  return mod;
-}
-
+const metaGet = name => __federation_import(name)
+const webpackGet = name => metaGet(name).then(module => ()=>module?.default ?? module)
 const shareScope = {
   ${getModuleMarker('shareScope')}
 };
-
 async function __federation_import(name){
   return import(name);
 }
-
-const initMap = {};
-           
+const initMap = Object.create(null);
 export default {
   ensure: async (remoteId) => {
     const remote = await remotesMap[remoteId]();
@@ -132,9 +120,20 @@ export default {
 
       if (builderInfo.isHost) {
         if (id === '\0virtual:__federation__') {
+          const res: string[] = []
+          parsedOptions.prodShared.forEach((arr) => {
+            const sharedName = removeNonLetter(arr[0])
+            const obj = arr[1]
+            let str = ''
+            if (typeof obj === 'object') {
+              const fileName = `./${path.basename(this.getFileName(obj.emitFile))}`
+              str += `metaGet: ()=> metaGet('${fileName}'), get:()=>webpackGet('${fileName}'), loaded:1`
+              res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
+            }
+          })
           return code.replace(
             getModuleMarker('shareScope'),
-            sharedScopeCode.call(this, parsedOptions.prodShared).join(',')
+            res.join(',')
           )
         }
 
@@ -166,7 +165,7 @@ export default {
                       remote.id
                     )}).then((remote) => remote.get(${JSON.stringify(
                       modName
-                    )}))`
+                    )}).then(factory=>factory()))`
                   )
                 }
               }
@@ -186,33 +185,5 @@ export default {
         }
       }
     }
-  }
-
-  function sharedScopeCode(
-    this: TransformPluginContext,
-    shared: (string | ConfigTypeSet)[]
-  ): string[] {
-    const res: string[] = []
-    const displayField = new Set<string>()
-    displayField.add('version')
-    displayField.add('shareScope')
-    if (shared.length) {
-      shared.forEach((arr) => {
-        const sharedName = removeNonLetter(arr[0])
-        const obj = arr[1]
-        let str = ''
-        if (typeof obj === 'object') {
-          Object.entries(obj).forEach(([key, value]) => {
-            if (displayField.has(key))
-              str += `${key}:${JSON.stringify(value)}, \n`
-          })
-          str += `get: ()=> __federation_import('./${path.basename(
-            this.getFileName(obj.emitFile)
-          )}')`
-          res.push(`'${sharedName}':{${str}}`)
-        }
-      })
-    }
-    return res
   }
 }
