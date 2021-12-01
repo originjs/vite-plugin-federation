@@ -1,9 +1,5 @@
 import { UserConfig } from 'vite'
-import {
-  ConfigTypeSet,
-  RemotesConfig,
-  VitePluginFederationOptions
-} from 'types'
+import { ConfigTypeSet, RemotesConfig, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
@@ -33,31 +29,17 @@ export function devRemotePlugin(
       __federation__: `
 const remotesMap = {
   ${remotes
-    .map(
-      (remote) =>
-        `${JSON.stringify(remote.id)}: () => ${
-          options.mode === 'development' ? 'import' : '__federation_import'
-        }(${JSON.stringify(remote.config.external[0])})`
-    )
-    .join(',\n  ')}
+        .map(
+          (remote) =>
+            `${JSON.stringify(remote.id)}: () => import(${JSON.stringify(remote.config.external[0])})`
+        )
+        .join(',\n  ')}
 };
-const processModule = (mod) => {
-  if (mod && mod.__useDefault) {
-    return mod.default;
-  }
-  return mod;
-}
-
+const webpackGet = name => import(/* @vite-ignore */ name).then(module => ()=>module?.default ?? module)
 const shareScope = {
   ${getModuleMarker('shareScope')}
 };
-
-async function __federation_import(name){
-  return import(/* @vite-ignore */name);
-}
-
-const initMap = {};
-           
+const initMap = Object.create(null);
 export default {
   ensure: async (remoteId) => {
     const remote = await remotesMap[remoteId]();
@@ -146,7 +128,7 @@ export default {
                       remote.id
                     )}).then((remote) => remote.get(${JSON.stringify(
                       modName
-                    )}))`
+                    )}).then(factory=>factory()))`
                   )
                 }
               }
@@ -184,21 +166,15 @@ export default {
         : normalizePath(cacheDir).split(regExp)[1]
     }`
     const res: string[] = []
-    const displayField = new Set<string>()
-    displayField.add('version')
-    displayField.add('shareScope')
     if (shared.length) {
       shared.forEach((arr) => {
         const sharedName = arr[0]
         const obj = arr[1]
         let str = ''
         if (typeof obj === 'object') {
-          Object.entries(obj).forEach(([key, value]) => {
-            if (displayField.has(key))
-              str += `${key}:${JSON.stringify(value)}, \n`
-          })
-          str += `get: ()=> import('${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?v=${viteVersion}') `
-          res.push(`'${sharedName}':{${str}}\n`)
+          const url = `'${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?v=${viteVersion}'`
+          str += `metaGet: ()=> import(/* @vite-ignore */ ${url}),loaded:1,webpackGet:()=> webpackGet(${url})`
+          res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
       })
     }

@@ -164,10 +164,15 @@ Github CI build, not engineering required:
 - playwright-chromium
 
 
-
 ## Development mode
 
 Since Vite is esbuild-based in development mode, we provide separate support for the development mode to leverage Vite’s high-performance development capabilities in the case of remote module deployment. And note that only Host supports the dev mode and Remote supports only build mode
+
+## Integration with webpack
+
+The current plug-in already supports the use of the components exposed by `webpack-federation` in the `vite/rollup` project. You can refer to `simple-react-webpack` and `vue3-demo-webpack` under `examples` for reference Configuration, it is recommended not to configure `singleton=true` on the `webpack` side as much as possible, this will cause the `shared` function to fail in some cases.<br>
+And the premise of using this function is that the output format must be `Systemjs`, because `webpack5` currently does not support the output format of `ESM` (experimental feature support can be turned on, but this function is currently unstable) <br>
+We will provide support for webpack5 ESM output once it is stable
 
 ### FAQ
 
