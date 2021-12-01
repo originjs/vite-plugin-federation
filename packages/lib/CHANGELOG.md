@@ -1,3 +1,18 @@
+## [1.0.6](https://github.com/originjs/vite-plugin-federation/compare/v1.0.5...v1.0.6) (2021-12-01)
+
+
+### Bug Fixes
+
+* empty dep error ([3affe92](https://github.com/originjs/vite-plugin-federation/commit/3affe92b714c10ff0869ca7a2a3876b27b2f22e2))
+
+
+### Features
+
+* plugin support webpack component ([372c69c](https://github.com/originjs/vite-plugin-federation/commit/372c69ca1a0fb6a0c333309d84b21d37fa22587b))
+* remove rollup generated empty import(import 'filename.js') ([#101](https://github.com/originjs/vite-plugin-federation/issues/101)) ([cdc5db4](https://github.com/originjs/vite-plugin-federation/commit/cdc5db4ae32f76a1147a3f6d4516f140b06b7648))
+
+
+
 ## [1.0.5](https://github.com/originjs/vite-plugin-federation/compare/v1.0.4...v1.0.5) (2021-11-22)
 
 
