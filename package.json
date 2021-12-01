@@ -14,7 +14,7 @@
     "format": "prettier -w .",
     "lint": "eslint packages/*/{src,types}/**",
     "lint:fix": "eslint --fix",
-    "build": "cd packages/lib && yarn build",
+    "build": "cd packages/lib && pnpm build",
     "test": "npm-run-all test:unit test:e2e",
     "test:unit": "jest --coverage",
     "test:e2e": "jest --runInBand --config ./jest.e2e.config.js"
