@@ -171,7 +171,11 @@ Github CI 构建，非工程必备：
 
 因为 Vite 在 development 模式下是基于 esbuild，所以我们单独提供了对 development 模式的支持，可以在远程模块部署的情况下，利用 Vite 的高性能开发能力。但是需要注意只有Host支持dev模式，Remote暂时只支持build模式
 
+## 与 `Webpack` 集成
 
+当前的插件已经支持在`vite/rollup`项目中使用 `webpack-federation` 暴露出来的组件，你可以参考 `examples` 下的 `simple-react-webpack` 和 `vue3-demo-webpack` 来参考如何配置，建议尽量不要在 `webpack` 侧配置 `singleton=true` ，这在某些情况下会导致 `shared` 功能失效。<br>
+而且使用这个功能的前提是输出格式必须为`Systemjs`，因为 `webpack5` 当前还不支持`ESM` 的输出格式（可以开启实验特性支持，但是该功能当前不稳定）<br> 
+webpack5 ESM 输出功能稳定后，我们将会提供支持
 
 ### FAQ
 
