@@ -1,0 +1,18 @@
+{
+  "name": "vue3-demo-webpack-esm-var",
+  "private": true,
+  "scripts": {
+    "build": "pnpm run build -r --filter ./",
+    "serve": "pnpm run serve --parallel --filter ./",
+    "stop": "kill-port --port 5000,5001"
+  },
+  "workspaces": [
+    "home",
+    "layout"
+  ],
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "workspace:*",
+    "kill-port": "^1.6.1",
+    "semver": "^7.3.5"
+  }
+}
