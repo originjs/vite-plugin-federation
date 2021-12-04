@@ -1,5 +1,5 @@
 {
-  "name": "vue3-demo-webpack",
+  "name": "vue3-demo-webpack-systemjs",
   "private": true,
   "scripts": {
     "build": "pnpm run build -r --filter ./",
