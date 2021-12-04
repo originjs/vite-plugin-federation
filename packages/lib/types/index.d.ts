@@ -217,6 +217,11 @@ declare interface RemotesConfig {
    * The name of the share scope shared with this remote.
    */
   shareScope?: string
+
+  /**
+   * the remote format
+   */
+  format?: 'esm' | 'systemjs' | 'var'
 }
 
 /**

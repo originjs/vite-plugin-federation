@@ -1,10 +1,10 @@
 import {
+  ConfigTypeSet,
   Exposes,
   Remotes,
   Shared,
-  ConfigTypeSet,
-  VitePluginFederationOptions,
-  SharedRuntimeInfo
+  SharedRuntimeInfo,
+  VitePluginFederationOptions
 } from '../types'
 import * as path from 'path'
 import { PluginContext } from 'rollup'
@@ -75,11 +75,13 @@ export function parseRemoteOptions(
     options.remotes ? options.remotes : {},
     (item) => ({
       external: Array.isArray(item) ? item : [item],
-      shareScope: options.shareScope || 'default'
+      shareScope: options.shareScope || 'default',
+      format: 'esm'
     }),
     (item) => ({
       external: Array.isArray(item.external) ? item.external : [item.external],
-      shareScope: item.shareScope || options.shareScope || 'default'
+      shareScope: item.shareScope || options.shareScope || 'default',
+      format: item.format || 'esm'
     })
   )
 }
