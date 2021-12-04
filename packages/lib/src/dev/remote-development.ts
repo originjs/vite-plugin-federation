@@ -29,12 +29,21 @@ export function devRemotePlugin(
       __federation__: `
 const remotesMap = {
   ${remotes
-        .map(
-          (remote) =>
-            `${JSON.stringify(remote.id)}: () => import(${JSON.stringify(remote.config.external[0])})`
-        )
-        .join(',\n  ')}
+          .map(
+              (remote) =>
+                  `'${remote.id}':{url:'${remote.config.external[0]}',format:'${remote.config.format}'}`
+          )
+          .join(',\n  ')}
 };
+const loadJS = (url, fn) => {
+  const script = document.createElement('script')
+  script.type = 'text/javascript';
+  script.onload = fn;
+  script.src = url;
+  document.getElementsByTagName('head')[0].appendChild(script);
+}
+const scriptTypes = ['var'];
+const importTypes = ['esm', 'systemjs']
 const webpackGet = name => import(/* @vite-ignore */ name).then(module => ()=>module?.default ?? module)
 const shareScope = {
   ${getModuleMarker('shareScope')}
@@ -42,12 +51,38 @@ const shareScope = {
 const initMap = Object.create(null);
 export default {
   ensure: async (remoteId) => {
-    const remote = await remotesMap[remoteId]();
-    if (!initMap[remoteId]) {
-      remote.init(shareScope);
-      initMap[remoteId] = true;
+    const remote = remotesMap[remoteId];
+    if (!remote.inited) {
+      if (scriptTypes.includes(remote.format)) {
+        // loading js with script tag
+        return new Promise(resolve => {
+          const callback = () => {
+            if (!remote.inited) {
+              remote.lib = window[remoteId];
+              remote.lib.init(shareScope)
+              remote.inited = true;
+            }
+            resolve(remote.lib);
+          }
+          loadJS(remote.url, callback);
+        });
+      } else if (importTypes.includes(remote.format)) {
+        // loading js with import(...)
+        return new Promise(resolve => {
+          import(/* @vite-ignore */ remote.url).then(lib => {
+            if (!remote.inited) {
+              lib.init(shareScope);
+              remote.lib = lib;
+              remote.lib.init(shareScope);
+              remote.inited = true;
+            }
+            resolve(remote.lib);
+          })
+        })
+      }
+    } else {
+      return remote.lib;
     }
-    return remote;
   }
 };`
     },
@@ -173,7 +208,7 @@ export default {
         let str = ''
         if (typeof obj === 'object') {
           const url = `'${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?v=${viteVersion}'`
-          str += `metaGet: ()=> import(/* @vite-ignore */ ${url}),loaded:1,webpackGet:()=> webpackGet(${url})`
+          str += `metaGet: ()=> import(/* @vite-ignore */ ${url}),loaded:1,get:()=> webpackGet(${url})`
           res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
       })
