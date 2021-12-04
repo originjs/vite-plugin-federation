@@ -118,14 +118,44 @@ exposes: {
 ```
 ### remotes
 The remote module entry file referenced as a local module
+> configuration information
+#### `external:string` 
+
+remote module address, e.g. https://localhost:5011/remoteEntry.js
+You can simply configure it as follows
+
   ```js
   remotes: {
     // 'remote module name': 'remote module entry file address'
     'remote-simple': 'http://localhost:5011/remoteEntry.js',
-},
+}
   ```
+Or do a slightly more complex configuration, if you need to use other fields
+``` javascript
+remotes: {
+    remote-simple: {
+        external: 'http://localhost:5011/remoteEntry.js',
+        format: 'var',
+    }
+}
+```
+***
+#### `format:'esm'|'systemjs'|'var'`  
+`default:'esm'`
+<br>
+Specify the format of the remote component, this is more effective when different packaging formats are used on the host and remote side, for example host uses vite+esm and remote uses webpack+var, this is required to specify `type:'var'`, the default value is `'esm'`,However, please note that not all formats are supported by each other, and the following are now supported
+
+| host                     | remote                   |
+| ------------------------ | ------------------------ |
+| `rollup/vite`+`esm`      | `rollup/vite`+`esm`      |
+| `rollup/vite`+`systemjs` | `rollup/vite`+`systemjs` |
+| `rollup/vite`+`systemjs` | `webpack`+`systemjs`     |
+| `rollup/vite`+`esm`      | `webpack`+`var`          |
+
+
 
 ### shared
+
 Dependencies shared by local and remote modules. Local modules need to configure the dependencies of all used remote modules; remote modules need to configure the dependencies of externally provided components.
 > configuration information
 #### `import: boolean`
