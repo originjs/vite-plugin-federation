@@ -116,17 +116,45 @@ vue2 为例
       // '对外暴露的组件名称':'对外暴露的组件地址'
       './remote-simple-button': './src/components/Button.vue',
       './remote-simple-section': './src/components/Section.vue'
-  },
+  }
   ```
 
 ### remotes
 作为本地模块，引用的远端模块入口文件
+> 配置信息
+#### `external:string`
+
+远程模块地址，例如：https://localhost:5011/remoteEntry.js
+你可以简单地进行如下配置
   ```js
   remotes: {
       // '远端模块名称':'远端模块入口文件地址'
       'remote-simple': 'http://localhost:5011/remoteEntry.js',
-  },
+  }
   ```
+或者做一个稍微复杂的配置，如果你需要使用其他字段的话
+```javascript
+remotes: {
+    remote-simple: {
+        external: 'http://localhost:5011/remoteEntry.js',
+        format: 'var'
+    }
+}
+```
+
+***
+#### `format:'esm'|'systemjs'|'var'`
+
+`default:'esm'`
+<br>
+指定远程组件的格式，当主机和远程端使用不同的打包格式时，这样做更有效，例如主机使用vite+esm，远程使用webpack+var，这时需要指定`type:'var'`，,不过，请注意不是所有的格式都被支持，现在支持的格式如下
+
+| host                     | remote                   |
+| ------------------------ | ------------------------ |
+| `rollup/vite`+`esm`      | `rollup/vite`+`esm`      |
+| `rollup/vite`+`systemjs` | `rollup/vite`+`systemjs` |
+| `rollup/vite`+`systemjs` | `webpack`+`systemjs`     |
+| `rollup/vite`+`esm`      | `webpack`+`var`          |
 
 ### shared
 本地模块和远程模块共享的依赖。本地模块需配置所有使用到的远端模块的依赖；远端模块需要配置对外提供的组件的依赖。
@@ -207,7 +235,7 @@ federation({
 
 
 
-#### 远程模块加载本地模块的共享以来失败，例如`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
+#### 远程模块加载本地模块的共享依赖失败，例如`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
 
 原因：Vite 在启动服务时对于 IP、Port 有自动获取逻辑，在 Plugin 中还没有找到完全对应的获取逻辑，在部分情况下可能会出现获取失败。
 
