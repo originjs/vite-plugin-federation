@@ -1,3 +1,17 @@
+## [1.0.7](https://github.com/originjs/vite-plugin-federation/compare/v1.0.6...v1.0.7) (2021-12-06)
+
+
+### Bug Fixes
+
+* federation will override vite `config.optimizeDeps` ([37f4e56](https://github.com/originjs/vite-plugin-federation/commit/37f4e56b65aca67bba75f51e0b8be2798c14cbc6))
+
+
+### Features
+
+* support webpack var format ([ed2a596](https://github.com/originjs/vite-plugin-federation/commit/ed2a596a2ee20f74310e9a1e8a59a80a538b7afc))
+
+
+
 ## [1.0.6](https://github.com/originjs/vite-plugin-federation/compare/v1.0.5...v1.0.6) (2021-12-01)
 
 
