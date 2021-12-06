@@ -88,15 +88,18 @@ export default {
     },
     config(config: UserConfig) {
       // need to include remotes in the optimizeDeps.exclude
-      let excludeRemotes: string[] = []
-      for (const providedRemote of parsedOptions.devRemote) {
-        excludeRemotes.push(providedRemote[0])
-      }
-      if (config?.optimizeDeps?.exclude) {
-        excludeRemotes = excludeRemotes.concat(config.optimizeDeps.exclude)
-      }
-
-      Object.assign(config, { optimizeDeps: { exclude: excludeRemotes } })
+        if (parsedOptions.devRemote.length) {
+            const excludeRemotes: string[] = []
+            parsedOptions.devRemote.forEach(item => excludeRemotes.push(item[0]));
+            let optimizeDeps = config.optimizeDeps;
+            if (!optimizeDeps) {
+                optimizeDeps = config.optimizeDeps = {};
+            }
+            if (!optimizeDeps.exclude) {
+                optimizeDeps.exclude = [];
+            }
+            optimizeDeps.exclude = optimizeDeps.exclude.concat(excludeRemotes);
+        }
     },
 
     configureServer(server: ViteDevServer) {
