@@ -5,9 +5,11 @@ import {
   Shared,
   SharedRuntimeInfo,
   VitePluginFederationOptions
-} from '../types'
+} from '../../types'
 import * as path from 'path'
 import { PluginContext } from 'rollup'
+
+export * from './semver'
 
 export function findDependencies(
   this: PluginContext,
