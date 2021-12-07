@@ -116,12 +116,10 @@ importers:
       '@originjs/vite-plugin-federation': workspace:*
       http-server: ^13.0.1
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       http-server: 13.0.2
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/simple-react-esm/host-esm:
     specifiers:
@@ -182,12 +180,10 @@ importers:
       '@originjs/vite-plugin-federation': workspace:*
       http-server: ^13.0.1
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       http-server: 13.0.2
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/simple-react-systemjs/host-systemjs:
     specifiers:
@@ -248,12 +244,10 @@ importers:
       '@originjs/vite-plugin-federation': workspace:*
       http-server: ^13.0.1
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       http-server: 13.0.2
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/simple-react-webpack/host:
     specifiers:
@@ -311,11 +305,9 @@ importers:
     specifiers:
       '@originjs/vite-plugin-federation': workspace:*
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/vue2-demo/host-simple:
     specifiers:
@@ -347,11 +339,9 @@ importers:
     specifiers:
       '@originjs/vite-plugin-federation': workspace:*
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/vue3-demo-esm/common-lib:
     specifiers:
@@ -417,11 +407,9 @@ importers:
     specifiers:
       '@originjs/vite-plugin-federation': workspace:*
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/vue3-demo-systemjs/common-lib:
     specifiers:
@@ -487,11 +475,9 @@ importers:
     specifiers:
       '@originjs/vite-plugin-federation': workspace:*
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/vue3-demo-webpack-esm-var/home:
     specifiers:
@@ -547,11 +533,9 @@ importers:
     specifiers:
       '@originjs/vite-plugin-federation': workspace:*
       kill-port: ^1.6.1
-      semver: ^7.3.5
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 1.6.1
-      semver: 7.3.5
 
   packages/examples/vue3-demo-webpack-systemjs/home:
     specifiers:
@@ -613,12 +597,10 @@ importers:
       estree-walker: ^1.0.1
       magic-string: ^0.25.7
       rollup: ^2.60.0
-      semver: ^7.3.5
       vite: ^2.5.0
     dependencies:
       estree-walker: 1.0.1
       magic-string: 0.25.7
-      semver: 7.3.5
     devDependencies:
       '@rollup/plugin-node-resolve': 13.0.6_rollup@2.60.2
       '@rollup/plugin-typescript': 8.3.0_cf49768e670184c7e0e13e8a66db2d3a
@@ -7331,6 +7313,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+    dev: true
 
   /magic-string/0.25.7:
     resolution: {integrity: sha512-4CrMT5DOHTDk4HYDlzmwu4FVCcIYI8gauveasrdCu2IKIFOJ3f0v/8MDGJCDL9oD2ppz/Av1b0Nj345H9M+XIA==}
@@ -8740,6 +8723,7 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
+    dev: true
 
   /send/0.17.1:
     resolution: {integrity: sha512-BsVKsiGcQMFwT8UxypobUKyv7irCNRHk1T0G680vk88yf6LBByGcZJOTJCrTP2xVN6yI+XjPJcNuE3V4fT9sAg==}
@@ -10118,6 +10102,7 @@ packages:
 
   /yallist/4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
+    dev: true
 
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
