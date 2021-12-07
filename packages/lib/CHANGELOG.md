@@ -1,3 +1,12 @@
+## [1.0.8](https://github.com/originjs/vite-plugin-federation/compare/v1.0.7...v1.0.8) (2021-12-07)
+
+
+### Bug Fixes
+
+* cant find module semver with pnpm build ([2951a9a](https://github.com/originjs/vite-plugin-federation/commit/2951a9aaef37cc0f99764ba5df4c9fc868e89b68))
+
+
+
 ## [1.0.7](https://github.com/originjs/vite-plugin-federation/compare/v1.0.6...v1.0.7) (2021-12-06)
 
 
