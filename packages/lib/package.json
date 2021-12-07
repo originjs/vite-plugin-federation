@@ -35,8 +35,7 @@
   },
   "dependencies": {
     "estree-walker": "^1.0.1",
-    "magic-string": "^0.25.7",
-    "semver": "^7.3.5"
+    "magic-string": "^0.25.7"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.4",

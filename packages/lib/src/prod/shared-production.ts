@@ -14,6 +14,7 @@ import {
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import * as path from 'path'
+import {semver} from "../large-virtual-files";
 
 const sharedFileReg = /^__federation_shared_.+\.js$/
 const pickSharedNameReg = /(?<=^__federation_shared_).+(?=\.js$)/
@@ -45,6 +46,7 @@ export function prodSharedPlugin(
   return {
     name: 'originjs:shared-production',
     virtualFile: {
+      __federation_lib_semver:semver,
       __federation_fn_import: `
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
       const moduleCache = Object.create(null);
@@ -62,7 +64,7 @@ export function prodSharedPlugin(
           const versionValue = Object.values(versionObj)[0];
           if (moduleMap[name]?.requiredVersion) {
             // judge version satisfy
-            const semver= await import('semver');
+            const semver= await import('__federation_lib_semver');
             const fn = semver.satisfies;
             if (fn(versionKey, moduleMap[name].requiredVersion)) {
                module = await versionValue.metaGet();
@@ -133,6 +135,14 @@ export function prodSharedPlugin(
           }__federation_fn_import.js`,
           type: 'chunk',
           id: '__federation_fn_import',
+          preserveSignature: 'strict'
+        })
+        this.emitFile({
+          fileName: `${
+              builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }__federation_lib_semver.js`,
+          type: 'chunk',
+          id: '__federation_lib_semver',
           preserveSignature: 'strict'
         })
       }
