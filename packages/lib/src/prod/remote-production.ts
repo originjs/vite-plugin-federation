@@ -1,11 +1,12 @@
-import { RemotesConfig, VitePluginFederationOptions } from 'types'
-import { walk } from 'estree-walker'
+import {RemotesConfig, VitePluginFederationOptions} from 'types'
+import {walk} from 'estree-walker'
 import MagicString from 'magic-string'
-import { AcornNode, TransformPluginContext } from 'rollup'
-import { getModuleMarker, parseRemoteOptions, removeNonLetter } from '../utils'
-import { builderInfo, parsedOptions } from '../public'
+import {AcornNode, TransformPluginContext} from 'rollup'
+import {getModuleMarker, parseRemoteOptions, removeNonLetter} from '../utils'
+import {builderInfo, parsedOptions} from '../public'
 import * as path from 'path'
-import { PluginHooks } from '../../types/pluginHooks'
+import {PluginHooks} from '../../types/pluginHooks'
+import * as fs from 'fs'
 
 export function prodRemotePlugin(
   options: VitePluginFederationOptions
@@ -123,6 +124,12 @@ export default {
             getModuleMarker('moduleMap', 'var'),
             `{${moduleMapCode}}`
           )
+        }
+
+        if(id === '\0virtual:__federation_lib_semver'){
+          const federationId = (await this.resolve('@originjs/vite-plugin-federation'))?.id;
+          const satisfyId = `${path.dirname(federationId!)}/satisfy.js`;
+          return fs.readFileSync(satisfyId, {encoding: 'utf-8'});
         }
       }
 

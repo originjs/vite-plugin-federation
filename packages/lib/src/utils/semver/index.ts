@@ -102,6 +102,6 @@ function satisfy(version: string, range: string): boolean {
   return true
 }
 
-export const semver = {
-  satisfy,
+export {
+  satisfy
 }
