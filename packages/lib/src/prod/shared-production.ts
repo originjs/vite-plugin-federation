@@ -14,7 +14,6 @@ import {
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import * as path from 'path'
-import { semver } from '../utils'
 
 const sharedFileReg = /^__federation_shared_.+\.js$/
 const pickSharedNameReg = /(?<=^__federation_shared_).+(?=\.js$)/
@@ -46,7 +45,7 @@ export function prodSharedPlugin(
   return {
     name: 'originjs:shared-production',
     virtualFile: {
-      __federation_lib_semver: semver,
+      __federation_lib_semver: 'void 0',
       __federation_fn_import: `
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
       const moduleCache = Object.create(null);

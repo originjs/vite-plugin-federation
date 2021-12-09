@@ -9,8 +9,6 @@ import {
 import * as path from 'path'
 import { PluginContext } from 'rollup'
 
-export * from './semver'
-
 export function findDependencies(
   this: PluginContext,
   id: string,
