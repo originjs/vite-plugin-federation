@@ -1,4 +1,4 @@
-import { extractComparator, pipe } from './utils'
+import { combineVersion, extractComparator, pipe } from './utils'
 import {
   parseHyphen,
   parseComparatorTrim,
@@ -52,7 +52,7 @@ function parseRange(range: string) {
   )(range.trim()).split(/\s+/).join(' ')
 }
 
-function satisfy(version: string, range: string): boolean {
+export function satisfy(version: string, range: string): boolean {
   if (!version) {
     return false
   }
@@ -66,14 +66,14 @@ function satisfy(version: string, range: string): boolean {
     return false
   }
 
-  const [, versionOperator, versionRaw, versionMajor, versionMinor, versionPatch, versionPreRelease] = extractedVersion
+  const [, versionOperator, , versionMajor, versionMinor, versionPatch, versionPreRelease] = extractedVersion
   const versionAtom: CompareAtom = {
     operator: versionOperator,
-    version: versionRaw,
+    version: combineVersion(versionMajor, versionMinor, versionPatch, versionPreRelease), // exclude build atom
     major: versionMajor,
     minor: versionMinor,
     patch: versionPatch,
-    preRelease: versionPreRelease,
+    preRelease: versionPreRelease?.split('.'),
   }
 
   for (const comparator of comparators) {
@@ -83,25 +83,20 @@ function satisfy(version: string, range: string): boolean {
       return false
     }
 
-    const [, rangeOperator, rangeRaw, rangeMajor, rangeMinor, rangePatch, rangePreRelease] = extractedComparator
+    const [, rangeOperator, , rangeMajor, rangeMinor, rangePatch, rangePreRelease] = extractedComparator
     const rangeAtom: CompareAtom = {
       operator: rangeOperator,
-      version: rangeRaw,
+      version: combineVersion(rangeMajor, rangeMinor, rangePatch, rangePreRelease), // exclude build atom
       major: rangeMajor,
       minor: rangeMinor,
       patch: rangePatch,
-      preRelease: rangePreRelease,
+      preRelease: rangePreRelease?.split('.'),
     }
 
-    const a = compare(rangeAtom, versionAtom)
-    if (!a) {
+    if (!compare(rangeAtom, versionAtom)) {
       return false // early return
     }
   }
 
   return true
-}
-
-export {
-  satisfy
 }
