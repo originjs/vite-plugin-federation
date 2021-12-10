@@ -13,7 +13,7 @@
 
 ## 应用与实践
 
-![image-20211210105354887](D:/developement/workspace/frontend-extranet/originjs/vite-plugin-federation/packages/examples/vue3-advanced-demo/README-Preview-Image)
+![image-20211210105354887](https://github.com/originjs/vite-plugin-federation/blob/main/packages/examples/vue3-advanced-demo/README-Preview-Image)
 
 ## 安装
 
