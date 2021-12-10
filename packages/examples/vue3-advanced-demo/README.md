@@ -25,4 +25,4 @@ yarn dev
 ```
 
 ### Preview
-![image-20211210105354887](.\README-Preview-Image)
+![image-20211210105354887](README-Preview-Image)
