@@ -7,9 +7,12 @@ English | [简体中文](./README-zh.md)
   <a href="https://nodejs.org/en/about/releases/"><img src="https://img.shields.io/node/v/vite.svg" alt="Node Compatibility"></a>
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
  </p>
-
 A Vite plugin which support Module Federation.
 Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) feature.
+
+## Application and practice
+
+![image-20211210105354887](packages\examples\vue3-advanced-demo\README-Preview-Image)
 
 ## Install
 
@@ -175,6 +178,7 @@ Only for the `remote` side, it specifies the required version of the `host share
 + [simple-react](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react)
 + [vue3-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo)
 + [vue2-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue2-demo)
++ [vue3-advanced-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-advanced-demo)
 
 
 ## Construct

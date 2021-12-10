@@ -1,0 +1,24 @@
+{
+  "name": "@vue3-demo/router-host",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite --port 5104 --strictPort",
+    "serve": "vite preview --port 5004 --strictPort",
+    "build": "vite build",
+    "clean": "rm -rf dist",
+    "stop": "kill-port --port 5004",
+    "restart": "yarn stop & yarn  build & yarn serve"
+  },
+  "dependencies": {
+    "element-plus": "^1.1.0-beta.20",
+    "vue": "^3.2.0",
+    "vue-router": "^4.0.12",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.3.0",
+    "@vue/compiler-sfc": "^3.2.0",
+    "vite": "^2.5.0"
+  }
+}

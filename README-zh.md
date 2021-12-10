@@ -11,6 +11,10 @@
 一个支持模块联邦的 Vite 插件
 灵感来源于 Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) 特性.
 
+## 应用与实践
+
+![image-20211210105354887](D:/developement/workspace/frontend-extranet/originjs/vite-plugin-federation/packages/examples/vue3-advanced-demo/README-Preview-Image)
+
 ## 安装
 
 使用 npm:
