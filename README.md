@@ -12,7 +12,7 @@ Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-f
 
 ## Application and practice
 
-![image-20211210105354887](packages\examples\vue3-advanced-demo\README-Preview-Image)
+![image-20211210105354887](https://github.com/originjs/vite-plugin-federation/blob/main/packages/examples/vue3-advanced-demo/README-Preview-Image)
 
 ## Install
 
