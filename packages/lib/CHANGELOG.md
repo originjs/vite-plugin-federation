@@ -1,3 +1,12 @@
+# [1.1.0](https://github.com/originjs/vite-plugin-federation/compare/v1.0.8...v1.1.0) (2021-12-13)
+
+
+### Features
+
+* add semver build ([5c6f9f5](https://github.com/originjs/vite-plugin-federation/commit/5c6f9f522f4ecc378d00f28722f8fe74ce7db925))
+
+
+
 ## [1.0.8](https://github.com/originjs/vite-plugin-federation/compare/v1.0.7...v1.0.8) (2021-12-07)
 
 
