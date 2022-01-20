@@ -1,11 +1,11 @@
-import {RemotesConfig, VitePluginFederationOptions} from 'types'
-import {walk} from 'estree-walker'
+import { RemotesConfig, VitePluginFederationOptions } from 'types'
+import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import {AcornNode, TransformPluginContext} from 'rollup'
-import {getModuleMarker, parseRemoteOptions, removeNonLetter} from '../utils'
-import {builderInfo, parsedOptions} from '../public'
+import { AcornNode, TransformPluginContext } from 'rollup'
+import { getModuleMarker, parseRemoteOptions, removeNonLetter } from '../utils'
+import { builderInfo, parsedOptions } from '../public'
 import * as path from 'path'
-import {PluginHooks} from '../../types/pluginHooks'
+import { PluginHooks } from '../../types/pluginHooks'
 import * as fs from 'fs'
 
 export function prodRemotePlugin(
@@ -95,11 +95,12 @@ export default {
           if (!sharedInfo[1].emitFile) {
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
-              id: sharedInfo[0],
+              id: sharedInfo[1].id ?? sharedInfo[0],
               fileName: `${
                 builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+              }${
+                sharedInfo[1].root ? sharedInfo[1].root[0] + '/' : ''
               }__federation_shared_${removeNonLetter(sharedInfo[0])}.js`,
-              name: sharedInfo[0],
               preserveSignature: 'allow-extension'
             })
           }
@@ -111,7 +112,9 @@ export default {
               (sharedInfo) =>
                 `'${removeNonLetter(
                   sharedInfo[0]
-                )}':{get:()=>__federation_import('./${path.basename(
+                )}':{get:()=>__federation_import('./${
+                  sharedInfo[1].root ? `${sharedInfo[1].root[0]}/` : ''
+                }${path.basename(
                   this.getFileName(sharedInfo[1].emitFile)
                 )}'),import:${sharedInfo[1].import}${
                   sharedInfo[1].requiredVersion
@@ -126,10 +129,12 @@ export default {
           )
         }
 
-        if(id === '\0virtual:__federation_lib_semver'){
-          const federationId = (await this.resolve('@originjs/vite-plugin-federation'))?.id;
-          const satisfyId = `${path.dirname(federationId!)}/satisfy.js`;
-          return fs.readFileSync(satisfyId, {encoding: 'utf-8'});
+        if (id === '\0virtual:__federation_lib_semver') {
+          const federationId = (
+            await this.resolve('@originjs/vite-plugin-federation')
+          )?.id
+          const satisfyId = `${path.dirname(federationId!)}/satisfy.js`
+          return fs.readFileSync(satisfyId, { encoding: 'utf-8' })
         }
       }
 
