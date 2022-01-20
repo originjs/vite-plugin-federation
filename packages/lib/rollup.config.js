@@ -6,24 +6,20 @@ import pkg from './package.json'
 export default [
   {
     input: 'src/utils/semver/index.ts',
-    plugins: [
-      typescript({include: './src/**/*.ts', module: 'esnext'})
-    ],
+    plugins: [typescript({ include: './src/**/*.ts', module: 'esnext' })],
     external: ['path'],
-    output: [
-      {format: 'esm', file: 'dist/satisfy.js'}
-    ]
+    output: [{ format: 'esm', file: 'dist/satisfy.js' }]
   },
   {
     input: 'src/index.ts',
     plugins: [
       resolve(),
-      typescript({include: './src/**/*.ts', module: 'esnext'})
+      typescript({ include: './src/**/*.ts', module: 'esnext' })
     ],
     external: ['path'],
     output: [
-      {format: 'cjs', file: pkg.main, exports: 'auto'},
-      {format: 'esm', file: pkg.module}
+      { format: 'cjs', file: pkg.main, exports: 'auto' },
+      { format: 'esm', file: pkg.module }
     ]
   }
 ]

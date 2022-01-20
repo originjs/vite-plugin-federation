@@ -28,4 +28,4 @@ export const tilde = `^${loneTilde}${xRangePlain}$`
 export const xRange = `^${gtlt}\\s*${xRangePlain}$`
 export const comparator = `^${gtlt}\\s*(${fullPlain})$|^$`
 // copy from semver package
-export const gte0 = '^\\s*>=\\s*0.0.0\\s*$';
+export const gte0 = '^\\s*>=\\s*0.0.0\\s*$'

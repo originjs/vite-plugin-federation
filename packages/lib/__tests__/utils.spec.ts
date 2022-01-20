@@ -1,8 +1,8 @@
 import {
-  parseOptions,
+  getModuleMarker,
   isSameFilepath,
-  removeNonLetter,
-  getModuleMarker
+  parseOptions,
+  removeNonLetter
 } from '../src/utils'
 import { ExposesObject } from '../types'
 

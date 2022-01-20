@@ -46,9 +46,7 @@ export function prodExposePlugin(
         console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".')
         return
       }
-      const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('${
-        options.filename
-      }'))
+      const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('${options.filename}'))
       const element = document.head.appendChild(document.createElement('link'))
       element.href = curUrl + cssFilePath
       element.rel = 'stylesheet'
@@ -189,7 +187,7 @@ export function prodExposePlugin(
     // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
     if (moduleCssFileMap.size === 0) {
       for (const file in bundle) {
-        cssFileMap.forEach(function(css) {
+        cssFileMap.forEach(function (css) {
           moduleCssFileMap.set(bundle[file].facadeModuleId, css)
         })
       }
