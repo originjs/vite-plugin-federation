@@ -1,5 +1,9 @@
 import { UserConfig } from 'vite'
-import { ConfigTypeSet, RemotesConfig, VitePluginFederationOptions } from 'types'
+import {
+  ConfigTypeSet,
+  RemotesConfig,
+  VitePluginFederationOptions
+} from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { AcornNode, TransformPluginContext } from 'rollup'
@@ -29,11 +33,11 @@ export function devRemotePlugin(
       __federation__: `
 const remotesMap = {
   ${remotes
-          .map(
-              (remote) =>
-                  `'${remote.id}':{url:'${remote.config.external[0]}',format:'${remote.config.format}'}`
-          )
-          .join(',\n  ')}
+    .map(
+      (remote) =>
+        `'${remote.id}':{url:'${remote.config.external[0]}',format:'${remote.config.format}'}`
+    )
+    .join(',\n  ')}
 };
 const loadJS = (url, fn) => {
   const script = document.createElement('script')
@@ -88,18 +92,18 @@ export default {
     },
     config(config: UserConfig) {
       // need to include remotes in the optimizeDeps.exclude
-        if (parsedOptions.devRemote.length) {
-            const excludeRemotes: string[] = []
-            parsedOptions.devRemote.forEach(item => excludeRemotes.push(item[0]));
-            let optimizeDeps = config.optimizeDeps;
-            if (!optimizeDeps) {
-                optimizeDeps = config.optimizeDeps = {};
-            }
-            if (!optimizeDeps.exclude) {
-                optimizeDeps.exclude = [];
-            }
-            optimizeDeps.exclude = optimizeDeps.exclude.concat(excludeRemotes);
+      if (parsedOptions.devRemote.length) {
+        const excludeRemotes: string[] = []
+        parsedOptions.devRemote.forEach((item) => excludeRemotes.push(item[0]))
+        let optimizeDeps = config.optimizeDeps
+        if (!optimizeDeps) {
+          optimizeDeps = config.optimizeDeps = {}
         }
+        if (!optimizeDeps.exclude) {
+          optimizeDeps.exclude = []
+        }
+        optimizeDeps.exclude = optimizeDeps.exclude.concat(excludeRemotes)
+      }
     },
 
     configureServer(server: ViteDevServer) {

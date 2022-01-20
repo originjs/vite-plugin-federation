@@ -1,6 +1,4 @@
-
 // test cases from https://devhints.io/semver
-
 
 import { satisfy } from '../src/utils/semver'
 
@@ -199,7 +197,9 @@ describe('hyphenated ranges', () => {
 
 describe('pre-release', () => {
   test('fixed version', () => {
-    expect(satisfy('1.2.3-prerelease+build', '1.2.3-prerelease+build')).toBe(true)
+    expect(satisfy('1.2.3-prerelease+build', '1.2.3-prerelease+build')).toBe(
+      true
+    )
     expect(satisfy('1.2.3-prerelease', '1.2.3-prerelease+build')).toBe(true)
     expect(satisfy('4.0.0', '4.0.0-alpha.57')).toBe(false)
     expect(satisfy('4.0.0-alpha.57', '4.0.0-alpha.57')).toBe(true)

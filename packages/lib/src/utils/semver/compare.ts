@@ -7,7 +7,10 @@ export interface CompareAtom {
   preRelease?: string[]
 }
 
-function compareAtom(rangeAtom: string | number, versionAtom: string | number): number {
+function compareAtom(
+  rangeAtom: string | number,
+  versionAtom: string | number
+): number {
   rangeAtom = +rangeAtom || rangeAtom
   versionAtom = +versionAtom || versionAtom
 
@@ -22,7 +25,10 @@ function compareAtom(rangeAtom: string | number, versionAtom: string | number): 
   return -1
 }
 
-function comparePreRelease(rangeAtom: CompareAtom, versionAtom: CompareAtom): number {
+function comparePreRelease(
+  rangeAtom: CompareAtom,
+  versionAtom: CompareAtom
+): number {
   const { preRelease: rangePreRelease } = rangeAtom
   const { preRelease: versionPreRelease } = versionAtom
 
@@ -43,7 +49,7 @@ function comparePreRelease(rangeAtom: CompareAtom, versionAtom: CompareAtom): nu
     const versionElement = versionPreRelease![i]
 
     if (rangeElement === versionElement) {
-      continue;
+      continue
     }
 
     if (rangeElement === undefined && versionElement === undefined) {
@@ -64,18 +70,26 @@ function comparePreRelease(rangeAtom: CompareAtom, versionAtom: CompareAtom): nu
   return 0
 }
 
-function compareVersion(rangeAtom: CompareAtom, versionAtom: CompareAtom): number {
-  return compareAtom(rangeAtom.major, versionAtom.major)
-    || compareAtom(rangeAtom.minor, versionAtom.minor)
-    || compareAtom(rangeAtom.patch, versionAtom.patch)
-    || comparePreRelease(rangeAtom, versionAtom)
+function compareVersion(
+  rangeAtom: CompareAtom,
+  versionAtom: CompareAtom
+): number {
+  return (
+    compareAtom(rangeAtom.major, versionAtom.major) ||
+    compareAtom(rangeAtom.minor, versionAtom.minor) ||
+    compareAtom(rangeAtom.patch, versionAtom.patch) ||
+    comparePreRelease(rangeAtom, versionAtom)
+  )
 }
 
 function eq(rangeAtom: CompareAtom, versionAtom: CompareAtom): boolean {
   return rangeAtom.version === versionAtom.version
 }
 
-export function compare(rangeAtom: CompareAtom, versionAtom: CompareAtom): boolean {
+export function compare(
+  rangeAtom: CompareAtom,
+  versionAtom: CompareAtom
+): boolean {
   switch (rangeAtom.operator) {
     case '':
     case '=':
@@ -83,12 +97,17 @@ export function compare(rangeAtom: CompareAtom, versionAtom: CompareAtom): boole
     case '>':
       return compareVersion(rangeAtom, versionAtom) < 0
     case '>=':
-      return eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) < 0
+      return (
+        eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) < 0
+      )
     case '<':
       return compareVersion(rangeAtom, versionAtom) > 0
     case '<=':
-      return eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) > 0
-    case undefined: { // mean * or x -> all versions
+      return (
+        eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) > 0
+      )
+    case undefined: {
+      // mean * or x -> all versions
       return true
     }
     default:

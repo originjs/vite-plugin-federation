@@ -56,11 +56,18 @@ export function pipe(...fns: ((params: any) => any)[]) {
   }
 }
 
-export function extractComparator(comparatorString: string): RegExpMatchArray | null {
+export function extractComparator(
+  comparatorString: string
+): RegExpMatchArray | null {
   return comparatorString.match(parseRegex(comparator))
 }
 
-export function combineVersion(major: string, minor: string, patch: string, preRelease: string): string {
+export function combineVersion(
+  major: string,
+  minor: string,
+  patch: string,
+  preRelease: string
+): string {
   const mainVersion = `${major}.${minor}.${patch}`
 
   if (preRelease) {

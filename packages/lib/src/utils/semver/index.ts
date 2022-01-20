@@ -8,7 +8,7 @@ import {
   parseTildes,
   parseXRanges,
   parseStar,
-  parseGTE0,
+  parseGTE0
 } from './parser'
 import { compare, CompareAtom } from './compare'
 
@@ -31,7 +31,7 @@ function parseComparatorString(range: string): string {
     // ~1.2.0, ~>1.2.0 --> >=1.2.0 <1.3.0-0
     parseTildes,
     parseXRanges,
-    parseStar,
+    parseStar
   )(range)
 }
 
@@ -48,8 +48,10 @@ function parseRange(range: string) {
     parseTildeTrim,
     // handle trim caret
     // `^ 1.2.3` => `^1.2.3`
-    parseCaretTrim,
-  )(range.trim()).split(/\s+/).join(' ')
+    parseCaretTrim
+  )(range.trim())
+    .split(/\s+/)
+    .join(' ')
 }
 
 export function satisfy(version: string, range: string): boolean {
@@ -58,22 +60,40 @@ export function satisfy(version: string, range: string): boolean {
   }
 
   const parsedRange = parseRange(range)
-  const parsedComparator = parsedRange.split(' ').map((rangeVersion) => parseComparatorString(rangeVersion)).join(' ')
-  const comparators = parsedComparator.split(/\s+/).map((comparator) => parseGTE0(comparator))
+  const parsedComparator = parsedRange
+    .split(' ')
+    .map((rangeVersion) => parseComparatorString(rangeVersion))
+    .join(' ')
+  const comparators = parsedComparator
+    .split(/\s+/)
+    .map((comparator) => parseGTE0(comparator))
   const extractedVersion = extractComparator(version)
 
   if (!extractedVersion) {
     return false
   }
 
-  const [, versionOperator, , versionMajor, versionMinor, versionPatch, versionPreRelease] = extractedVersion
+  const [
+    ,
+    versionOperator,
+    ,
+    versionMajor,
+    versionMinor,
+    versionPatch,
+    versionPreRelease
+  ] = extractedVersion
   const versionAtom: CompareAtom = {
     operator: versionOperator,
-    version: combineVersion(versionMajor, versionMinor, versionPatch, versionPreRelease), // exclude build atom
+    version: combineVersion(
+      versionMajor,
+      versionMinor,
+      versionPatch,
+      versionPreRelease
+    ), // exclude build atom
     major: versionMajor,
     minor: versionMinor,
     patch: versionPatch,
-    preRelease: versionPreRelease?.split('.'),
+    preRelease: versionPreRelease?.split('.')
   }
 
   for (const comparator of comparators) {
@@ -83,14 +103,27 @@ export function satisfy(version: string, range: string): boolean {
       return false
     }
 
-    const [, rangeOperator, , rangeMajor, rangeMinor, rangePatch, rangePreRelease] = extractedComparator
+    const [
+      ,
+      rangeOperator,
+      ,
+      rangeMajor,
+      rangeMinor,
+      rangePatch,
+      rangePreRelease
+    ] = extractedComparator
     const rangeAtom: CompareAtom = {
       operator: rangeOperator,
-      version: combineVersion(rangeMajor, rangeMinor, rangePatch, rangePreRelease), // exclude build atom
+      version: combineVersion(
+        rangeMajor,
+        rangeMinor,
+        rangePatch,
+        rangePreRelease
+      ), // exclude build atom
       major: rangeMajor,
       minor: rangeMinor,
       patch: rangePatch,
-      preRelease: rangePreRelease?.split('.'),
+      preRelease: rangePreRelease?.split('.')
     }
 
     if (!compare(rangeAtom, versionAtom)) {
