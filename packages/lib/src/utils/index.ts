@@ -1,4 +1,4 @@
-import {
+import type {
   ConfigTypeSet,
   Exposes,
   Remotes,
@@ -6,8 +6,8 @@ import {
   SharedRuntimeInfo,
   VitePluginFederationOptions
 } from '../../types'
-import * as path from 'path'
-import { PluginContext } from 'rollup'
+import { posix, parse } from 'path'
+import type { PluginContext } from 'rollup'
 
 export function findDependencies(
   this: PluginContext,
@@ -147,7 +147,7 @@ export function getModuleMarker(value: string, type?: string): string {
 }
 
 export function normalizePath(id: string): string {
-  return path.posix.normalize(id.replace(/\\/g, '/'))
+  return posix.normalize(id.replace(/\\/g, '/'))
 }
 
 export function isSameFilepath(src: string, dest: string): boolean {
@@ -156,8 +156,8 @@ export function isSameFilepath(src: string, dest: string): boolean {
   }
   src = normalizePath(src)
   dest = normalizePath(dest)
-  const srcExt = path.parse(src).ext
-  const destExt = path.parse(dest).ext
+  const srcExt = parse(src).ext
+  const destExt = parse(dest).ext
   if (srcExt && destExt && srcExt !== destExt) {
     return false
   }

@@ -1,7 +1,7 @@
 import { parseExposeOptions } from '../utils'
 import { parsedOptions } from '../public'
-import { VitePluginFederationOptions } from 'types'
-import { PluginHooks } from '../../types/pluginHooks'
+import type { VitePluginFederationOptions } from 'types'
+import type { PluginHooks } from '../../types/pluginHooks'
 
 export function devExposePlugin(
   options: VitePluginFederationOptions

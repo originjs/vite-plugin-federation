@@ -10,7 +10,8 @@ import {
   parseStar,
   parseGTE0
 } from './parser'
-import { compare, CompareAtom } from './compare'
+import { compare } from './compare'
+import type { CompareAtom } from './compare'
 
 function parseComparatorString(range: string): string {
   return pipe(

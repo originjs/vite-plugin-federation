@@ -1,4 +1,4 @@
-import * as path from 'path'
+import { resolve, parse, basename, extname } from 'path'
 import { getModuleMarker, normalizePath, parseExposeOptions } from '../utils'
 import {
   builderInfo,
@@ -9,9 +9,9 @@ import {
   parsedOptions,
   SHARED
 } from '../public'
-import { AcornNode } from 'rollup'
-import { VitePluginFederationOptions } from 'types'
-import { PluginHooks } from '../../types/pluginHooks'
+import type { AcornNode } from 'rollup'
+import type { VitePluginFederationOptions } from 'types'
+import type { PluginHooks } from '../../types/pluginHooks'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
 
@@ -24,7 +24,7 @@ export function prodExposePlugin(
   for (const item of parsedOptions.prodExpose) {
     const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
     EXTERNALS.push(moduleName)
-    const exposeFilepath = normalizePath(path.resolve(item[1].import))
+    const exposeFilepath = normalizePath(resolve(item[1].import))
     EXPOSES_MAP.set(item[0], exposeFilepath)
     item[1].id = exposeFilepath
     moduleMap += `\n"${item[0]}":()=>{
@@ -114,7 +114,7 @@ export function prodExposePlugin(
         moduleCssFileMap.forEach((value, key) => {
           item.code = item.code.replace(
             `${DYNAMIC_LOADING_CSS_PREFIX}${key}`,
-            `./${path.basename(value)}`
+            `./${basename(value)}`
           )
         })
 
@@ -159,14 +159,14 @@ export function prodExposePlugin(
     const moduleCssFileMap = new Map()
 
     for (const file in bundle) {
-      if (path.extname(file) === '.css') {
+      if (extname(file) === '.css') {
         cssFileMap.set(getOriginalFileName(file), file)
       }
     }
 
     for (const file in bundle) {
       let name = getOriginalFileName(file)
-      if (cssFileMap.get(name) != null && path.extname(file) !== '.css') {
+      if (cssFileMap.get(name) != null && extname(file) !== '.css') {
         moduleCssFileMap.set(bundle[file].facadeModuleId, cssFileMap.get(name))
         continue
       }
@@ -195,7 +195,7 @@ export function prodExposePlugin(
     return moduleCssFileMap
 
     function getOriginalFileName(file: string): string {
-      return path.parse(path.parse(file).name).name
+      return parse(parse(file).name).name
     }
   }
 }

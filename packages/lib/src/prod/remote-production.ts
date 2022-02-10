@@ -1,12 +1,12 @@
-import { RemotesConfig, VitePluginFederationOptions } from 'types'
+import type { RemotesConfig, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { AcornNode, TransformPluginContext } from 'rollup'
+import type { AcornNode, TransformPluginContext } from 'rollup'
 import { getModuleMarker, parseRemoteOptions, removeNonLetter } from '../utils'
 import { builderInfo, parsedOptions } from '../public'
-import * as path from 'path'
-import { PluginHooks } from '../../types/pluginHooks'
-import * as fs from 'fs'
+import { basename, dirname } from 'path'
+import type { PluginHooks } from '../../types/pluginHooks'
+import { readFileSync } from 'fs'
 
 export function prodRemotePlugin(
   options: VitePluginFederationOptions
@@ -114,7 +114,7 @@ export default {
                   sharedInfo[0]
                 )}':{get:()=>__federation_import('./${
                   sharedInfo[1].root ? `${sharedInfo[1].root[0]}/` : ''
-                }${path.basename(
+                }${basename(
                   this.getFileName(sharedInfo[1].emitFile)
                 )}'),import:${sharedInfo[1].import}${
                   sharedInfo[1].requiredVersion
@@ -133,8 +133,8 @@ export default {
           const federationId = (
             await this.resolve('@originjs/vite-plugin-federation')
           )?.id
-          const satisfyId = `${path.dirname(federationId!)}/satisfy.js`
-          return fs.readFileSync(satisfyId, { encoding: 'utf-8' })
+          const satisfyId = `${dirname(federationId!)}/satisfy.js`
+          return readFileSync(satisfyId, { encoding: 'utf-8' })
         }
       }
 
@@ -156,7 +156,7 @@ export default {
           for (const expose of parsedOptions.prodExpose) {
             code = code.replace(
               `\${__federation_expose_${expose[0]}}`,
-              `./${path.basename(this.getFileName(expose[1].emitFile))}`
+              `./${basename(this.getFileName(expose[1].emitFile))}`
             )
           }
           return code
@@ -171,7 +171,7 @@ export default {
             const obj = arr[1]
             let str = ''
             if (typeof obj === 'object') {
-              const fileName = `./${path.basename(
+              const fileName = `./${basename(
                 this.getFileName(obj.emitFile)
               )}`
               str += `metaGet: ()=> metaGet('${fileName}'), get:()=>webpackGet('${fileName}'), loaded:1`

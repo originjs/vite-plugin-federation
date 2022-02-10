@@ -1,4 +1,4 @@
-import { ConfigTypeSet } from 'types'
+import type { ConfigTypeSet } from 'types'
 // for generateBundle Hook replace
 export const EXPOSES_MAP = new Map()
 export const SHARED = 'shared'

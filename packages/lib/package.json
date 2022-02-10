@@ -31,6 +31,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "rollup -c",
+    "dev": "rollup -c --watch",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path ."
   },
   "dependencies": {

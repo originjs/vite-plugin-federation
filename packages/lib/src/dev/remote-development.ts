@@ -1,16 +1,16 @@
-import { UserConfig } from 'vite'
-import {
+import type { UserConfig } from 'vite'
+import type {
   ConfigTypeSet,
   RemotesConfig,
   VitePluginFederationOptions
 } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { AcornNode, TransformPluginContext } from 'rollup'
-import { Hostname, ViteDevServer } from '../../types/viteDevServer'
+import type { AcornNode, TransformPluginContext } from 'rollup'
+import type { Hostname, ViteDevServer } from '../../types/viteDevServer'
 import { getModuleMarker, normalizePath, parseRemoteOptions } from '../utils'
 import { builderInfo, parsedOptions } from '../public'
-import { PluginHooks } from '../../types/pluginHooks'
+import type { PluginHooks } from '../../types/pluginHooks'
 
 export function devRemotePlugin(
   options: VitePluginFederationOptions
