@@ -1,4 +1,4 @@
-import { PluginHooks } from '../../types/pluginHooks'
+import type { PluginHooks } from '../../types/pluginHooks'
 import {
   findDependencies,
   getModuleMarker,
@@ -6,11 +6,11 @@ import {
   parseOptions
 } from '../utils'
 import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
-import { ConfigTypeSet, VitePluginFederationOptions } from 'types'
+import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import * as path from 'path'
-import * as fs from 'fs'
+import { join, sep, resolve, basename } from 'path'
+import { readdirSync, statSync } from 'fs'
 
 const sharedFileReg = /^__federation_shared_.+\.js$/
 const pickSharedNameReg = /(?<=^__federation_shared_).+(?=\.js$)/
@@ -109,10 +109,10 @@ export function prodSharedPlugin(
     async buildStart() {
       // forEach and collect dir
       const collectDirFn = (filePath: string, collect: string[]) => {
-        const files = fs.readdirSync(filePath)
+        const files = readdirSync(filePath)
         files.forEach((name) => {
-          const tempPath = path.join(filePath, name)
-          const isDir = fs.statSync(tempPath).isDirectory()
+          const tempPath = join(filePath, name)
+          const isDir = statSync(tempPath).isDirectory()
           if (isDir) {
             collect.push(tempPath)
             collectDirFn(tempPath, collect)
@@ -122,7 +122,7 @@ export function prodSharedPlugin(
 
       const monoRepos: { arr: string[]; root: string | ConfigTypeSet }[] = []
       const dirPaths: string[] = []
-      const currentDir = path.resolve()
+      const currentDir = resolve()
       for (const arr of parsedOptions.prodShared) {
         try {
           const resolve = await this.resolve(arr[0])
@@ -130,8 +130,8 @@ export function prodSharedPlugin(
         } catch (e) {
           //    try to resolve monoRepo
           arr[1].removed = true
-          const dir = path.join(currentDir, 'node_modules', arr[0])
-          const dirStat = fs.statSync(dir)
+          const dir = join(currentDir, 'node_modules', arr[0])
+          const dirStat = statSync(dir)
           if (dirStat.isDirectory()) {
             collectDirFn(dir, dirPaths)
           } else {
@@ -144,7 +144,7 @@ export function prodSharedPlugin(
         }
 
         if (isHost && !arr[1].version) {
-          const packageJsonPath = `${currentDir}${path.sep}node_modules${path.sep}${arr[0]}${path.sep}package.json`
+          const packageJsonPath = `${currentDir}${sep}node_modules${sep}${arr[0]}${sep}package.json`
           arr[1].version = (await import(packageJsonPath)).version
           if (!arr[1].version) {
             this.error(
@@ -164,7 +164,7 @@ export function prodSharedPlugin(
               const idResolve = await this.resolve(id)
               if (idResolve?.id) {
                 (parsedOptions.prodShared as any[]).push([
-                  `${monoRepo.root[0]}/${path.basename(id)}`,
+                  `${monoRepo.root[0]}/${basename(id)}`,
                   {
                     id: idResolve?.id,
                     import: monoRepo.root[1].import,
@@ -289,7 +289,7 @@ export function prodSharedPlugin(
     },
     renderChunk: function (code, chunk, options) {
       //   process shared chunk
-      const sharedFlag = sharedFileReg.test(path.basename(chunk.fileName))
+      const sharedFlag = sharedFileReg.test(basename(chunk.fileName))
       const facadeModuleId = chunk.facadeModuleId
       const exposesFlag = parsedOptions.prodExpose.some((expose) =>
         isSameFilepath(expose[1].id, facadeModuleId as string)
@@ -300,7 +300,7 @@ export function prodSharedPlugin(
         chunk.type === 'chunk' &&
         (sharedFlag || exposesFlag) &&
         chunk.imports.some((importName) =>
-          sharedFileReg.test(path.basename(importName))
+          sharedFileReg.test(basename(importName))
         )
       if (needSharedImport) {
         const ast = this.parse(code)
@@ -313,10 +313,9 @@ export function prodSharedPlugin(
                 enter(node: any) {
                   if (
                     node.type === 'ImportDeclaration' &&
-                    sharedFileReg.test(path.basename(node.source.value))
+                    sharedFileReg.test(basename(node.source.value))
                   ) {
-                    const sharedName = path
-                      .basename(node.source.value)
+                    const sharedName = basename(node.source.value)
                       .match(pickSharedNameReg)?.[0]
                     if (sharedName) {
                       const declaration: (string | never)[] = []
@@ -381,7 +380,7 @@ export function prodSharedPlugin(
                       const importIndex: any[] = []
                       let removeLast = false
                       chunk.imports.forEach((importName, index) => {
-                        const baseName = path.basename(importName)
+                        const baseName = basename(importName)
                         if (sharedFileReg.test(baseName)) {
                           importIndex.push({
                             index: index,

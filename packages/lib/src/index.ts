@@ -1,10 +1,10 @@
-import { ConfigEnv, Plugin, UserConfig, ViteDevServer } from 'vite'
+import type { ConfigEnv, Plugin, UserConfig, ViteDevServer } from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { prodRemotePlugin } from './prod/remote-production'
-import { VitePluginFederationOptions } from '../types'
+import type { VitePluginFederationOptions } from '../types'
 import { builderInfo, DEFAULT_ENTRY_FILENAME, parsedOptions } from './public'
-import { PluginHooks } from '../types/pluginHooks'
-import { ModuleInfo } from 'rollup'
+import type { PluginHooks } from '../types/pluginHooks'
+import type { ModuleInfo } from 'rollup'
 import { prodSharedPlugin } from './prod/shared-production'
 import { prodExposePlugin } from './prod/expose-production'
 import { devSharedPlugin } from './dev/shared-development'
@@ -22,14 +22,14 @@ export default function federation(
   let virtualMod
   let registerCount = 0
 
-  function registerPlugins(mode: string) {
-    if (mode === 'development') {
+  function registerPlugins(mode: string, command: string) {
+    if (mode === 'development' || command === 'serve') {
       pluginList = [
         devSharedPlugin(options),
         devExposePlugin(options),
         devRemotePlugin(options)
       ]
-    } else if (mode === 'production') {
+    } else if (mode === 'production' || command === 'build') {
       pluginList = [
         prodSharedPlugin(options),
         prodExposePlugin(options),
@@ -65,9 +65,9 @@ export default function federation(
     enforce: 'post',
     // apply:'build',
     options(_options) {
-      // rollup doesnt has options.mode
+      // rollup doesnt has options.mode and options.command
       if (!registerCount++) {
-        registerPlugins((options.mode = options.mode ?? 'production'))
+        registerPlugins((options.mode = options.mode ?? 'production'), '')
       }
 
       if (typeof _options.input === 'string') {
@@ -84,7 +84,7 @@ export default function federation(
     },
     config(config: UserConfig, env: ConfigEnv) {
       options.mode = env.mode
-      registerPlugins(options.mode)
+      registerPlugins(options.mode, env.command)
       registerCount++
       for (const pluginHook of pluginList) {
         pluginHook.config?.call(this, config, env)

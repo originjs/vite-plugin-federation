@@ -1,7 +1,7 @@
-import { PluginHooks } from '../../types/pluginHooks'
+import type { PluginHooks } from '../../types/pluginHooks'
 import { parseSharedOptions } from '../utils'
 import { parsedOptions } from '../public'
-import { VitePluginFederationOptions } from 'types'
+import type { VitePluginFederationOptions } from 'types'
 
 export function devSharedPlugin(
   options: VitePluginFederationOptions
