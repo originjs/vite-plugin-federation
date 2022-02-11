@@ -120,7 +120,9 @@ export default {
       }
       state.showMenu = !noMenu.includes(to.path)
       state.currentPath = to.path
-      document.title = api.pathMap[to.name]
+      if(to.name && api.pathMap[to.name]) {
+        document.title = api.pathMap[to.name]
+      }
     })
 
     onUnmounted(() => {
