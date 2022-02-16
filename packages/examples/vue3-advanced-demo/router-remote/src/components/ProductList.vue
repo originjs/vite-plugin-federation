@@ -48,3 +48,8 @@ export default {
   // }
 }
 </script>
+<style scoped>
+.el-button {
+  color: red;
+}
+</style>

@@ -8,7 +8,9 @@
     "build": "vite build",
     "clean": "rm -rf dist",
     "stop": "kill-port --port 5005",
-    "restart": "yarn stop & yarn  build & yarn serve"
+    "restart": "yarn stop & yarn  build & yarn serve",
+    "staging": "vite build --mode=staging",
+    "pro": "vite build --mode=pro"
   },
   "dependencies": {
     "echarts": "^5.2.1",
@@ -21,7 +23,9 @@
     "@rollup/plugin-replace": "^3.0.0",
     "@vitejs/plugin-vue": "^1.3.0",
     "@vue/compiler-sfc": "^3.2.0",
+    "rollup-plugin-copy": "^3.4.0",
     "unplugin-element-plus": "0.1.0",
-    "vite": "^2.5.0"
+    "vite": "^2.5.0",
+    "vite-plugin-html": "^3.0.6"
   }
 }
