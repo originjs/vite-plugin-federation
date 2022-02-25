@@ -2,7 +2,7 @@
  * The following code is adapted from https://github.com/webpack/webpack/types.d.ts
  * MIT License https://github.com/webpack/webpack/LICENSE
  */
-import { RenderedChunk } from 'rollup'
+import {RenderedChunk} from 'rollup'
 
 export default function federation(options: VitePluginFederationOptions): Plugin
 
@@ -20,7 +20,7 @@ declare interface VitePluginFederationOptions {
   /**
    * Options for library.
    */
-  library?: LibraryOptions
+  // library?: LibraryOptions
 
   /**
    * The name of the container.
@@ -221,7 +221,12 @@ declare interface RemotesConfig {
   /**
    * the remote format
    */
-  format?: 'esm' | 'systemjs' | 'var'
+  format?: 'esm' | 'systemjs' | 'var',
+
+  /**
+   * from
+   */
+  from?: 'vite' | 'webpack'
 }
 
 /**

@@ -64,12 +64,12 @@ export function prodSharedPlugin(
             const semver= await import('__federation_lib_semver');
             const fn = semver.satisfy;
             if (fn(versionKey, moduleMap[name].requiredVersion)) {
-               module = await versionValue.metaGet();
+               module = (await versionValue.get())();
             } else {
               console.log(\`provider support \${name}(\${versionKey}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})\`)
             }
           } else {
-            module = await versionValue.metaGet();
+            module = (await versionValue.get())();
           }
         }
         if(module){
@@ -81,7 +81,7 @@ export function prodSharedPlugin(
       }
       async function getConsumerSharedModule(name , shareScope) {
         if (moduleMap[name]?.import) {
-          const module = await moduleMap[name].get()
+          const module = (await moduleMap[name].get())()
           moduleCache[name] = module;
           return module;
         } else {

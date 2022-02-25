@@ -76,12 +76,14 @@ export function parseRemoteOptions(
     (item) => ({
       external: Array.isArray(item) ? item : [item],
       shareScope: options.shareScope || 'default',
-      format: 'esm'
+      format: 'esm',
+      from:'vite'
     }),
     (item) => ({
       external: Array.isArray(item.external) ? item.external : [item.external],
       shareScope: item.shareScope || options.shareScope || 'default',
-      format: item.format || 'esm'
+      format: item.format || 'esm',
+      from:item.from ?? 'vite'
     })
   )
 }
