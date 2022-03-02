@@ -29,7 +29,7 @@ export function prodExposePlugin(
     item[1].id = exposeFilepath
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
-      return __federation_import('\${__federation_expose_${item[0]}}').then(module=>()=>module)
+      return __federation_import('\${__federation_expose_${item[0]}}').then(module=>()=>module?.default??module)
     },`
   }
 

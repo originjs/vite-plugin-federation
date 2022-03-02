@@ -109,9 +109,17 @@ vue2 为例
 ## 配置项说明
 ### exposes
 #### `name：string`
+
+<br>
+
 作为远程模块的模块名称，必填。
 
+****
+
 #### `filename：string`
+
+<br>
+
 作为远程模块的入口文件，非必填，默认为`remoteEntry.js`
 
 作为远程模块，对外暴露的组件列表，远程模块必填。
@@ -123,10 +131,15 @@ vue2 为例
   }
   ```
 
+
+
 ### remotes
+
 作为本地模块，引用的远端模块入口文件
-> 配置信息
+
 #### `external:string`
+
+<br>
 
 远程模块地址，例如：https://localhost:5011/remoteEntry.js
 你可以简单地进行如下配置
@@ -141,41 +154,69 @@ vue2 为例
 remotes: {
     remote-simple: {
         external: 'http://localhost:5011/remoteEntry.js',
-        format: 'var'
+        format: 'var',
+        from: 'webpack'
     }
 }
 ```
 
 ***
-#### `format:'esm'|'systemjs'|'var'`
+#### `format` : `'esm'|'systemjs'|'var'`
 
 `default:'esm'`
 <br>
-指定远程组件的格式，当主机和远程端使用不同的打包格式时，这样做更有效，例如主机使用vite+esm，远程使用webpack+var，这时需要指定`type:'var'`，,不过，请注意不是所有的格式都被支持，现在支持的格式如下
+指定远程组件的格式，当主机和远程端使用不同的打包格式时，这样做更有效，例如主机使用 `vite` + `esm`，远程使用 `webpack` + `var`，这时需要指定`type:'var'`
 
-| host                     | remote                   |
-| ------------------------ | ------------------------ |
-| `rollup/vite`+`esm`      | `rollup/vite`+`esm`      |
-| `rollup/vite`+`systemjs` | `rollup/vite`+`systemjs` |
-| `rollup/vite`+`systemjs` | `webpack`+`systemjs`     |
-| `rollup/vite`+`esm`      | `webpack`+`var`          |
+***
+
+#### `from` : `'vite'|'webpack'`
+
+`default : 'vite'`
+
+<br>
+
+指定远程组件的来源，来源于 `vite-plugin-federation` 选择 `vite`，来源于 `webpack` 选择 `webpack`
+
+
 
 ### shared
+
 本地模块和远程模块共享的依赖。本地模块需配置所有使用到的远端模块的依赖；远端模块需要配置对外提供的组件的依赖。
-> 配置信息
->
-> ####  `import: boolean`
+
+<br>
+
+####  `import: boolean`
+
+<br>
 
 默认为 `true` ，是否加入shared共享该模块，仅对 `remote` 端生效，`remote` 开启该配置后，会减少部分打包时间，因为不需要打包部分` shared`，但是一旦 `host` 端没有可用的 `shared` 模块，会直接报错，因为没有可用的回退模块
+
+****
+
 #### `shareScope: string`
 
+<br>
+
 默认为 `defualt`，共享域名称，保持 `remote` 和 `host` 端一致即可
+
+****
+
 #### `version: string`
 
+<br>
+
 仅对 `host` 端生效，提供的share模块的版本，默认为share包中的 `package.json` 文件的 `version` ，只有当以此法无法获取 `version` 时才需要手动配置
+
+****
+
 ####  `requiredVersion: string`
 
+<br>
+
 仅对 `remote` 端生效，规定所使用的 `host shared` 所需要的版本，当 `host` 端的版本不符合 `requiredVersion` 要求时，会使用自己的 `shared` 模块，前提是自己没有配置 `import=false` ，默认不启用该功能
+
+
+
 ## 例子
 + [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
 + [simple-react](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react)
@@ -205,9 +246,19 @@ Github CI 构建，非工程必备：
 
 ## 与 `Webpack` 集成
 
-当前的插件已经支持在`vite/rollup`项目中使用 `webpack-federation` 暴露出来的组件，你可以参考 `examples` 下的 `simple-react-webpack` 和 `vue3-demo-webpack` 来参考如何配置，建议尽量不要在 `webpack` 侧配置 `singleton=true` ，这在某些情况下会导致 `shared` 功能失效。<br>
-而且使用这个功能的前提是输出格式必须为`Systemjs`，因为 `webpack5` 当前还不支持`ESM` 的输出格式（可以开启实验特性支持，但是该功能当前不稳定）<br> 
-webpack5 ESM 输出功能稳定后，我们将会提供支持
+现在可以不受 `vite` 和 `webpack` 的限制而使用 `federation` 了，也就是说，你可以选择在 `webpack` 中使用 `vit-plugin-federation` 的组件，也可以选择在 `vite` 中使用 `webpack-module-federation` 的组件，但需要注意 `remotes` 中的配置，对于不同的框架，你需要指定 `remotes.from` 和 `remotes.format` ，使它们更好地工作，当前支持的格式搭配如下：
+
+| host                     | remote                   | demo                                                                                                                                  |
+| ------------------------ | ------------------------ |---------------------------------------------------------------------------------------------------------------------------------------|
+| `rollup/vite`+`esm`      | `rollup/vite`+`esm`      | [simple-react-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)                   |
+| `rollup/vite`+`systemjs` | `rollup/vite`+`systemjs` | [vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)                         |
+| `rollup/vite`+`systemjs` | `webpack`+`systemjs`     | [vue3-demo-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-systemjs)               |
+| `rollup/vite`+`esm`      | `webpack`+`var`          | [vue3-demo-webpack-esm-var](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-var) |
+| `rollup/vite`+`esm`      | `webpack`+`esm`          | [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm) |
+
+⚠️：`vite` 使用 `webpack` 组件相对容易，但是 `webpack` 使用 `vite` 组件时 `vite-plugin-federation` 组件最好是 `esm` 格式，因为其他格式暂时缺少测试用例完成测试
+
+
 
 ### FAQ
 
