@@ -106,9 +106,17 @@ Vue2, for example
 
 ### exposes
 #### `name: string`
+
+<br>
+
 Required as the module name of the remote module.
 
+****
+
 #### `filename:string`
+
+<br>
+
 As the entry file of the remote module, not required, default is `remoteEntry.js`
 
 As the remote module, the list of components exposed to the public, required for the remote module.
@@ -120,9 +128,12 @@ exposes: {
 },
 ```
 ### remotes
+
 The remote module entry file referenced as a local module
 > configuration information
-#### `external:string` 
+#### `external:string`
+
+<br>
 
 remote module address, e.g. https://localhost:5011/remoteEntry.js
 You can simply configure it as follows
@@ -143,19 +154,20 @@ remotes: {
 }
 ```
 ***
-#### `format:'esm'|'systemjs'|'var'`  
+#### `format:'esm'|'systemjs'|'var'`
+
 `default:'esm'`
 <br>
-Specify the format of the remote component, this is more effective when different packaging formats are used on the host and remote side, for example host uses vite+esm and remote uses webpack+var, this is required to specify `type:'var'`, the default value is `'esm'`,However, please note that not all formats are supported by each other, and the following are now supported
+Specify the format of the remote component, this is more effective when the host and the remote use different packaging formats, for example the host uses vite + esm and the remote uses webpack + var, in which case you need to specify `type` : `'var'`
 
-| host                     | remote                   |
-| ------------------------ | ------------------------ |
-| `rollup/vite`+`esm`      | `rollup/vite`+`esm`      |
-| `rollup/vite`+`systemjs` | `rollup/vite`+`systemjs` |
-| `rollup/vite`+`systemjs` | `webpack`+`systemjs`     |
-| `rollup/vite`+`esm`      | `webpack`+`var`          |
+****
 
+#### `from` : `'vite'|'webpack'`
 
+`default : vite`
+<br>
+
+Specify the source of the remote component, from `vite-plugin-federation` select `vite`, from `webpack` select `webpack`
 
 ### shared
 
@@ -163,14 +175,31 @@ Dependencies shared by local and remote modules. Local modules need to configure
 > configuration information
 #### `import: boolean`
 
+<br>
+
 The default is `true`, whether to add shared to the module, only for the `remote` side, `remote` will reduce some of the packaging time when this configuration is turned on, because there is no need to package some of the `shared`, but once there is no `shared` module available on the `host` side, it will report an error directly, because there is no fallback module available
+
+****
+
 #### `shareScope: string`
 
+<br>
+
 Default is `defualt`, the shared domain name, just keep the `remote` and `host` sides the same
+
+****
+
 #### `version: string`
 
+<br>
+
 Only works on `host` side, the version of the shared module provided is `version` of the `package.json` file in the shared package by default, you need to configure it manually only if you can't get `version` by this method
+
+****
+
 #### `requiredVersion: string`
+
+<br>
 
 Only for the `remote` side, it specifies the required version of the `host shared` used, when the version of the `host` side does not meet the `requiredVersion` requirement, it will use its own `shared` module, provided that it is not configured with `import=false`, which is not enabled by default
 ## Examples
@@ -204,9 +233,21 @@ Since Vite is esbuild-based in development mode, we provide separate support for
 
 ## Integration with webpack
 
-The current plug-in already supports the use of the components exposed by `webpack-federation` in the `vite/rollup` project. You can refer to `simple-react-webpack` and `vue3-demo-webpack` under `examples` for reference Configuration, it is recommended not to configure `singleton=true` on the `webpack` side as much as possible, this will cause the `shared` function to fail in some cases.<br>
-And the premise of using this function is that the output format must be `Systemjs`, because `webpack5` currently does not support the output format of `ESM` (experimental feature support can be turned on, but this function is currently unstable) <br>
-We will provide support for webpack5 ESM output once it is stable
+Now you can use `federation` without the restrictions of `vite` and `webpack`, that is, you can choose to use the `vit-plugin-federation` component in `webpack` or the `webpack-module- federation` in `vite`, but you need to pay attention to the configuration in `remotes`, for different frameworks you need to specify `remotes.from` and `remotes.format` to make them work better, the currently supported format pairings are as follows.
+
+| host                     | remote                   | demo                                                                                                                                  |
+| ------------------------ | ------------------------ |---------------------------------------------------------------------------------------------------------------------------------------|
+| `rollup/vite`+`esm`      | `rollup/vite`+`esm`      | [simple-react-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)                   |
+| `rollup/vite`+`systemjs` | `rollup/vite`+`systemjs` | [vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)                         |
+| `rollup/vite`+`systemjs` | `webpack`+`systemjs`     | [vue3-demo-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-systemjs)               |
+| `rollup/vite`+`esm`      | `webpack`+`var`          | [vue3-demo-webpack-esm-var](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-var) |
+| `rollup/vite`+`esm`      | `webpack`+`esm`          | [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm) |
+
+⚠️: `vite` is relatively easy to use with `webpack` components, but `vite-plugin-federation` components are better in `esm` format when `webpack` uses `vite` components, because other formats temporarily lack test cases to complete the test
+
+
+
+
 
 ### FAQ
 
@@ -238,7 +279,7 @@ federation({
 
 
 
-####The remote module failed to load the share of the local module, for example`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
+#### The remote module failed to load the share of the local module, for example`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
 
 Reason: Vite has auto fetch logic for `IP` and Port when starting the service, no full fetch logic has been found in the `Plugin`, and in some cases a fetch failure may occur.
 
