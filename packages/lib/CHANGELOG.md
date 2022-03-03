@@ -1,3 +1,19 @@
+## [1.1.1](https://github.com/originjs/vite-plugin-federation/compare/v1.1.0...v1.1.1) (2022-03-03)
+
+
+### Bug Fixes
+
+* dev mode error ([47d76c7](https://github.com/originjs/vite-plugin-federation/commit/47d76c730e8abf4f834c8b66889c5421463c0e47))
+
+
+### Features
+
+* add `registerPlugins` support command & chore ts ([c374843](https://github.com/originjs/vite-plugin-federation/commit/c37484382127ea51d690291ab439648b52179082))
+* shared supports monoRepo ([c629a09](https://github.com/originjs/vite-plugin-federation/commit/c629a0972222d59ab878cf72b3398d6ed9853df7))
+* support webpack using vite component([7f7ceacf](https://github.com/originjs/vite-plugin-federation/commit/7f7ceacf2baa808677f6e1a0d3b390b12dba0b37))
+
+
+
 # [1.1.0](https://github.com/originjs/vite-plugin-federation/compare/v1.0.8...v1.1.0) (2021-12-13)
 
 
