@@ -49,7 +49,7 @@ const loadJS = (url, fn) => {
 const scriptTypes = ['var'];
 const importTypes = ['esm', 'systemjs']
 function get(name){
-  return import(name).then(module => ()=>module?.default ?? module)
+  return import(/* @vite-ignore */ name).then(module => ()=>module?.default ?? module)
 }
 const shareScope = {
   ${getModuleMarker('shareScope')}
@@ -226,7 +226,7 @@ export {__federation_method_ensure, __federation_method_getRemote};`
         let str = ''
         if (typeof obj === 'object') {
           const url = `'${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?v=${viteVersion}'`
-          str += `get:()=> ()=> get(${url})`
+          str += `get:()=> get(${url})`
           res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
       })
