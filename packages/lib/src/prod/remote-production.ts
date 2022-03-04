@@ -87,18 +87,24 @@ async function __federation_method_ensure(remoteId) {
   }
 }
 
-function __federation_method_getRemote (remoteName, componentName){
-  return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory())).then(module => {
-    if (!module?.default && remotesMap[remoteName].from==='vite') {
-      let obj = Object.create(null);
-      obj.default = module;
-      obj.__esModule = true;
-      return obj;
-    }
-    return module;
-  })
+function __federation_method_unwrapDefault(module) {
+  return module?.__esModule ? module['default'] : module
 }
-export {__federation_method_ensure, __federation_method_getRemote}
+
+function __federation_method_wrapDefault(module ,need){
+  if (!module?.default && need) {
+    let obj = Object.create(null);
+    obj.default = module;
+    obj.__esModule = true;
+    return obj;
+  }
+  return module; 
+}
+
+function __federation_method_getRemote(remoteName,  componentName){
+  return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
+}
+export {__federation_method_ensure, __federation_method_getRemote , __federation_method_unwrapDefault , __federation_method_wrapDefault}
 `
     },
 
@@ -206,20 +212,80 @@ export {__federation_method_ensure, __federation_method_getRemote}
         let requiresRuntime = false
         walk(ast, {
           enter(node: any) {
-            if (node.type === 'ImportExpression') {
-              if (node.source && node.source.value) {
-                const moduleId = node.source.value
-                const remote = remotes.find((r) => r.regexp.test(moduleId))
-                if (remote) {
-                  requiresRuntime = true
-                  const modName = `.${moduleId.slice(remote.id.length)}`
-                  magicString.overwrite(
-                    node.start,
-                    node.end,
-                    `__federation_method_getRemote(${JSON.stringify(
-                      remote.id
-                    )} , ${JSON.stringify(modName)})`
-                  )
+            if (
+              (node.type === 'ImportExpression' ||
+                node.type === 'ImportDeclaration') &&
+              node.source?.value?.indexOf('/') > -1
+            ) {
+              const moduleId = node.source.value
+              const remote = remotes.find((r) => r.regexp.test(moduleId))
+              const needWrap = remote?.config.from === 'vite'
+              if (remote) {
+                requiresRuntime = true
+                const modName = `.${moduleId.slice(remote.id.length)}`
+                switch (node.type) {
+                  case 'ImportExpression': {
+                    magicString.overwrite(
+                      node.start,
+                      node.end,
+                      `__federation_method_getRemote(${JSON.stringify(
+                        remote.id
+                      )} , ${JSON.stringify(
+                        modName
+                      )}).then(module=>__federation_method_wrapDefault(module, ${needWrap}))`
+                    )
+                    break
+                  }
+                  case 'ImportDeclaration': {
+                    if (node.specifiers?.length) {
+                      const afterImportName = `__federation_var_${moduleId.replace(
+                        /[@/\\.-]/g,
+                        ''
+                      )}`
+                      magicString.overwrite(
+                        node.start,
+                        node.end,
+                        `const ${afterImportName} = await __federation_method_getRemote(${JSON.stringify(
+                          remote.id
+                        )} , ${JSON.stringify(modName)});`
+                      )
+                      let deconstructStr = ''
+                      node.specifiers.forEach((spec) => {
+                        // default import , like import a from 'lib'
+                        if (spec.type === 'ImportDefaultSpecifier') {
+                          magicString.appendRight(
+                            node.end,
+                            `\n let ${spec.local.name} = __federation_method_unwrapDefault(${afterImportName}) `
+                          )
+                        } else if (spec.type === 'ImportSpecifier') {
+                          //  like import {a as b} from 'lib'
+                          const importedName = spec.imported.name
+                          const localName = spec.local.name
+                          deconstructStr += `${
+                            importedName === localName
+                              ? localName
+                              : `${importedName} : ${localName}`
+                          },`
+                        } else if (spec.type === 'ImportNamespaceSpecifier') {
+                          //  like import * as a from 'lib'
+                          magicString.appendRight(
+                            node.end,
+                            `let {${spec.local.name}} = ${afterImportName}`
+                          )
+                        }
+                      })
+                      if (deconstructStr.length > 0) {
+                        magicString.appendRight(
+                          node.end,
+                          `\n let {${deconstructStr.slice(
+                            0,
+                            -1
+                          )}} = ${afterImportName}`
+                        )
+                      }
+                    }
+                    break;
+                  }
                 }
               }
             }
@@ -228,7 +294,7 @@ export {__federation_method_ensure, __federation_method_getRemote}
 
         if (requiresRuntime) {
           magicString.prepend(
-            `import {__federation_method_ensure , __federation_method_getRemote} from '__federation__';\n\n`
+            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
           )
         }
 
