@@ -260,6 +260,51 @@ Github CI 构建，非工程必备：
 
 
 
+## 静态导入
+
+现阶段已经支持静态导入，下面展示两种方式的区别，你可以在`examples`中的每个项目看到动态导入和静态导入的例子，下面是一个简单的示例：
+
++ Vue
+
+``` javascript
+// dynamic import
+const myButton = defineAsyncComponent(() => import('remote/myButton));
+app.component('my-button' , myButton);
+// or
+export default {
+  name: 'App',
+  components: {
+    myButton: () => import('remote/Button.vue'),
+  }
+}
+
+
+// static import
+import myButton from 'remote/myButton';
+app.component('my-button' , myButton);
+// or
+export default {
+  name: 'App',
+  components: {
+    myButton: myButton
+  }
+
+```
+
+
+
++ React
+
+``` js
+// dynamic import
+const myButton = React.lazy(() => import('remote/myButton'))
+
+// static import
+import myButton from 'remote/myButton'
+```
+
+
+
 ### FAQ
 
 #### 远程模块的某个组件无法正常显示，控制台显示“[Vue warn]: Invalid VNode type: Symbol() (symbol)”
