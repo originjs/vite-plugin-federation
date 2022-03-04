@@ -2,7 +2,7 @@ import { createApp, defineAsyncComponent } from "vue";
 import store from './store';
 import Layout from "./Layout.vue";
 
-const HomeContent = defineAsyncComponent(() => import("home/Content"));
+import HomeContent from "home/Content";
 const HomeButton = defineAsyncComponent(() => import("home/Button"));
 const app = createApp(Layout);
 

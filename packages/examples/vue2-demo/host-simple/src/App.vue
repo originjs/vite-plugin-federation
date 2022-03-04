@@ -11,14 +11,15 @@
 
 <script>
 import Section from './components/Section.vue'
-
+import RButton from 'remote-simple/remote-simple-button';
+import RSection from 'remote-simple/remote-simple-section'
 export default {
   name: 'App',
   components: {
     Section,
     Button: () => import('./components/Button.vue'),
-    RemoteButton: () => import('remote-simple/remote-simple-button'),
-    RemoteSection: () => import('remote-simple/remote-simple-section'),
+    RemoteButton: RButton,
+    RemoteSection: RSection
   }
 }
 </script>
