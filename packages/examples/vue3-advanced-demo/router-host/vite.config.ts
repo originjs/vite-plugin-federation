@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
                 name: "router-host",
                 filename: "remoteEntry.js",
                 remotes: {
-                    "router-remote": "http://localhost:5105/assets/remoteEntry.js",
+                    "router-remote": "http://localhost:5005/assets/remoteEntry.js",
                 },
                 shared: ["vue", "vue-router", "element-plus", "vuex"]
             }),

@@ -1,15 +1,13 @@
-import { createApp, defineAsyncComponent } from "vue";
+import { createApp} from "vue";
 import store from './store';
 import Layout from "./Layout.vue";
 
-const HomeContent = defineAsyncComponent(() => import("home/Content"));
-const HomeButton = defineAsyncComponent(() => import("home/Button"));
-const HomeImages = defineAsyncComponent(() => import("home/Images"));
-
-const CommonLibCounter = defineAsyncComponent(() => import("common-lib/CommonCounter"));
-const CommonLibHeader = defineAsyncComponent(() => import("common-lib/CommonHeader"));
-
-const CssModuleButton = defineAsyncComponent(() => import("css-modules/Button"));
+import HomeContent from "home/Content";
+import HomeButton from "home/Button";
+import HomeImages from  "home/Images";
+import CommonLibCounter from  "common-lib/CommonCounter";
+import CommonLibHeader from "common-lib/CommonHeader";
+import CssModuleButton from "css-modules/Button";
 
 
 const app = createApp(Layout);
@@ -21,7 +19,6 @@ app.component("home-button", HomeButton);
 app.component("home-images", HomeImages);
 
 app.component("css-modules-button", CssModuleButton);
-
 app.component("common-lib-element", CommonLibHeader);
 app.component("common-lib-counter", CommonLibCounter);
 

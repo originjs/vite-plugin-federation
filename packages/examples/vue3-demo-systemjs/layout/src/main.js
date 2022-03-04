@@ -2,9 +2,9 @@ import { createApp, defineAsyncComponent } from "vue";
 import store from './store';
 import Layout from "./Layout.vue";
 
-const HomeContent = defineAsyncComponent(() => import("home/Content"));
-const HomeButton = defineAsyncComponent(() => import("home/Button"));
-const HomeImages = defineAsyncComponent(() => import("home/Images"));
+import HomeContent from "home/Content";
+import HomeButton  from "home/Button";
+import HomeImages from "home/Images";
 
 const CommonLibCounter = defineAsyncComponent(() => import("common-lib/CommonCounter"));
 const CommonLibHeader = defineAsyncComponent(() => import("common-lib/CommonHeader"));

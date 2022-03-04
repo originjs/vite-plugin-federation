@@ -67,8 +67,8 @@ import {ElAside, ElContainer, ElMenu, ElMenuItem, ElMenuItemGroup, ElSubMenu} fr
 import ElSubMenuSystemManagement from './components/ElSubMenuSystemManagement.vue'
 import * as api from "./utils/hostUtils.js"
 
-const RouterRemoteElSubMenuDashboard = defineAsyncComponent(() => import("router-remote/ElSubMenuDashboard"));
-const RouterRemoteFooter = defineAsyncComponent(() => import("router-remote/Footer"));
+import RouterRemoteElSubMenuDashboard from "router-remote/ElSubMenuDashboard";
+import RouterRemoteFooter from "router-remote/Footer";
 // import RouterHostHeader from './components/Header.vue'
 const RouterRemoteHeader = defineAsyncComponent(() => import("router-remote/Header"));
 const RouterRemoteLogin = defineAsyncComponent(() => import("router-remote/Login"));
