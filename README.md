@@ -245,6 +245,51 @@ Now you can use `federation` without the restrictions of `vite` and `webpack`, t
 
 ⚠️: `vite` is relatively easy to use with `webpack` components, but `vite-plugin-federation` components are better in `esm` format when `webpack` uses `vite` components, because other formats temporarily lack test cases to complete the test
 
+## Static Import
+
+Static import is supported at this stage. The following shows the difference between the two methods. You can see `examples` of dynamic import and static import in each project in examples, and here is a simple example.
+
++ Vue
+
+``` javascript
+// dynamic import
+const myButton = defineAsyncComponent(() => import('remote/myButton));
+app.component('my-button' , myButton);
+// or
+export default {
+  name: 'App',
+  components: {
+    myButton: () => import('remote/Button.vue'),
+  }
+}
+
+
+// static import
+import myButton from 'remote/myButton';
+app.component('my-button' , myButton);
+// or
+export default {
+  name: 'App',
+  components: {
+    myButton: myButton
+  }
+
+```
+
+
+
++ React
+
+``` js
+// dynamic import
+const myButton = React.lazy(() => import('remote/myButton'))
+
+// static import
+import myButton from 'remote/myButton'
+```
+
+
+
 
 
 
