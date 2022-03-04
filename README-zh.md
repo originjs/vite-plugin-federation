@@ -274,7 +274,7 @@ app.component('my-button' , myButton);
 export default {
   name: 'App',
   components: {
-    myButton: () => import('remote/Button.vue'),
+    myButton: () => import('remote/myButton'),
   }
 }
 
