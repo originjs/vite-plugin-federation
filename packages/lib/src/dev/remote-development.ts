@@ -49,7 +49,7 @@ const loadJS = (url, fn) => {
 const scriptTypes = ['var'];
 const importTypes = ['esm', 'systemjs']
 function get(name){
-  return import(/* @vite-ignore */ name).then(module => ()=>module?.default ?? module)
+  return import(/* @vite-ignore */ name).then(module => ()=>module)
 }
 const shareScope = {
   ${getModuleMarker('shareScope')}
