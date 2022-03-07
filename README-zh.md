@@ -245,6 +245,7 @@ Github CI 构建，非工程必备：
 因为 Vite 在 development 模式下是基于 esbuild，所以我们单独提供了对 development 模式的支持，可以在远程模块部署的情况下，利用 Vite 的高性能开发能力。但是需要注意只有Host支持dev模式，Remote暂时只支持build模式
 
 ## 与 `Webpack` 集成
+⚠️：`React` 项目中请不要使用异构组件（例如 `vite` 使用 `webpack` 的组件或者反之），因为现在还无法保证 `vite/rollup` 和 `webpack` 在打包 `commonjs` 框架时转换出 `export` 一致的 `chunk`，这是使用 `shared` 的先决条件
 
 现在可以不受 `vite` 和 `webpack` 的限制而使用 `federation` 了，也就是说，你可以选择在 `webpack` 中使用 `vit-plugin-federation` 的组件，也可以选择在 `vite` 中使用 `webpack-module-federation` 的组件，但需要注意 `remotes` 中的配置，对于不同的框架，你需要指定 `remotes.from` 和 `remotes.format` ，使它们更好地工作，当前支持的格式搭配如下：
 
