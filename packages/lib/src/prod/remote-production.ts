@@ -43,7 +43,7 @@ const loadJS = (url, fn) => {
 const scriptTypes = ['var'];
 const importTypes = ['esm', 'systemjs']
 function get(name){
-  return __federation_import(name).then(module => ()=>module?.default ?? module)
+  return __federation_import(name).then(module => ()=>module)
 }
 const shareScope = {
   ${getModuleMarker('shareScope')}
