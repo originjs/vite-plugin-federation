@@ -7,12 +7,12 @@
     "router-remote"
   ],
   "scripts": {
-    "start": "lerna run start",
-    "build": "lerna run build --loglevel=error",
-    "serve": "lerna run serve --parallel --loglevel=silent",
-    "restart": "lerna run stop & lerna run build & lerna run serve --parallel --loglevel=silent & ",
+    "start": "pnpm run start",
+    "build": "pnpm run build --parallel --filter ./",
+    "serve": "pnpm run serve --parallel --filter ./",
+    "restart": "pnpm run stop & lerna run build & lerna run serve --parallel --loglevel=silent & ",
     "stop": "kill-port --port 5004,5005",
-    "clean": "lerna run clean"
+    "clean": "pnpm run clean"
   },
   "devDependencies": {
     "@originjs/vite-plugin-federation": "link:../../lib",

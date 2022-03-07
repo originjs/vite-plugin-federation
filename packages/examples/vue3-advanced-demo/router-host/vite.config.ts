@@ -1,9 +1,9 @@
-import { defineConfig, loadEnv } from "vite";
+import {defineConfig, loadEnv} from "vite";
 import vue from "@vitejs/plugin-vue";
 import federation from "@originjs/vite-plugin-federation";
-import { createHtmlPlugin } from 'vite-plugin-html'
+import {createHtmlPlugin} from 'vite-plugin-html'
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({mode}) => {
     const root = process.cwd()
 
     const env = loadEnv(mode, root)
@@ -14,7 +14,11 @@ export default defineConfig(({ mode }) => {
                 name: "router-host",
                 filename: "remoteEntry.js",
                 remotes: {
-                    "router-remote": "http://localhost:5005/assets/remoteEntry.js",
+                    "router-remote": {
+                        external: "http://localhost:5005/assets/remoteEntry.js",
+                        format: 'esm',
+                        from: 'vite'
+                    },
                 },
                 shared: ["vue", "vue-router", "element-plus", "vuex"]
             }),
