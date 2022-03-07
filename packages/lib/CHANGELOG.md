@@ -1,3 +1,17 @@
+## [1.1.2](https://github.com/originjs/vite-plugin-federation/compare/v1.1.1...v1.1.2) (2022-03-07)
+
+
+### Bug Fixes
+
+* fix the default import for esm ([6085594](https://github.com/originjs/vite-plugin-federation/commit/6085594cead17943f4d8f8c8af47a1f67db22ed1))
+
+
+### Features
+
+* support static import ([f882f22](https://github.com/originjs/vite-plugin-federation/commit/f882f222bdd20b84a6ee23e8c7c56350558a7e59))
+
+
+
 ## [1.1.1](https://github.com/originjs/vite-plugin-federation/compare/v1.1.0...v1.1.1) (2022-03-03)
 
 
