@@ -233,6 +233,8 @@ Since Vite is esbuild-based in development mode, we provide separate support for
 
 ## Integration with webpack
 
+⚠️: Please don't use heterogeneous components in `React` projects (e.g. `vite` using `webpack` components or vice versa), because there is no guarantee that `vite/rollup` and `webpack` will convert `export` consistent `chunk` when packaging the `commonjs` framework, which is a prerequisite for using ` shared` is a prerequisite for using
+
 Now you can use `federation` without the restrictions of `vite` and `webpack`, that is, you can choose to use the `vit-plugin-federation` component in `webpack` or the `webpack-module- federation` in `vite`, but you need to pay attention to the configuration in `remotes`, for different frameworks you need to specify `remotes.from` and `remotes.format` to make them work better, the currently supported format pairings are as follows.
 
 | host                     | remote                   | demo                                                                                                                                  |
