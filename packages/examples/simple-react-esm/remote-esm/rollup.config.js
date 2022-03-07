@@ -27,7 +27,6 @@ export default {
       shared: [
         {
           react: {
-            requiredVersion: '^1.0.0',
           },
           'react-dom': {
             requiredVersion: pkg.dependencies['react-dom'],

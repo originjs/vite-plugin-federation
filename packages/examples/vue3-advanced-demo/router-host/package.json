@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite --port 5104 --strictPort",
+    "dev": "vite --port 5004 --strictPort",
     "serve": "vite preview --port 5004 --strictPort",
     "build": "vite build",
     "clean": "rm -rf dist",
