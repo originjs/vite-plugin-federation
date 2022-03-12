@@ -204,8 +204,8 @@ Only works on `host` side, the version of the shared module provided is `version
 Only for the `remote` side, it specifies the required version of the `host shared` used, when the version of the `host` side does not meet the `requiredVersion` requirement, it will use its own `shared` module, provided that it is not configured with `import=false`, which is not enabled by default
 ## Examples
 + [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
-+ [simple-react-esm](https://github.com/ChelesteWang/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)
-+ [vue3-demo-esm](https://github.com/ChelesteWang/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)
++ [simple-react-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)
++ [vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)
 + [vue2-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue2-demo)
 + [vue3-advanced-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-advanced-demo)
 
