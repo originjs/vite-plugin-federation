@@ -219,9 +219,11 @@ remotes: {
 
 ## 例子
 + [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
-+ [simple-react](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react)
-+ [vue3-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo)
++ [simple-react-esm](https://github.com/ChelesteWang/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)
++ [vue3-demo-esm](https://github.com/ChelesteWang/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)
 + [vue2-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue2-demo)
++ [vue3-advanced-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-advanced-demo)
+
 
 
 ## 构建
