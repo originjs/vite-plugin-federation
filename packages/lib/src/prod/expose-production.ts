@@ -9,11 +9,12 @@ import {
   parsedOptions,
   SHARED
 } from '../public'
-import type { AcornNode } from 'rollup'
+import type { AcornNode, OutputAsset, OutputChunk } from 'rollup'
 import type { VitePluginFederationOptions } from 'types'
 import type { PluginHooks } from '../../types/pluginHooks'
 import MagicString from 'magic-string'
 import { walk } from 'estree-walker'
+import type { ResolvedConfig } from 'vite'
 
 export function prodExposePlugin(
   options: VitePluginFederationOptions
@@ -35,21 +36,30 @@ export function prodExposePlugin(
 
   let remoteEntryChunk
 
+  let viteConfigResolved: ResolvedConfig
+
   return {
     name: 'originjs:expose-production',
     virtualFile: {
       // code generated for remote
       __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
-    export const ${DYNAMIC_LOADING_CSS} = (cssFilePath) => {
+      const seen = {}
+    export const ${DYNAMIC_LOADING_CSS} = (cssFilePaths) => {
       const metaUrl = import.meta.url
       if (typeof metaUrl == 'undefined') {
         console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".')
         return
       }
       const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('${options.filename}'))
-      const element = document.head.appendChild(document.createElement('link'))
-      element.href = curUrl + cssFilePath
-      element.rel = 'stylesheet'
+
+      cssFilePaths.forEach(cssFilePath => {
+        const href = curUrl + cssFilePath
+        if (href in seen) return
+        seen[href] = true
+        const element = document.head.appendChild(document.createElement('link'))
+        element.href = href
+        element.rel = 'stylesheet'
+      })
     };
     async function __federation_import(name) {
         return import(name);
@@ -76,6 +86,10 @@ export function prodExposePlugin(
       return null
     },
 
+    configResolved(config: ResolvedConfig) {
+      viteConfigResolved = config
+    },
+
     buildStart() {
       // if we don't expose any modules, there is no need to emit file
       if (parsedOptions.prodExpose.length > 0) {
@@ -96,7 +110,7 @@ export function prodExposePlugin(
       return null
     },
     generateBundle(_options, bundle) {
-      const moduleCssFileMap = getChunkCssRelation(bundle)
+      // const moduleCssFileMap = getChunkCssRelation(bundle)
 
       // replace import absolute path to chunk's fileName in remoteEntry.js
       for (const file in bundle) {
@@ -110,12 +124,55 @@ export function prodExposePlugin(
       // placeholder replace
       if (remoteEntryChunk) {
         const item = remoteEntryChunk
-        // replace __f__dynamic_loading_css__ to dynamicLoadingCss
-        moduleCssFileMap.forEach((value, key) => {
-          item.code = item.code.replace(
-            `${DYNAMIC_LOADING_CSS_PREFIX}${key}`,
-            `./${basename(value)}`
-          )
+        
+        const filepathMap = new Map()
+        const getFilename = name => parse(parse(name).name).name
+        const cssBundlesMap: Map<string, OutputAsset | OutputChunk> = Object.keys(bundle).filter(name => extname(name) === '.css').reduce((res, name) => {
+          const filename = getFilename(name)
+          res.set(filename, bundle[name])
+          return res
+        }, new Map())
+        item.code = item.code.replace(new RegExp(`'${DYNAMIC_LOADING_CSS_PREFIX}[^']+'`, 'g'), str => {
+          // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
+          if (!viteConfigResolved.build.cssCodeSplit) {
+            if (cssBundlesMap.size) {
+              return `[${[...cssBundlesMap.values()].map(cssBundle => JSON.stringify(basename(cssBundle.fileName))).join(',')}]`
+            } else {
+              return '[]'
+            }
+          }
+          const filepath = str.slice((`'` + DYNAMIC_LOADING_CSS_PREFIX).length, -1)
+
+          if (!filepath || !filepath.length) return str
+
+          let fileBundle = filepathMap.get(filepath)
+
+          if (!fileBundle) {
+            fileBundle = Object.values(bundle).find(b => 'facadeModuleId' in b && b.facadeModuleId === filepath)
+
+            if (fileBundle) filepathMap.set(filepath, fileBundle)
+
+            else return str
+          }
+
+          const depCssFiles: Set<string> = new Set()
+          const addDepCss = (bundleName) => {
+            const filename = getFilename(bundleName)
+            const cssBundle = cssBundlesMap.get(filename)
+            if (cssBundle) {
+              depCssFiles.add(cssBundle.fileName)
+            }
+            
+            const theBundle = bundle[bundleName] as OutputChunk
+
+            if (theBundle && theBundle.imports && theBundle.imports.length) {
+              theBundle.imports.forEach(name => addDepCss(name))
+            }
+          }
+
+          [fileBundle.fileName, ...fileBundle.imports].forEach(addDepCss)
+
+          return `[${[...depCssFiles].map(d => JSON.stringify(basename(d))).join(',')}]`
         })
 
         // remove all __f__dynamic_loading_css__ after replace
@@ -145,57 +202,6 @@ export function prodExposePlugin(
         })
         item.code = magicString.toString()
       }
-    }
-  }
-
-  /**
-   *
-   * Gets the relationship between CSS and JS based on the original file name
-   * @param bundle bundle
-   * @returns relationship between CSS and JS
-   */
-  function getChunkCssRelation(bundle) {
-    const cssFileMap = new Map()
-    const moduleCssFileMap = new Map()
-
-    for (const file in bundle) {
-      if (extname(file) === '.css') {
-        cssFileMap.set(getOriginalFileName(file), file)
-      }
-    }
-
-    for (const file in bundle) {
-      let name = getOriginalFileName(file)
-      if (cssFileMap.get(name) != null && extname(file) !== '.css') {
-        moduleCssFileMap.set(bundle[file].facadeModuleId, cssFileMap.get(name))
-        continue
-      }
-
-      // Replace the null reference file with the original file
-      const chunk = bundle[file]
-      if (
-        chunk?.modules != undefined &&
-        Object.keys(chunk?.modules)?.length === 0
-      ) {
-        name = getOriginalFileName(chunk.imports[0])
-        if (cssFileMap.get(name) != null) {
-          moduleCssFileMap.set(chunk.facadeModuleId, cssFileMap.get(name))
-        }
-      }
-    }
-
-    // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
-    if (moduleCssFileMap.size === 0) {
-      for (const file in bundle) {
-        cssFileMap.forEach(function (css) {
-          moduleCssFileMap.set(bundle[file].facadeModuleId, css)
-        })
-      }
-    }
-    return moduleCssFileMap
-
-    function getOriginalFileName(file: string): string {
-      return parse(parse(file).name).name
     }
   }
 }

@@ -2,7 +2,7 @@ import type { PluginHooks } from '../../types/pluginHooks'
 import {
   findDependencies,
   getModuleMarker,
-  isSameFilepath,
+  // isSameFilepath,
   parseOptions
 } from '../utils'
 import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
@@ -289,16 +289,16 @@ export function prodSharedPlugin(
     },
     renderChunk: function (code, chunk, options) {
       //   process shared chunk
-      const sharedFlag = sharedFileReg.test(basename(chunk.fileName))
+      // const sharedFlag = sharedFileReg.test(basename(chunk.fileName))
       const facadeModuleId = chunk.facadeModuleId
-      const exposesFlag = parsedOptions.prodExpose.some((expose) =>
-        isSameFilepath(expose[1].id, facadeModuleId as string)
-      )
+      // const exposesFlag = parsedOptions.prodExpose.some((expose) =>
+      //   isSameFilepath(expose[1].id, facadeModuleId as string)
+      // )
       const needSharedImport =
         isRemote &&
         parsedOptions.prodShared.length > 0 &&
         chunk.type === 'chunk' &&
-        (sharedFlag || exposesFlag) &&
+        // (sharedFlag || exposesFlag) &&
         chunk.imports.some((importName) =>
           sharedFileReg.test(basename(importName))
         )
