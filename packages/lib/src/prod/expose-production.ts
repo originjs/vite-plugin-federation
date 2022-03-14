@@ -134,7 +134,7 @@ export function prodExposePlugin(
         }, new Map())
         item.code = item.code.replace(new RegExp(`'${DYNAMIC_LOADING_CSS_PREFIX}[^']+'`, 'g'), str => {
           // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
-          if (!viteConfigResolved.build.cssCodeSplit) {
+          if (viteConfigResolved && !viteConfigResolved.build.cssCodeSplit) {
             if (cssBundlesMap.size) {
               return `[${[...cssBundlesMap.values()].map(cssBundle => JSON.stringify(basename(cssBundle.fileName))).join(',')}]`
             } else {
