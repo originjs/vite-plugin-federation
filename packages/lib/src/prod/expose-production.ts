@@ -191,8 +191,8 @@ export function prodExposePlugin(
           enter(node: any) {
             if (
               node && node.type === 'CallExpression' &&
-              typeof node?.arguments[0]?.value === 'string' &&
-              node?.arguments[0]?.value.indexOf(
+              typeof node.arguments[0]?.value === 'string' &&
+              node.arguments[0]?.value.indexOf(
                 `${DYNAMIC_LOADING_CSS_PREFIX}`
               ) > -1
             ) {
