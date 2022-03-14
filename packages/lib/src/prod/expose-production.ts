@@ -190,7 +190,7 @@ export function prodExposePlugin(
         walk(ast, {
           enter(node: any) {
             if (
-              node.type === 'CallExpression' &&
+              node && node.type === 'CallExpression' &&
               typeof node?.arguments[0]?.value === 'string' &&
               node?.arguments[0]?.value.indexOf(
                 `${DYNAMIC_LOADING_CSS_PREFIX}`
