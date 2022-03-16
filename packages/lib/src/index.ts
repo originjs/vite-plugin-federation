@@ -1,4 +1,4 @@
-import type { ConfigEnv, Plugin, UserConfig, ViteDevServer } from 'vite'
+import type { ConfigEnv, Plugin, UserConfig, ViteDevServer, ResolvedConfig } from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { prodRemotePlugin } from './prod/remote-production'
 import type { VitePluginFederationOptions } from '../types'
@@ -97,6 +97,11 @@ export default function federation(
     configureServer(server: ViteDevServer) {
       for (const pluginHook of pluginList) {
         pluginHook.configureServer?.call(this, server)
+      }
+    },
+    configResolved(config: ResolvedConfig) {
+      for (const pluginHook of pluginList) {
+        pluginHook.configResolved?.call(this, config)
       }
     },
     buildStart(inputOptions) {
