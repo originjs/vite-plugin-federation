@@ -11,6 +11,7 @@ import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { join, sep, resolve, basename } from 'path'
 import { readdirSync, statSync } from 'fs'
+import type { OutputOptions, PluginContext, OutputChunk, RenderedChunk } from 'rollup'
 
 const sharedFileReg = /^__federation_shared_.+\.js$/
 const pickSharedNameReg = /(?<=^__federation_shared_).+(?=\.js$)/
@@ -39,6 +40,186 @@ export function prodSharedPlugin(
   let isHost
   let isRemote
   const id2Prop = new Map<string, any>()
+  const needSharedImportFiles = new Set<string>()
+
+  const transformImportFn = function (this: PluginContext, code, chunk: OutputChunk | RenderedChunk, options: OutputOptions) {
+    const ast = this.parse(code)
+    const magicString = new MagicString(code)
+    let modify = false
+    switch (options.format) {
+      case 'es':
+        {
+          walk(ast, {
+            enter(node: any) {
+              if (
+                node.type === 'ImportDeclaration' &&
+                sharedFileReg.test(basename(node.source.value))
+              ) {
+                const sharedName = basename(node.source.value)
+                  .match(pickSharedNameReg)?.[0]
+                if (sharedName) {
+                  const declaration: (string | never)[] = []
+                  node.specifiers?.forEach((specify) => {
+                    declaration.push(
+                      `${
+                        specify.imported?.name
+                          ? `${
+                              specify.imported.name === specify.local.name
+                                ? specify.local.name
+                                : `${specify.imported.name}:${specify.local.name}`
+                            }`
+                          : `default:${specify.local.name}`
+                      }`
+                    )
+                  })
+                  if (declaration.length) {
+                    magicString.overwrite(
+                      node.start,
+                      node.end,
+                      `const {${declaration.join(
+                        ','
+                      )}} = await importShared('${sharedName}')`
+                    )
+                    modify = true
+                  }
+                }
+              }
+            }
+          })
+          if (modify) {
+            const prop = id2Prop.get(chunk.facadeModuleId as string)
+            magicString.prepend(
+              `import {importShared} from '${
+                prop?.root ? '.' : ''
+              }./__federation_fn_import.js'\n`
+            )
+            return magicString.toString()
+          }
+        }
+        break
+      case 'system':
+        {
+          walk(ast, {
+            enter(node: any) {
+              const expression =
+                node.body.length === 1
+                  ? node.body[0]?.expression
+                  : node.body.find(
+                      (item) =>
+                        item.type === 'ExpressionStatement' &&
+                        item.expression?.callee?.object?.name ===
+                          'System' &&
+                        item.expression.callee.property?.name === 'register'
+                    )?.expression
+              if (expression) {
+                const args = expression.arguments
+                if (
+                  args[0].type === 'ArrayExpression' &&
+                  args[0].elements?.length > 0
+                ) {
+                  const importIndex: any[] = []
+                  let removeLast = false
+                  chunk.imports.forEach((importName, index) => {
+                    const baseName = basename(importName)
+                    if (sharedFileReg.test(baseName)) {
+                      importIndex.push({
+                        index: index,
+                        name: baseName.match(pickSharedNameReg)?.[0]
+                      })
+                      if (index === chunk.imports.length - 1) {
+                        removeLast = true
+                      }
+                    }
+                  })
+                  if (
+                    importIndex.length &&
+                    args[1]?.type === 'FunctionExpression'
+                  ) {
+                    const functionExpression = args[1]
+                    const returnStatement =
+                      functionExpression?.body?.body.find(
+                        (item) => item.type === 'ReturnStatement'
+                      )
+                    // insert __federation_import variable
+                    magicString.prependLeft(
+                      returnStatement.start,
+                      'var __federation_import;\n'
+                    )
+                    const setters =
+                      returnStatement.argument.properties.find(
+                        (property) => property.key.name === 'setters'
+                      )
+                    const settersElements = setters.value.elements
+                    // insert __federation_import setter
+                    magicString.appendRight(
+                      setters.end - 1,
+                      `${
+                        removeLast ? '' : ','
+                      }function (module){__federation_import=module.importShared}`
+                    )
+                    const execute =
+                      returnStatement.argument.properties.find(
+                        (property) => property.key.name === 'execute'
+                      )
+                    const insertPos = execute.value.body.body[0].start
+                    importIndex.forEach((item) => {
+                      // remove unnecessary setters and import
+                      const last = item.index === settersElements.length - 1
+                      magicString.remove(
+                        settersElements[item.index].start,
+                        last
+                          ? settersElements[item.index].end
+                          : settersElements[item.index + 1].start - 1
+                      )
+                      magicString.remove(
+                        args[0].elements[item.index].start,
+                        last
+                          ? args[0].elements[item.index].end
+                          : args[0].elements[item.index + 1].start - 1
+                      )
+                      // insert federation shared import lib
+                      const varName = `__federation_${item.name}`
+                      magicString.prependLeft(
+                        insertPos,
+                        `var  ${varName} = await __federation_import('${item.name}');\n`
+                      )
+                      // replace it with sharedImport
+                      setters.value.elements[item.index].body.body.forEach(
+                        (setFn) => {
+                          magicString.appendLeft(
+                            insertPos,
+                            `${setFn.expression.left.name} = ${varName}.${
+                              setFn.expression.right.property.name ??
+                              setFn.expression.right.property.value
+                            };\n`
+                          )
+                        }
+                      )
+                    })
+                    // add async flag to execute function
+                    magicString.prependLeft(execute.value.start, ' async ')
+                    // add sharedImport import declaration
+                    magicString.appendRight(
+                      args[0].end - 1,
+                      `${
+                        removeLast ? '' : ','
+                      }'./__federation_fn_import.js'`
+                    )
+                    modify = true
+                  }
+                }
+              }
+              // only need to process once
+              this.skip()
+            }
+          })
+          if (modify) {
+            return magicString.toString()
+          }
+        }
+        break
+    }
+  }
 
   return {
     name: 'originjs:shared-production',
@@ -303,184 +484,43 @@ export function prodSharedPlugin(
           sharedFileReg.test(basename(importName))
         )
       if (needSharedImport) {
-        const ast = this.parse(code)
-        const magicString = new MagicString(code)
-        let modify = false
-        switch (options.format) {
-          case 'es':
-            {
-              walk(ast, {
-                enter(node: any) {
-                  if (
-                    node.type === 'ImportDeclaration' &&
-                    sharedFileReg.test(basename(node.source.value))
-                  ) {
-                    const sharedName = basename(node.source.value)
-                      .match(pickSharedNameReg)?.[0]
-                    if (sharedName) {
-                      const declaration: (string | never)[] = []
-                      node.specifiers?.forEach((specify) => {
-                        declaration.push(
-                          `${
-                            specify.imported?.name
-                              ? `${
-                                  specify.imported.name === specify.local.name
-                                    ? specify.local.name
-                                    : `${specify.imported.name}:${specify.local.name}`
-                                }`
-                              : `default:${specify.local.name}`
-                          }`
-                        )
-                      })
-                      if (declaration.length) {
-                        magicString.overwrite(
-                          node.start,
-                          node.end,
-                          `const {${declaration.join(
-                            ','
-                          )}} = await importShared('${sharedName}')`
-                        )
-                        modify = true
-                      }
-                    }
-                  }
-                }
-              })
-              if (modify) {
-                const prop = id2Prop.get(facadeModuleId as string)
-                magicString.prepend(
-                  `import {importShared} from '${
-                    prop?.root ? '.' : ''
-                  }./__federation_fn_import.js'\n`
-                )
-                return magicString.toString()
-              }
-            }
-            break
-          case 'system':
-            {
-              walk(ast, {
-                enter(node: any) {
-                  const expression =
-                    node.body.length === 1
-                      ? node.body[0]?.expression
-                      : node.body.find(
-                          (item) =>
-                            item.type === 'ExpressionStatement' &&
-                            item.expression?.callee?.object?.name ===
-                              'System' &&
-                            item.expression.callee.property?.name === 'register'
-                        )?.expression
-                  if (expression) {
-                    const args = expression.arguments
-                    if (
-                      args[0].type === 'ArrayExpression' &&
-                      args[0].elements?.length > 0
-                    ) {
-                      const importIndex: any[] = []
-                      let removeLast = false
-                      chunk.imports.forEach((importName, index) => {
-                        const baseName = basename(importName)
-                        if (sharedFileReg.test(baseName)) {
-                          importIndex.push({
-                            index: index,
-                            name: baseName.match(pickSharedNameReg)?.[0]
-                          })
-                          if (index === chunk.imports.length - 1) {
-                            removeLast = true
-                          }
-                        }
-                      })
-                      if (
-                        importIndex.length &&
-                        args[1]?.type === 'FunctionExpression'
-                      ) {
-                        const functionExpression = args[1]
-                        const returnStatement =
-                          functionExpression?.body?.body.find(
-                            (item) => item.type === 'ReturnStatement'
-                          )
-                        // insert __federation_import variable
-                        magicString.prependLeft(
-                          returnStatement.start,
-                          'var __federation_import;\n'
-                        )
-                        const setters =
-                          returnStatement.argument.properties.find(
-                            (property) => property.key.name === 'setters'
-                          )
-                        const settersElements = setters.value.elements
-                        // insert __federation_import setter
-                        magicString.appendRight(
-                          setters.end - 1,
-                          `${
-                            removeLast ? '' : ','
-                          }function (module){__federation_import=module.importShared}`
-                        )
-                        const execute =
-                          returnStatement.argument.properties.find(
-                            (property) => property.key.name === 'execute'
-                          )
-                        const insertPos = execute.value.body.body[0].start
-                        importIndex.forEach((item) => {
-                          // remove unnecessary setters and import
-                          const last = item.index === settersElements.length - 1
-                          magicString.remove(
-                            settersElements[item.index].start,
-                            last
-                              ? settersElements[item.index].end
-                              : settersElements[item.index + 1].start - 1
-                          )
-                          magicString.remove(
-                            args[0].elements[item.index].start,
-                            last
-                              ? args[0].elements[item.index].end
-                              : args[0].elements[item.index + 1].start - 1
-                          )
-                          // insert federation shared import lib
-                          const varName = `__federation_${item.name}`
-                          magicString.prependLeft(
-                            insertPos,
-                            `var  ${varName} = await __federation_import('${item.name}');\n`
-                          )
-                          // replace it with sharedImport
-                          setters.value.elements[item.index].body.body.forEach(
-                            (setFn) => {
-                              magicString.appendLeft(
-                                insertPos,
-                                `${setFn.expression.left.name} = ${varName}.${
-                                  setFn.expression.right.property.name ??
-                                  setFn.expression.right.property.value
-                                };\n`
-                              )
-                            }
-                          )
-                        })
-                        // add async flag to execute function
-                        magicString.prependLeft(execute.value.start, ' async ')
-                        // add sharedImport import declaration
-                        magicString.appendRight(
-                          args[0].end - 1,
-                          `${
-                            removeLast ? '' : ','
-                          }'./__federation_fn_import.js'`
-                        )
-                        modify = true
-                      }
-                    }
-                  }
-                  // only need to process once
-                  this.skip()
-                }
-              })
-              if (modify) {
-                return magicString.toString()
-              }
-            }
-            break
-        }
+        needSharedImportFiles.add(chunk.fileName)
+        const transformedCode = transformImportFn.apply(this, [code, chunk, options])
+        if (transformedCode) return transformedCode
       }
       return null
+    },
+    generateBundle: function (_options, bundle) {
+      if (!needSharedImportFiles.size) return
+
+      const dependencyChecked = new Set()
+
+      const handleChunkImport = fileName => {
+        if (dependencyChecked.has(fileName)) return
+        dependencyChecked.add(fileName)
+
+        const chunk = bundle[fileName] as OutputChunk
+        
+        if (chunk) {
+          const transformedCode = transformImportFn.apply(this, [chunk.code, chunk, _options])
+
+          if (transformedCode) {
+            chunk.code = transformedCode
+          }
+
+          if (chunk.imports.length) {
+            chunk.imports.forEach(handleChunkImport)
+          }
+        }
+      }
+
+      Object.values(bundle).forEach(item => {
+        if (!needSharedImportFiles.has(item.fileName) || dependencyChecked.has(item.fileName)) return
+
+        if ('imports' in item) {
+          item.imports.forEach(handleChunkImport)
+        }
+      })
     }
   }
 }
