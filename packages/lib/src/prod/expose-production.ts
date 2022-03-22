@@ -42,8 +42,9 @@ export function prodExposePlugin(
     name: 'originjs:expose-production',
     virtualFile: {
       // code generated for remote
-      __remoteEntryHelper__: `let moduleMap = {${moduleMap}}
-      const seen = {}
+      __remoteEntryHelper__:
+   `let moduleMap = {${moduleMap}}
+    const seen = {}
     export const ${DYNAMIC_LOADING_CSS} = (cssFilePaths) => {
       const metaUrl = import.meta.url
       if (typeof metaUrl == 'undefined') {
@@ -124,7 +125,6 @@ export function prodExposePlugin(
       // placeholder replace
       if (remoteEntryChunk) {
         const item = remoteEntryChunk
-        
         const filepathMap = new Map()
         const getFilename = name => parse(parse(name).name).name
         const cssBundlesMap: Map<string, OutputAsset | OutputChunk> = Object.keys(bundle).filter(name => extname(name) === '.css').reduce((res, name) => {
@@ -142,19 +142,13 @@ export function prodExposePlugin(
             }
           }
           const filepath = str.slice((`'` + DYNAMIC_LOADING_CSS_PREFIX).length, -1)
-
           if (!filepath || !filepath.length) return str
-
           let fileBundle = filepathMap.get(filepath)
-
           if (!fileBundle) {
             fileBundle = Object.values(bundle).find(b => 'facadeModuleId' in b && b.facadeModuleId === filepath)
-
             if (fileBundle) filepathMap.set(filepath, fileBundle)
-
             else return str
           }
-
           const depCssFiles: Set<string> = new Set()
           const addDepCss = (bundleName) => {
             const filename = getFilename(bundleName)
@@ -162,16 +156,12 @@ export function prodExposePlugin(
             if (cssBundle) {
               depCssFiles.add(cssBundle.fileName)
             }
-            
             const theBundle = bundle[bundleName] as OutputChunk
-
             if (theBundle && theBundle.imports && theBundle.imports.length) {
               theBundle.imports.forEach(name => addDepCss(name))
             }
           }
-
           [fileBundle.fileName, ...fileBundle.imports].forEach(addDepCss)
-
           return `[${[...depCssFiles].map(d => JSON.stringify(basename(d))).join(',')}]`
         })
 

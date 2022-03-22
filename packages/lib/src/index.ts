@@ -1,4 +1,10 @@
-import type { ConfigEnv, Plugin, UserConfig, ViteDevServer, ResolvedConfig } from 'vite'
+import type {
+  ConfigEnv,
+  Plugin,
+  UserConfig,
+  ViteDevServer,
+  ResolvedConfig
+} from 'vite'
 import virtual from '@rollup/plugin-virtual'
 import { prodRemotePlugin } from './prod/remote-production'
 import type { VitePluginFederationOptions } from '../types'

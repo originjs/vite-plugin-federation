@@ -1,13 +1,6 @@
-import type {
-  ConfigTypeSet,
-  Exposes,
-  Remotes,
-  Shared,
-  SharedRuntimeInfo,
-  VitePluginFederationOptions
-} from '../../types'
-import { posix, parse } from 'path'
-import type { PluginContext } from 'rollup'
+import type {ConfigTypeSet, Exposes, Remotes, Shared, SharedRuntimeInfo, VitePluginFederationOptions} from '../../types'
+import {parse, posix} from 'path'
+import type {PluginContext} from 'rollup'
 
 export function findDependencies(
   this: PluginContext,
@@ -129,12 +122,13 @@ export function parseOptions(
   return list
 }
 
-export function removeNonLetter(str: string): string {
-  const wordRegexp = new RegExp('[0-9a-zA-Z-_@]+')
+const letterReg = new RegExp('[0-9a-zA-Z]+');
+
+export function removeNonRegLetter(str: string, reg = letterReg): string {
   let needUpperCase = false
   let ret = ''
   for (const c of str) {
-    if (wordRegexp.test(c)) {
+    if (reg.test(c)) {
       ret += needUpperCase ? c.toUpperCase() : c
       needUpperCase = false
     } else {

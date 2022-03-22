@@ -2,17 +2,21 @@ import {
   getModuleMarker,
   isSameFilepath,
   parseOptions,
-  removeNonLetter
+  removeNonRegLetter
 } from '../src/utils'
-import { ExposesObject } from '../types'
+import type { ExposesObject } from '../types'
 
 test('remove nonLetter', () => {
   const includeUnderline = 'user_name'
   const includeDash = 'user-name'
   const all = 'U"s-e@r#n$a%m^e&*(),./;[]{}'
-  expect(removeNonLetter(includeUnderline)).toMatch('user_name')
-  expect(removeNonLetter(includeDash)).toMatch('user-name')
-  expect(removeNonLetter(all)).toMatch('US-e@rNAME')
+  const fileNameReg = new RegExp('[0-9a-zA-Z@_-]+')
+  expect(removeNonRegLetter(includeUnderline)).toMatch('userName')
+  expect(removeNonRegLetter(includeDash)).toMatch('userName')
+  expect(removeNonRegLetter(all)).toMatch('USERNAME')
+  expect(removeNonRegLetter(includeUnderline, fileNameReg)).toMatch('user_name')
+  expect(removeNonRegLetter(includeDash, fileNameReg)).toMatch('user-name')
+  expect(removeNonRegLetter(all, fileNameReg)).toMatch('US-e@rNAME')
 })
 
 test('get moduleMarker', () => {
