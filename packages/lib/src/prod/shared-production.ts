@@ -2,8 +2,7 @@ import type { PluginHooks } from '../../types/pluginHooks'
 import {
   findDependencies,
   getModuleMarker,
-  // isSameFilepath,
-  parseOptions
+  parseOptions, removeNonRegLetter
 } from '../utils'
 import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
@@ -12,9 +11,8 @@ import MagicString from 'magic-string'
 import { join, sep, resolve, basename } from 'path'
 import { readdirSync, statSync } from 'fs'
 import type { OutputOptions, PluginContext, OutputChunk, RenderedChunk } from 'rollup'
-
+import {sharedFileName2Prop} from "./remote-production";
 const sharedFileReg = /^__federation_shared_.+\.js$/
-const pickSharedNameReg = /(?<=^__federation_shared_).+(?=\.js$)/
 
 export function prodSharedPlugin(
   options: VitePluginFederationOptions
@@ -57,8 +55,7 @@ export function prodSharedPlugin(
                 node.type === 'ImportDeclaration' &&
                 sharedFileReg.test(basename(node.source.value))
               ) {
-                const sharedName = basename(node.source.value)
-                  .match(pickSharedNameReg)?.[0]
+                const sharedName = sharedFileName2Prop.get(basename(node.source.value))?.[0];
                 if (sharedName) {
                   const declaration: (string | never)[] = []
                   node.specifiers?.forEach((specify) => {
@@ -126,7 +123,7 @@ export function prodSharedPlugin(
                     if (sharedFileReg.test(baseName)) {
                       importIndex.push({
                         index: index,
-                        name: baseName.match(pickSharedNameReg)?.[0]
+                        name: sharedFileName2Prop.get(baseName)?.[0]
                       })
                       if (index === chunk.imports.length - 1) {
                         removeLast = true
@@ -142,7 +139,7 @@ export function prodSharedPlugin(
                       functionExpression?.body?.body.find(
                         (item) => item.type === 'ReturnStatement'
                       )
-                    
+
                     if (returnStatement) {
                       // insert __federation_import variable
                       magicString.prependLeft(
@@ -182,7 +179,7 @@ export function prodSharedPlugin(
                             : args[0].elements[item.index + 1].start - 1
                         )
                         // insert federation shared import lib
-                        const varName = `__federation_${item.name}`
+                        const varName = `__federation_${removeNonRegLetter(item.name)}`
                         magicString.prependLeft(
                           insertPos,
                           `var  ${varName} = await __federation_import('${item.name}');\n`
@@ -365,7 +362,6 @@ export function prodSharedPlugin(
           }
         }
       }
-      // console.log(parsedOptions.prodShared);
 
       if (parsedOptions.prodShared.length && isRemote) {
         for (const prod of parsedOptions.prodShared) {
@@ -471,50 +467,40 @@ export function prodSharedPlugin(
           }
         })
       }
-      return outputOption
-    },
-    buildEnd: function () {
+
+      // handle expose component import other components which may import shared
       if (isRemote && parsedOptions.prodShared.length && parsedOptions.prodExpose.length) {
         // start collect exposed modules and their dependency modules which imported shared libs
         const exposedModuleIds = parsedOptions.prodExpose.filter(item => !!item?.[1]?.id).map(item => item[1]['id'])
-
-        const sharedLibIds = parsedOptions.prodShared.map(item => item?.[1]?.id).filter(item => !!item)
+        const sharedLibIds = new Set( parsedOptions.prodShared.map(item => item?.[1]?.id).filter(item => !!item));
 
         const addDeps = id => {
           if (moduleCheckedSet.has(id)) return
-
           moduleCheckedSet.add(id)
-
           const info = this.getModuleInfo(id)
-
           if (!info) return
-
           const dependencyModuleIds = [...info.importedIds, ...info.dynamicallyImportedIds]
-
-          const isImportSharedLib = dependencyModuleIds.some(id => sharedLibIds.includes(id))
-
+          const isImportSharedLib = dependencyModuleIds.some(id => sharedLibIds.has(id))
           if (isImportSharedLib) {
             moduleNeedToTransformSet.add(id)
           }
-
           dependencyModuleIds.forEach(addDeps)
         }
 
         exposedModuleIds.forEach(addDeps)
       }
+      return outputOption
     },
     renderChunk: function (code, chunk, options) {
       if (!isRemote) return null
-
-      if (moduleNeedToTransformSet.size === 0) return null // means that there's no module import shared libs
-
+      // means that there's no module import shared libs
+      if (moduleNeedToTransformSet.size === 0) return null
       const relatedModules = Object.keys(chunk.modules)
 
       if (relatedModules.some(id => moduleNeedToTransformSet.has(id))) {
         const transformedCode = transformImportFn.apply(this, [code, chunk, options])
         if (transformedCode) return transformedCode
       }
-
       return null
     }
   }

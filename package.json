@@ -11,7 +11,7 @@
   "license": "MulanPSL-2.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "format": "prettier -w .",
+    "format": "prettier -w packages/lib/**/*.ts",
     "lint": "eslint packages/*/{src,types}/**",
     "lint:fix": "eslint --fix",
     "build": "cd packages/lib && pnpm build",
