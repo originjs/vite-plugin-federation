@@ -2,7 +2,7 @@ import type { PluginHooks } from '../../types/pluginHooks'
 import {
   findDependencies,
   getModuleMarker,
-  isSameFilepath,
+  // isSameFilepath,
   parseOptions
 } from '../utils'
 import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
@@ -40,7 +40,9 @@ export function prodSharedPlugin(
   let isHost
   let isRemote
   const id2Prop = new Map<string, any>()
-  const needSharedImportFiles = new Set<string>()
+
+  const moduleCheckedSet = new Set<string>()
+  const moduleNeedToTransformSet = new Set<string>() // record modules that import shard libs, and refered in chunk tranform logic
 
   const transformImportFn = function (this: PluginContext, code, chunk: OutputChunk | RenderedChunk, options: OutputOptions) {
     const ast = this.parse(code)
@@ -471,59 +473,49 @@ export function prodSharedPlugin(
       }
       return outputOption
     },
+    buildEnd: function () {
+      if (isRemote && parsedOptions.prodShared.length && parsedOptions.prodExpose.length) {
+        // start collect exposed modules and their dependency modules which imported shared libs
+        const exposedModuleIds = parsedOptions.prodExpose.filter(item => !!item?.[1]?.id).map(item => item[1]['id'])
+
+        const sharedLibIds = parsedOptions.prodShared.map(item => item?.[1]?.id).filter(item => !!item)
+
+        const addDeps = id => {
+          if (moduleCheckedSet.has(id)) return
+
+          moduleCheckedSet.add(id)
+
+          const info = this.getModuleInfo(id)
+
+          if (!info) return
+
+          const dependencyModuleIds = [...info.importedIds, ...info.dynamicallyImportedIds]
+
+          const isImportSharedLib = dependencyModuleIds.some(id => sharedLibIds.includes(id))
+
+          if (isImportSharedLib) {
+            moduleNeedToTransformSet.add(id)
+          }
+
+          dependencyModuleIds.forEach(addDeps)
+        }
+
+        exposedModuleIds.forEach(addDeps)
+      }
+    },
     renderChunk: function (code, chunk, options) {
-      //   process shared chunk
-      const sharedFlag = sharedFileReg.test(basename(chunk.fileName))
-      const facadeModuleId = chunk.facadeModuleId
-      const exposesFlag = parsedOptions.prodExpose.some((expose) =>
-        isSameFilepath(expose[1].id, facadeModuleId as string)
-      )
-      const needSharedImport =
-        isRemote &&
-        parsedOptions.prodShared.length > 0 &&
-        chunk.type === 'chunk' &&
-        (sharedFlag || exposesFlag) &&
-        chunk.imports.some((importName) =>
-          sharedFileReg.test(basename(importName))
-        )
-      if (needSharedImport) {
-        needSharedImportFiles.add(chunk.fileName)
+      if (!isRemote) return null
+
+      if (moduleNeedToTransformSet.size === 0) return null // means that there's no module import shared libs
+
+      const relatedModules = Object.keys(chunk.modules)
+
+      if (relatedModules.some(id => moduleNeedToTransformSet.has(id))) {
         const transformedCode = transformImportFn.apply(this, [code, chunk, options])
         if (transformedCode) return transformedCode
       }
+
       return null
-    },
-    generateBundle: function (_options, bundle) {
-      if (!needSharedImportFiles.size) return
-
-      const dependencyChecked = new Set()
-
-      const handleChunkImport = fileName => {
-        if (dependencyChecked.has(fileName)) return
-        dependencyChecked.add(fileName)
-
-        const chunk = bundle[fileName] as OutputChunk
-        
-        if (chunk) {
-          const transformedCode = transformImportFn.apply(this, [chunk.code, chunk, _options])
-
-          if (transformedCode) {
-            chunk.code = transformedCode
-          }
-
-          if (chunk.imports.length) {
-            chunk.imports.forEach(handleChunkImport)
-          }
-        }
-      }
-
-      Object.values(bundle).forEach(item => {
-        if (!needSharedImportFiles.has(item.fileName) || dependencyChecked.has(item.fileName)) return
-
-        if ('imports' in item) {
-          item.imports.forEach(handleChunkImport)
-        }
-      })
     }
   }
 }
