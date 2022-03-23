@@ -1,3 +1,13 @@
+## [1.1.3](https://github.com/originjs/vite-plugin-federation/compare/v1.1.2...v1.1.3) (2022-03-23)
+
+
+### Bug Fixes
+
+* exposed component imports other components that do not handle shared properly ([52f8b65](https://github.com/originjs/vite-plugin-federation/commit/52f8b6553d3136c06714f874ed2f2724512b8ad8))
+* share names with special characters fail to integrate with webpack ([5421ece](https://github.com/originjs/vite-plugin-federation/commit/5421ece7719bf93445494119b82d6e1978bfb5ee))
+
+
+
 ## [1.1.2](https://github.com/originjs/vite-plugin-federation/compare/v1.1.1...v1.1.2) (2022-03-07)
 
 
