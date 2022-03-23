@@ -165,6 +165,25 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       if (builderInfo.isRemote) {
         for (const expose of parsedOptions.prodExpose) {
           if (!expose[1].emitFile) {
+            const resolveId = await this.resolve(expose[1].id)
+            if (resolveId && resolveId.id) {
+              /**
+               * overwrite the id with rollup resolved
+               * in rollup building context, rather than vite,
+               * the id of a module is using backslash(\) instead of slash(/) in windows os
+               * e.g.
+               * perhaps an expose's id is: 
+               * /path/to/a/module
+               * 
+               * will be resolved to:
+               * \path\to\a\module
+               * 
+               * it will break down some logic which rely on the this like #152
+               * 
+               * so overwrite here ensure that the id of expose object is synchronized with building context(rollup or vite)
+               */
+              expose[1].id = resolveId.id
+            }
             expose[1].emitFile = this.emitFile({
               type: 'chunk',
               id: expose[1].id,
