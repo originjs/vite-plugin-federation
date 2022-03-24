@@ -165,6 +165,10 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       if (builderInfo.isRemote) {
         for (const expose of parsedOptions.prodExpose) {
           if (!expose[1].emitFile) {
+            if (!expose[1].id) {
+              // resolved the moduleId here for the referrence somewhere else like #152
+              expose[1].id = (await this.resolve(expose[1].import))?.id
+            }
             expose[1].emitFile = this.emitFile({
               type: 'chunk',
               id: expose[1].id,

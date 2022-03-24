@@ -27,7 +27,6 @@ export function prodExposePlugin(
     EXTERNALS.push(moduleName)
     const exposeFilepath = normalizePath(resolve(item[1].import))
     EXPOSES_MAP.set(item[0], exposeFilepath)
-    item[1].id = exposeFilepath
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
       return __federation_import('\${__federation_expose_${item[0]}}').then(module=>()=>module?.default??module)
