@@ -1,21 +1,29 @@
-import type {ConfigTypeSet, RemotesConfig, VitePluginFederationOptions} from 'types'
-import {walk} from 'estree-walker'
+import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
+import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import type {AcornNode, TransformPluginContext} from 'rollup'
-import {getModuleMarker, parseRemoteOptions, removeNonRegLetter} from '../utils'
-import {builderInfo, parsedOptions} from '../public'
-import {basename, dirname} from 'path'
-import type {PluginHooks} from '../../types/pluginHooks'
-import {readFileSync} from 'fs'
+import type { AcornNode, TransformPluginContext } from 'rollup'
+import {
+  createRemotesMap,
+  getModuleMarker,
+  parseRemoteOptions,
+  Remote,
+  removeNonRegLetter
+} from '../utils'
+import { builderInfo, parsedOptions } from '../public'
+import { basename, dirname } from 'path'
+import type { PluginHooks } from '../../types/pluginHooks'
+import { readFileSync } from 'fs'
 
-
-const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<string, ConfigTypeSet>();
+const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
+  string,
+  ConfigTypeSet
+>()
 const nameCharReg = new RegExp('[0-9a-zA-Z@_-]+')
 export function prodRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.prodRemote = parseRemoteOptions(options)
-  const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
+  const remotes: Remote[] = []
   for (const item of parsedOptions.prodRemote) {
     remotes.push({
       id: item[0],
@@ -28,19 +36,13 @@ export function prodRemotePlugin(
     name: 'originjs:remote-production',
     virtualFile: {
       __federation__: `
-const remotesMap = {
-  ${remotes
-    .map(
-      (remote) =>
-        `'${remote.id}':{url:'${remote.config.external[0]}',format:'${remote.config.format}',from:'${remote.config.from}'}`
-    )
-    .join(',\n  ')}
-};
-const loadJS = (url, fn) => {
+${createRemotesMap(remotes)}
+const loadJS = async (url, fn) => {
+  const resolvedUrl = typeof url === 'string' ? url : await url();
   const script = document.createElement('script')
   script.type = 'text/javascript';
   script.onload = fn;
-  script.src = url;
+  script.src = resolvedUrl;
   document.getElementsByTagName('head')[0].appendChild(script);
 }
 const scriptTypes = ['var'];
@@ -69,19 +71,22 @@ async function __federation_method_ensure(remoteId) {
           }
           resolve(remote.lib);
         }
-        loadJS(remote.url, callback);
+        return loadJS(remote.url, callback);
       });
     } else if (importTypes.includes(remote.format)) {
       // loading js with import(...)
       return new Promise(resolve => {
-        import(/* @vite-ignore */ remote.url).then(lib => {
-          if (!remote.inited) {
-            lib.init(shareScope);
-            remote.lib = lib;
-            remote.lib.init(shareScope);
-            remote.inited = true;
-          }
-          resolve(remote.lib);
+        const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
+        getUrl().then(url => {
+          import(/* @vite-ignore */ url).then(lib => {
+            if (!remote.inited) {
+              lib.init(shareScope);
+              remote.lib = lib;
+              remote.lib.init(shareScope);
+              remote.inited = true;
+            }
+            resolve(remote.lib);
+          })
         })
       })
     }
@@ -115,7 +120,10 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       if (builderInfo.isShared) {
         for (const sharedInfo of parsedOptions.prodShared) {
           if (!sharedInfo[1].emitFile) {
-            const basename = `__federation_shared_${removeNonRegLetter(sharedInfo[0] , nameCharReg)}.js`;
+            const basename = `__federation_shared_${removeNonRegLetter(
+              sharedInfo[0],
+              nameCharReg
+            )}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
               id: sharedInfo[1].id ?? sharedInfo[0],
@@ -126,7 +134,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
               }${basename}`,
               preserveSignature: 'allow-extension'
             })
-            sharedFileName2Prop.set(basename , sharedInfo as ConfigTypeSet);
+            sharedFileName2Prop.set(basename, sharedInfo as ConfigTypeSet)
           }
         }
 
@@ -134,9 +142,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
           const moduleMapCode = parsedOptions.prodShared
             .map(
               (sharedInfo) =>
-                `'${
-                  sharedInfo[0]
-                }':{get:()=>()=>__federation_import('./${
+                `'${sharedInfo[0]}':{get:()=>()=>__federation_import('./${
                   sharedInfo[1].root ? `${sharedInfo[1].root[0]}/` : ''
                 }${basename(
                   this.getFileName(sharedInfo[1].emitFile)
@@ -174,8 +180,14 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
               id: expose[1].id,
               fileName: `${
                 builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-              }__federation_expose_${removeNonRegLetter(expose[0], nameCharReg)}.js`,
-              name: `__federation_expose_${removeNonRegLetter(expose[0], nameCharReg)}`,
+              }__federation_expose_${removeNonRegLetter(
+                expose[0],
+                nameCharReg
+              )}.js`,
+              name: `__federation_expose_${removeNonRegLetter(
+                expose[0],
+                nameCharReg
+              )}`,
               preserveSignature: 'allow-extension'
             })
           }
@@ -292,7 +304,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                         )
                       }
                     }
-                    break;
+                    break
                   }
                 }
               }
@@ -314,4 +326,4 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     }
   }
 }
-export {sharedFileName2Prop};
+export { sharedFileName2Prop }

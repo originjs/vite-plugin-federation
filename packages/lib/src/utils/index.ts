@@ -1,6 +1,14 @@
-import type {ConfigTypeSet, Exposes, Remotes, Shared, SharedRuntimeInfo, VitePluginFederationOptions} from '../../types'
-import {parse, posix} from 'path'
-import type {PluginContext} from 'rollup'
+import type {
+  ConfigTypeSet,
+  Exposes,
+  Remotes,
+  RemotesConfig,
+  Shared,
+  SharedRuntimeInfo,
+  VitePluginFederationOptions
+} from '../../types'
+import { parse, posix } from 'path'
+import type { PluginContext } from 'rollup'
 
 export function findDependencies(
   this: PluginContext,
@@ -70,13 +78,13 @@ export function parseRemoteOptions(
       external: Array.isArray(item) ? item : [item],
       shareScope: options.shareScope || 'default',
       format: 'esm',
-      from:'vite'
+      from: 'vite'
     }),
     (item) => ({
       external: Array.isArray(item.external) ? item.external : [item.external],
       shareScope: item.shareScope || options.shareScope || 'default',
       format: item.format || 'esm',
-      from:item.from ?? 'vite'
+      from: item.from ?? 'vite'
     })
   )
 }
@@ -122,7 +130,7 @@ export function parseOptions(
   return list
 }
 
-const letterReg = new RegExp('[0-9a-zA-Z]+');
+const letterReg = new RegExp('[0-9a-zA-Z]+')
 
 export function removeNonRegLetter(str: string, reg = letterReg): string {
   let needUpperCase = false
@@ -164,4 +172,26 @@ export function isSameFilepath(src: string, dest: string): boolean {
     dest = dest.slice(0, -destExt.length)
   }
   return src === dest
+}
+
+export type Remote = { id: string; regexp: RegExp; config: RemotesConfig }
+
+export const createRemotesMap = (remotes: Remote[]) => {
+  const createUrl = (remote: Remote) => {
+    const external = remote.config.external[0]
+    if (external.startsWith('promise ')) {
+      return `() => ${external.slice(8)}`
+    }
+    return `'${external}'`
+  }
+  return `const remotesMap = {
+${remotes
+  .map(
+    (remote) =>
+      `'${remote.id}':{url:${createUrl(remote)},format:'${
+        remote.config.format
+      }',from:'${remote.config.from}'}`
+  )
+  .join(',\n  ')}
+};`
 }
