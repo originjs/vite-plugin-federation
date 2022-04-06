@@ -38,7 +38,7 @@ export function prodRemotePlugin(
       __federation__: `
 ${createRemotesMap(remotes)}
 const loadJS = async (url, fn) => {
-  const resolvedUrl = typeof url === 'string' ? url : await url();
+  const resolvedUrl = typeof url === 'function' ? await url() : url;
   const script = document.createElement('script')
   script.type = 'text/javascript';
   script.onload = fn;
