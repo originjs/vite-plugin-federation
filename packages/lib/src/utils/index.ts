@@ -176,7 +176,7 @@ export function isSameFilepath(src: string, dest: string): boolean {
 
 export type Remote = { id: string; regexp: RegExp; config: RemotesConfig }
 
-export const createRemotesMap = (remotes: Remote[]) => {
+export function createRemotesMap(remotes: Remote[]): string {
   const createUrl = (remote: Remote) => {
     const external = remote.config.external[0]
     if (external.startsWith('promise ')) {
