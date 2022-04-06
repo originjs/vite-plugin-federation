@@ -8,7 +8,12 @@ import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import type { AcornNode, TransformPluginContext } from 'rollup'
 import type { Hostname, ViteDevServer } from '../../types/viteDevServer'
-import { getModuleMarker, normalizePath, parseRemoteOptions } from '../utils'
+import {
+  createRemotesMap,
+  getModuleMarker,
+  normalizePath,
+  parseRemoteOptions
+} from '../utils'
 import { builderInfo, parsedOptions } from '../public'
 import type { PluginHooks } from '../../types/pluginHooks'
 
@@ -31,19 +36,13 @@ export function devRemotePlugin(
     name: 'originjs:remote-development',
     virtualFile: {
       __federation__: `
-const remotesMap = {
-  ${remotes
-    .map(
-      (remote) =>
-        `'${remote.id}':{url:'${remote.config.external[0]}',format:'${remote.config.format}',from:'${remote.config.from}'}`
-    )
-    .join(',\n  ')}
-};
-const loadJS = (url, fn) => {
+${createRemotesMap(remotes)}
+const loadJS = async (url, fn) => {
+  const resolvedUrl = typeof url === 'function' ? await url() : url;
   const script = document.createElement('script')
   script.type = 'text/javascript';
   script.onload = fn;
-  script.src = url;
+  script.src = resolvedUrl;
   document.getElementsByTagName('head')[0].appendChild(script);
 }
 const scriptTypes = ['var'];
@@ -69,19 +68,22 @@ async function __federation_method_ensure(remoteId) {
           }
           resolve(remote.lib);
         }
-        loadJS(remote.url, callback);
+        return loadJS(remote.url, callback);
       });
     } else if (importTypes.includes(remote.format)) {
       // loading js with import(...)
       return new Promise(resolve => {
-        import(/* @vite-ignore */ remote.url).then(lib => {
-          if (!remote.inited) {
-            lib.init(shareScope);
-            remote.lib = lib;
-            remote.lib.init(shareScope);
-            remote.inited = true;
-          }
-          resolve(remote.lib);
+        const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
+        getUrl().then(url => {
+          import(/* @vite-ignore */ url).then(lib => {
+            if (!remote.inited) {
+              lib.init(shareScope);
+              remote.lib = lib;
+              remote.lib.init(shareScope);
+              remote.inited = true;
+            }
+            resolve(remote.lib);
+          })
         })
       })
     }
@@ -258,7 +260,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
         if (requiresRuntime) {
           magicString.prepend(
-                `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
           )
         }
         return {
