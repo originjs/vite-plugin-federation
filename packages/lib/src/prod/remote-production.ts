@@ -48,7 +48,7 @@ const loadJS = async (url, fn) => {
 const scriptTypes = ['var'];
 const importTypes = ['esm', 'systemjs']
 function get(name){
-  return __federation_import(name).then(module => ()=>module)
+  return __federation_import(name).then(module => ()=> { return Object.prototype.toString.call(module).indexOf('Module') > -1 && module.default ? module.default : module })
 }
 const shareScope = {
   ${getModuleMarker('shareScope')}
