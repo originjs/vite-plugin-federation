@@ -33,11 +33,11 @@ export function devRemotePlugin(
       __federation__: `
 const remotesMap = {
   ${remotes
-    .map(
-      (remote) =>
-        `'${remote.id}':{url:'${remote.config.external[0]}',format:'${remote.config.format}',from:'${remote.config.from}'}`
-    )
-    .join(',\n  ')}
+          .map(
+            (remote) =>
+              `'${remote.id}':{url:'${remote.config.external[0]}',format:'${remote.config.format}',from:'${remote.config.from}'}`
+          )
+          .join(',\n  ')}
 };
 const loadJS = (url, fn) => {
   const script = document.createElement('script')
@@ -49,7 +49,7 @@ const loadJS = (url, fn) => {
 const scriptTypes = ['var'];
 const importTypes = ['esm', 'systemjs']
 function get(name){
-  return import(/* @vite-ignore */ name).then(module => ()=>module)
+  return import(/* @vite-ignore */ name).then(module => ()=> { return Object.prototype.toString.call(module).indexOf('Module') > -1 && module.default ? module.default : module })
 }
 const shareScope = {
   ${getModuleMarker('shareScope')}
@@ -139,9 +139,8 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             for (const arr of parsedOptions.devShared) {
               if (!arr[1].version) {
                 const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
-                const packageJsonPath = `${
-                  optimized[arr[0]].src?.split(regExp)[0]
-                }node_modules/${arr[0]}/package.json`
+                const packageJsonPath = `${optimized[arr[0]].src?.split(regExp)[0]
+                  }node_modules/${arr[0]}/package.json`
                 try {
                   arr[1].version = (await import(packageJsonPath)).version
                   arr[1].version.length
@@ -156,9 +155,10 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         }
 
         if (id === '\0virtual:__federation__') {
+          const scopeCode = await devSharedScopeCode.call(this, parsedOptions.devShared, browserHash)
           return code.replace(
             getModuleMarker('shareScope'),
-            devSharedScopeCode(parsedOptions.devShared, browserHash).join(',')
+            scopeCode.join(',')
           )
         }
 
@@ -225,11 +225,10 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                           //  like import {a as b} from 'lib'
                           const importedName = spec.imported.name
                           const localName = spec.local.name
-                          deconstructStr += `${
-                            importedName === localName
+                          deconstructStr += `${importedName === localName
                               ? localName
                               : `${importedName} : ${localName}`
-                          },`
+                            },`
                         } else if (spec.type === 'ImportNamespaceSpecifier') {
                           //  like import * as a from 'lib'
                           magicString.appendRight(
@@ -258,7 +257,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
         if (requiresRuntime) {
           magicString.prepend(
-                `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
           )
         }
         return {
@@ -269,10 +268,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     }
   }
 
-  function devSharedScopeCode(
+  async function devSharedScopeCode(
+    this: TransformPluginContext,
     shared: (string | ConfigTypeSet)[],
     viteVersion: string | undefined
-  ): string[] {
+  ): Promise<string[]> {
     const hostname = resolveHostname(viteDevServer.config.server.host)
     const protocol = viteDevServer.config.server.https ? 'https' : 'http'
     const port = viteDevServer.config.server.port ?? 5000
@@ -280,23 +280,36 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       `${normalizePath(viteDevServer.config.root)}[/\\\\]`
     )
     let cacheDir = viteDevServer.config.cacheDir
-    cacheDir = `${
-      cacheDir === null || cacheDir === void 0
+    cacheDir = `${cacheDir === null || cacheDir === void 0
         ? 'node_modules/.vite'
         : normalizePath(cacheDir).split(regExp)[1]
-    }`
+      }`
     const res: string[] = []
     if (shared.length) {
-      shared.forEach((arr) => {
-        const sharedName = arr[0]
-        const obj = arr[1]
+      const cwdPath = normalizePath(process.cwd())
+
+      for (const item of shared) {
+        const moduleInfo = await this.resolve(item[0], undefined, { skipSelf: true })
+
+        if (!moduleInfo) continue
+
+        const moduleFilePath = normalizePath(moduleInfo.id)
+        const idx = moduleFilePath.indexOf(cwdPath)
+
+        const relativePath = idx === 0 ? moduleFilePath.slice(cwdPath.length) : null
+
+        const sharedName = item[0]
+        const obj = item[1]
         let str = ''
         if (typeof obj === 'object') {
-          const url = `'${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?v=${viteVersion}'`
+          const url = relativePath
+            ? `'${protocol}://${hostname.name}:${port}${relativePath}'`
+            : `'${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?v=${viteVersion}'`
+
           str += `get:()=> get(${url})`
           res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
-      })
+      }
     }
     return res
   }
@@ -322,9 +335,9 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     // Set host name to localhost when possible, unless the user explicitly asked for '127.0.0.1'
     const name =
       (optionsHost !== '127.0.0.1' && host === '127.0.0.1') ||
-      host === '0.0.0.0' ||
-      host === '::' ||
-      host === undefined
+        host === '0.0.0.0' ||
+        host === '::' ||
+        host === undefined
         ? 'localhost'
         : host
 
