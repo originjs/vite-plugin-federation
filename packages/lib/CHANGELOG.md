@@ -1,3 +1,19 @@
+## [1.1.4](https://github.com/originjs/vite-plugin-federation/compare/v1.1.3...v1.1.4) (2022-04-12)
+
+
+### Bug Fixes
+
+* overwrite the expose's id to synchronize with building context ([#158](https://github.com/originjs/vite-plugin-federation/issues/158)) ([3be750b](https://github.com/originjs/vite-plugin-federation/commit/3be750bec6f7bc33203a92fbad95f65c510dcbde))
+* react shared problems ([#166](https://github.com/originjs/vite-plugin-federation/issues/166)) ([4bb26ce](https://github.com/originjs/vite-plugin-federation/commit/4bb26ce660abf6443d3d1c0cbb795438881f0acf)), closes [#161](https://github.com/originjs/vite-plugin-federation/issues/161) [#161](https://github.com/originjs/vite-plugin-federation/issues/161)
+* regexp of dynamic css matchs double quotes(") ([74f6941](https://github.com/originjs/vite-plugin-federation/commit/74f69413b37f1b77acf0f3df31124d3c79b582d5))
+
+
+### Features
+
+* enable dynamic remote loading ([#163](https://github.com/originjs/vite-plugin-federation/issues/163)) ([1cd75ff](https://github.com/originjs/vite-plugin-federation/commit/1cd75ffaec409bb81f15bda0d6e3543c91e81cd4))
+
+
+
 ## [1.1.3](https://github.com/originjs/vite-plugin-federation/compare/v1.1.2...v1.1.3) (2022-03-23)
 
 
