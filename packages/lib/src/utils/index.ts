@@ -195,3 +195,5 @@ ${remotes
   .join(',\n  ')}
 };`
 }
+
+export const REMOTE_FROM_PARAMETER = 'remoteFrom'

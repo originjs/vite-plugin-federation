@@ -7,7 +7,8 @@ import {
   getModuleMarker,
   parseRemoteOptions,
   Remote,
-  removeNonRegLetter
+  removeNonRegLetter,
+  REMOTE_FROM_PARAMETER
 } from '../utils'
 import { builderInfo, parsedOptions } from '../public'
 import { basename, dirname } from 'path'
@@ -47,12 +48,19 @@ const loadJS = async (url, fn) => {
 }
 const scriptTypes = ['var'];
 const importTypes = ['esm', 'systemjs']
-function get(name){
-  return __federation_import(name).then(module => ()=>module)
+function get(name, ${REMOTE_FROM_PARAMETER}){
+  return __federation_import(name).then(module => ()=> {
+    if (${REMOTE_FROM_PARAMETER} === 'webpack') {
+      return Object.prototype.toString.call(module).indexOf('Module') > -1 && module.default ? module.default : module
+    }
+    return module
+  })
 }
-const shareScope = {
-  ${getModuleMarker('shareScope')}
-};
+const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
+  return {
+    ${getModuleMarker('shareScope')}
+  }
+}
 async function __federation_import(name){
   return import(name);
 }
@@ -66,7 +74,7 @@ async function __federation_method_ensure(remoteId) {
         const callback = () => {
           if (!remote.inited) {
             remote.lib = window[remoteId];
-            remote.lib.init(shareScope)
+            remote.lib.init(wrapShareModule(remote.from))
             remote.inited = true;
           }
           resolve(remote.lib);
@@ -80,6 +88,7 @@ async function __federation_method_ensure(remoteId) {
         getUrl().then(url => {
           import(/* @vite-ignore */ url).then(lib => {
             if (!remote.inited) {
+              const shareScope = wrapShareModule(remote.from)
               lib.init(shareScope);
               remote.lib = lib;
               remote.lib.init(shareScope);
@@ -211,7 +220,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             let str = ''
             if (typeof obj === 'object') {
               const fileName = `./${basename(this.getFileName(obj.emitFile))}`
-              str += `get:()=>get('${fileName}'), loaded:1`
+              str += `get:()=>get('${fileName}', ${REMOTE_FROM_PARAMETER}), loaded:1`
               res.push(`'${arr[0]}':{'${obj.version}':{${str}}}`)
             }
           })
