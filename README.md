@@ -132,7 +132,7 @@ exposes: {
 
 The remote module entry file referenced as a local module
 > configuration information
-#### `external:string`
+#### `external:string|Promise<string>`
 
 <br>
 
@@ -154,6 +154,26 @@ remotes: {
     }
 }
 ```
+If you want to use a dynamic url address, you can set the `external` as `promise`, but please note that you need to set the `externalType` as 'promise' at the same time, and please ensure that the code of the `promise` part is correct, otherwise the package may fail,here is a simple example.
+
+``` js
+remotes: {
+      home: {
+          external: `Promise.resolve('your url')`,
+          externalType: 'promise'
+      },
+},
+    
+// or from networke
+remotes: {
+    remote-simple: {
+        external: `fetch('your url').then(response=>response.json()).then(data=>data.url)`
+    }
+}
+```
+
+
+
 ***
 #### `format:'esm'|'systemjs'|'var'`
 

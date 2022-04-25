@@ -138,12 +138,13 @@ vue2 为例
 
 作为本地模块，引用的远端模块入口文件
 
-#### `external:string`
+#### `external:string|Promise<string>`
 
 <br>
 
 远程模块地址，例如：https://localhost:5011/remoteEntry.js
 你可以简单地进行如下配置
+
   ```js
   remotes: {
       // '远端模块名称':'远端模块入口文件地址'
@@ -160,6 +161,26 @@ remotes: {
     }
 }
 ```
+
+如果你想使用动态的URL地址，你可以设置`external`为一个promise，但是请注意需要同时指定`externalType`为'promise'，确保promise部分的代码正确并且返回`string`，否则可能打包失败，这里提供一个简单是示例
+
+``` js
+remotes: {
+      home: {
+          external: `Promise.resolve('your url')`,
+          externalType: 'promise'
+      },
+},
+    
+// or from networke
+remotes: {
+    remote-simple: {
+        external: `fetch('your url').then(response=>response.json()).then(data=>data.url)`
+    }
+}
+```
+
+
 
 ***
 #### `format` : `'esm'|'systemjs'|'var'`

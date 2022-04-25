@@ -60,7 +60,7 @@ declare interface VitePluginFederationOptions {
   /**
    * The name of the runtime chunk. If set a runtime chunk with this name is created or an existing entrypoint is used as runtime.
    */
-  runtime?: string | false
+  // runtime?: string | false
 
   /**
    * Share scope name used for all shared modules (defaults to 'default').
@@ -201,7 +201,7 @@ declare interface LibraryCustomUmdObject {
  * Container locations from which modules should be resolved and loaded at runtime. Property names are used as request scopes.
  */
 declare interface RemotesObject {
-  [index: string]: string | RemotesConfig | string[]
+  [index: string]: string | RemotesConfig | string[] | Promise<any>
 }
 
 /**
@@ -211,7 +211,12 @@ declare interface RemotesConfig {
   /**
    * Container locations from which modules should be resolved and loaded at runtime.
    */
-  external: string | string[]
+  external: string
+
+  /**
+   * The format of the specified external
+   */
+  externalType: 'url' | 'promise'
 
   /**
    * The name of the share scope shared with this remote.

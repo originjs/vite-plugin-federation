@@ -78,13 +78,15 @@ export function parseRemoteOptions(
       external: Array.isArray(item) ? item : [item],
       shareScope: options.shareScope || 'default',
       format: 'esm',
-      from: 'vite'
+      from: 'vite',
+      externalType: 'url'
     }),
     (item) => ({
       external: Array.isArray(item.external) ? item.external : [item.external],
       shareScope: item.shareScope || options.shareScope || 'default',
       format: item.format || 'esm',
-      from: item.from ?? 'vite'
+      from: item.from ?? 'vite',
+      externalType: item.externalType || 'url'
     })
   )
 }
@@ -179,10 +181,12 @@ export type Remote = { id: string; regexp: RegExp; config: RemotesConfig }
 export function createRemotesMap(remotes: Remote[]): string {
   const createUrl = (remote: Remote) => {
     const external = remote.config.external[0]
-    if (external.startsWith('promise ')) {
-      return `() => ${external.slice(8)}`
+    const externalType = remote.config.externalType
+    if (externalType === 'promise') {
+      return `()=>${external}`
+    } else {
+      return `'${external}'`
     }
-    return `'${external}'`
   }
   return `const remotesMap = {
 ${remotes
