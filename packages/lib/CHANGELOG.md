@@ -1,3 +1,12 @@
+## [1.1.5](https://github.com/originjs/vite-plugin-federation/compare/v1.1.4...v1.1.5) (2022-04-26)
+
+
+### Features
+
+* add dynamic field `externalType` and demo ([1f0ddf6](https://github.com/originjs/vite-plugin-federation/commit/1f0ddf6c9adaa533f777dc6b4b3ad7fd1edab5e5))
+
+
+
 ## [1.1.4](https://github.com/originjs/vite-plugin-federation/compare/v1.1.3...v1.1.4) (2022-04-12)
 
 
