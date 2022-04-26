@@ -162,6 +162,14 @@ remotes: {
 }
 ```
 
+
+
+### `externalType:'url'|'promise'`
+
+`default:'url'`
+
+设置`external`的类型
+
 如果你想使用动态的URL地址，你可以设置`external`为一个promise，但是请注意需要同时指定`externalType`为'promise'，确保promise部分的代码正确并且返回`string`，否则可能打包失败，这里提供一个简单是示例
 
 ``` js
@@ -175,7 +183,8 @@ remotes: {
 // or from networke
 remotes: {
     remote-simple: {
-        external: `fetch('your url').then(response=>response.json()).then(data=>data.url)`
+        external: `fetch('your url').then(response=>response.json()).then(data=>data.url)`,
+        externalType: 'promise'
     }
 }
 ```
@@ -209,6 +218,8 @@ remotes: {
 
 ####  `import: boolean`
 
+`default: true`
+
 <br>
 
 默认为 `true` ，是否加入shared共享该模块，仅对 `remote` 端生效，`remote` 开启该配置后，会减少部分打包时间，因为不需要打包部分` shared`，但是一旦 `host` 端没有可用的 `shared` 模块，会直接报错，因为没有可用的回退模块
@@ -216,6 +227,8 @@ remotes: {
 ****
 
 #### `shareScope: string`
+
+`default: 'default'`
 
 <br>
 
