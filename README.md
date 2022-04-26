@@ -154,6 +154,14 @@ remotes: {
     }
 }
 ```
+#### `enternalType: 'url'|'promise'`
+
+`default: 'url'`
+
+<br>
+
+set the type of external
+
 If you want to use a dynamic url address, you can set the `external` as `promise`, but please note that you need to set the `externalType` as 'promise' at the same time, and please ensure that the code of the `promise` part is correct, otherwise the package may fail,here is a simple example.
 
 ``` js
@@ -167,7 +175,8 @@ remotes: {
 // or from networke
 remotes: {
     remote-simple: {
-        external: `fetch('your url').then(response=>response.json()).then(data=>data.url)`
+        external: `fetch('your url').then(response=>response.json()).then(data=>data.url)`,
+        externalType: 'promise'
     }
 }
 ```
@@ -185,7 +194,7 @@ Specify the format of the remote component, this is more effective when the host
 
 #### `from` : `'vite'|'webpack'`
 
-`default : vite`
+`default : 'vite'`
 <br>
 
 Specify the source of the remote component, from `vite-plugin-federation` select `vite`, from `webpack` select `webpack`
@@ -196,6 +205,8 @@ Dependencies shared by local and remote modules. Local modules need to configure
 > configuration information
 #### `import: boolean`
 
+`default: true`
+
 <br>
 
 The default is `true`, whether to add shared to the module, only for the `remote` side, `remote` will reduce some of the packaging time when this configuration is turned on, because there is no need to package some of the `shared`, but once there is no `shared` module available on the `host` side, it will report an error directly, because there is no fallback module available
@@ -203,6 +214,8 @@ The default is `true`, whether to add shared to the module, only for the `remote
 ****
 
 #### `shareScope: string`
+
+`default: 'default'`
 
 <br>
 
