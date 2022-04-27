@@ -29,7 +29,7 @@ export function prodExposePlugin(
     EXPOSES_MAP.set(item[0], exposeFilepath)
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
-      return __federation_import('\${__federation_expose_${item[0]}}').then(module=>()=>module?.default??module)
+      return __federation_import('\${__federation_expose_${item[0]}}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)
     },`
   }
 
@@ -41,8 +41,9 @@ export function prodExposePlugin(
     name: 'originjs:expose-production',
     virtualFile: {
       // code generated for remote
-      __remoteEntryHelper__:
-   `let moduleMap = {${moduleMap}}
+      __remoteEntryHelper__: `
+      const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
+      let moduleMap = {${moduleMap}}
     const seen = {}
     export const ${DYNAMIC_LOADING_CSS} = (cssFilePaths) => {
       const metaUrl = import.meta.url
@@ -125,44 +126,61 @@ export function prodExposePlugin(
       if (remoteEntryChunk) {
         const item = remoteEntryChunk
         const filepathMap = new Map()
-        const getFilename = name => parse(parse(name).name).name
-        const cssBundlesMap: Map<string, OutputAsset | OutputChunk> = Object.keys(bundle).filter(name => extname(name) === '.css').reduce((res, name) => {
-          const filename = getFilename(name)
-          res.set(filename, bundle[name])
-          return res
-        }, new Map())
-        item.code = item.code.replace(new RegExp(`(["'])${DYNAMIC_LOADING_CSS_PREFIX}.*?\\1`, 'g'), str => {
-          // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
-          if (viteConfigResolved && !viteConfigResolved.build.cssCodeSplit) {
-            if (cssBundlesMap.size) {
-              return `[${[...cssBundlesMap.values()].map(cssBundle => JSON.stringify(basename(cssBundle.fileName))).join(',')}]`
-            } else {
-              return '[]'
+        const getFilename = (name) => parse(parse(name).name).name
+        const cssBundlesMap: Map<string, OutputAsset | OutputChunk> =
+          Object.keys(bundle)
+            .filter((name) => extname(name) === '.css')
+            .reduce((res, name) => {
+              const filename = getFilename(name)
+              res.set(filename, bundle[name])
+              return res
+            }, new Map())
+        item.code = item.code.replace(
+          new RegExp(`(["'])${DYNAMIC_LOADING_CSS_PREFIX}.*?\\1`, 'g'),
+          (str) => {
+            // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
+            if (viteConfigResolved && !viteConfigResolved.build.cssCodeSplit) {
+              if (cssBundlesMap.size) {
+                return `[${[...cssBundlesMap.values()]
+                  .map((cssBundle) =>
+                    JSON.stringify(basename(cssBundle.fileName))
+                  )
+                  .join(',')}]`
+              } else {
+                return '[]'
+              }
             }
-          }
-          const filepath = str.slice((`'` + DYNAMIC_LOADING_CSS_PREFIX).length, -1)
-          if (!filepath || !filepath.length) return str
-          let fileBundle = filepathMap.get(filepath)
-          if (!fileBundle) {
-            fileBundle = Object.values(bundle).find(b => 'facadeModuleId' in b && b.facadeModuleId === filepath)
-            if (fileBundle) filepathMap.set(filepath, fileBundle)
-            else return str
-          }
-          const depCssFiles: Set<string> = new Set()
-          const addDepCss = (bundleName) => {
-            const filename = getFilename(bundleName)
-            const cssBundle = cssBundlesMap.get(filename)
-            if (cssBundle) {
-              depCssFiles.add(cssBundle.fileName)
+            const filepath = str.slice(
+              (`'` + DYNAMIC_LOADING_CSS_PREFIX).length,
+              -1
+            )
+            if (!filepath || !filepath.length) return str
+            let fileBundle = filepathMap.get(filepath)
+            if (!fileBundle) {
+              fileBundle = Object.values(bundle).find(
+                (b) => 'facadeModuleId' in b && b.facadeModuleId === filepath
+              )
+              if (fileBundle) filepathMap.set(filepath, fileBundle)
+              else return str
             }
-            const theBundle = bundle[bundleName] as OutputChunk
-            if (theBundle && theBundle.imports && theBundle.imports.length) {
-              theBundle.imports.forEach(name => addDepCss(name))
+            const depCssFiles: Set<string> = new Set()
+            const addDepCss = (bundleName) => {
+              const filename = getFilename(bundleName)
+              const cssBundle = cssBundlesMap.get(filename)
+              if (cssBundle) {
+                depCssFiles.add(cssBundle.fileName)
+              }
+              const theBundle = bundle[bundleName] as OutputChunk
+              if (theBundle && theBundle.imports && theBundle.imports.length) {
+                theBundle.imports.forEach((name) => addDepCss(name))
+              }
             }
+            ;[fileBundle.fileName, ...fileBundle.imports].forEach(addDepCss)
+            return `[${[...depCssFiles]
+              .map((d) => JSON.stringify(basename(d)))
+              .join(',')}]`
           }
-          [fileBundle.fileName, ...fileBundle.imports].forEach(addDepCss)
-          return `[${[...depCssFiles].map(d => JSON.stringify(basename(d))).join(',')}]`
-        })
+        )
 
         // remove all __f__dynamic_loading_css__ after replace
         let ast: AcornNode | null = null
@@ -179,7 +197,8 @@ export function prodExposePlugin(
         walk(ast, {
           enter(node: any) {
             if (
-              node && node.type === 'CallExpression' &&
+              node &&
+              node.type === 'CallExpression' &&
               typeof node.arguments[0]?.value === 'string' &&
               node.arguments[0]?.value.indexOf(
                 `${DYNAMIC_LOADING_CSS_PREFIX}`

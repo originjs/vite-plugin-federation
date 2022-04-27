@@ -20,6 +20,7 @@ const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   ConfigTypeSet
 >()
 const nameCharReg = new RegExp('[0-9a-zA-Z@_-]+')
+
 export function prodRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
@@ -105,7 +106,7 @@ async function __federation_method_ensure(remoteId) {
 }
 
 function __federation_method_unwrapDefault(module) {
-  return module?.__esModule ? module['default'] : module
+  return (module?.__esModule || module?.[Symbol.toStringTag] === 'Module')?module.default:module
 }
 
 function __federation_method_wrapDefault(module ,need){
@@ -238,12 +239,14 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         }
 
         const magicString = new MagicString(code)
+        const hasStaticImported = new Map<string, string>()
         let requiresRuntime = false
         walk(ast, {
           enter(node: any) {
             if (
               (node.type === 'ImportExpression' ||
-                node.type === 'ImportDeclaration') &&
+                node.type === 'ImportDeclaration' ||
+                node.type === 'ExportNamedDeclaration') &&
               node.source?.value?.indexOf('/') > -1
             ) {
               const moduleId = node.source.value
@@ -271,13 +274,16 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                         /[@/\\.-]/g,
                         ''
                       )}`
-                      magicString.overwrite(
-                        node.start,
-                        node.end,
-                        `const ${afterImportName} = await __federation_method_getRemote(${JSON.stringify(
-                          remote.id
-                        )} , ${JSON.stringify(modName)});`
-                      )
+                      if (!hasStaticImported.has(moduleId)) {
+                        hasStaticImported.set(moduleId, afterImportName)
+                        magicString.overwrite(
+                          node.start,
+                          node.end,
+                          `const ${afterImportName} = await __federation_method_getRemote(${JSON.stringify(
+                            remote.id
+                          )} , ${JSON.stringify(modName)});`
+                        )
+                      }
                       let deconstructStr = ''
                       node.specifiers.forEach((spec) => {
                         // default import , like import a from 'lib'
@@ -315,6 +321,52 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                     }
                     break
                   }
+                  case 'ExportNamedDeclaration': {
+                    // handle export like export {a} from 'remotes/lib'
+                    const afterImportName = `__federation_var_${moduleId.replace(
+                      /[@/\\.-]/g,
+                      ''
+                    )}`
+                    if (!hasStaticImported.has(moduleId)) {
+                      hasStaticImported.set(moduleId, afterImportName)
+                      magicString.overwrite(
+                        node.start,
+                        node.end,
+                        `const ${afterImportName} = await __federation_method_getRemote(${JSON.stringify(
+                          remote.id
+                        )} , ${JSON.stringify(modName)});`
+                      )
+                    }
+                    if (node.specifiers.length > 0) {
+                      const specifiers = node.specifiers
+                      let exportContent = ''
+                      let deconstructContent = ''
+                      specifiers.forEach((spec) => {
+                        const localName = spec.local.name
+                        const exportName = spec.exported.name
+                        const variableName = `${afterImportName}_${localName}`
+                        deconstructContent = deconstructContent.concat(
+                          `${localName}:${variableName},`
+                        )
+                        exportContent = exportContent.concat(
+                          `${variableName} as ${exportName},`
+                        )
+                      })
+                      magicString.append(
+                        `\n const {${deconstructContent.slice(
+                          0,
+                          deconstructContent.length - 1
+                        )}} = ${afterImportName}; \n`
+                      )
+                      magicString.append(
+                        `\n export {${exportContent.slice(
+                          0,
+                          exportContent.length - 1
+                        )}}; `
+                      )
+                    }
+                    break
+                  }
                 }
               }
             }
@@ -335,4 +387,5 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     }
   }
 }
+
 export { sharedFileName2Prop }
