@@ -45,9 +45,9 @@
     "husky": "^7.0.4"
   },
   "lint-staged": {
-    "*.ts": [
-      "eslint --cache --fix",
+    "*.{ts,js,json,tsx,jsx,vue}": [
       "eslint",
+      "eslint --cache --fix",
       "prettier --write"
     ]
   }

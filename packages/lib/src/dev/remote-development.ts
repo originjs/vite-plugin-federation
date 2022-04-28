@@ -102,7 +102,7 @@ async function __federation_method_ensure(remoteId) {
 }
 
 function __federation_method_unwrapDefault(module) {
-  return module?.__esModule ? module['default'] : module
+  return (module?.__esModule || module?.[Symbol.toStringTag] === 'Module')?module.default:module
 }
 
 function __federation_method_wrapDefault(module ,need){
@@ -150,8 +150,9 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             for (const arr of parsedOptions.devShared) {
               if (!arr[1].version) {
                 const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
-                const packageJsonPath = `${optimized[arr[0]].src?.split(regExp)[0]
-                  }node_modules/${arr[0]}/package.json`
+                const packageJsonPath = `${
+                  optimized[arr[0]].src?.split(regExp)[0]
+                }node_modules/${arr[0]}/package.json`
                 try {
                   arr[1].version = (await import(packageJsonPath)).version
                   arr[1].version.length
@@ -166,7 +167,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         }
 
         if (id === '\0virtual:__federation__') {
-          const scopeCode = await devSharedScopeCode.call(this, parsedOptions.devShared, browserHash)
+          const scopeCode = await devSharedScopeCode.call(
+            this,
+            parsedOptions.devShared,
+            browserHash
+          )
           return code.replace(
             getModuleMarker('shareScope'),
             scopeCode.join(',')
@@ -184,12 +189,15 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         }
 
         const magicString = new MagicString(code)
+        const hasStaticImported = new Map<string, string>()
+
         let requiresRuntime = false
         walk(ast, {
           enter(node: any) {
             if (
               (node.type === 'ImportExpression' ||
-                node.type === 'ImportDeclaration') &&
+                node.type === 'ImportDeclaration' ||
+                node.type === 'ExportNamedDeclaration') &&
               node.source?.value?.indexOf('/') > -1
             ) {
               const moduleId = node.source.value
@@ -217,13 +225,16 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                         /[@/\\.-]/g,
                         ''
                       )}`
-                      magicString.overwrite(
-                        node.start,
-                        node.end,
-                        `const ${afterImportName} = await __federation_method_getRemote(${JSON.stringify(
-                          remote.id
-                        )} , ${JSON.stringify(modName)});`
-                      )
+                      if (!hasStaticImported.has(moduleId)) {
+                        magicString.overwrite(
+                          node.start,
+                          node.end,
+                          `const ${afterImportName} = await __federation_method_getRemote(${JSON.stringify(
+                            remote.id
+                          )} , ${JSON.stringify(modName)});`
+                        )
+                        hasStaticImported.set(moduleId, afterImportName)
+                      }
                       let deconstructStr = ''
                       node.specifiers.forEach((spec) => {
                         // default import , like import a from 'lib'
@@ -236,10 +247,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                           //  like import {a as b} from 'lib'
                           const importedName = spec.imported.name
                           const localName = spec.local.name
-                          deconstructStr += `${importedName === localName
+                          deconstructStr += `${
+                            importedName === localName
                               ? localName
                               : `${importedName} : ${localName}`
-                            },`
+                          },`
                         } else if (spec.type === 'ImportNamespaceSpecifier') {
                           //  like import * as a from 'lib'
                           magicString.appendRight(
@@ -257,6 +269,52 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                           )}} = ${afterImportName}`
                         )
                       }
+                    }
+                    break
+                  }
+                  case 'ExportNamedDeclaration': {
+                    // handle export like export {a} from 'remotes/lib'
+                    const afterImportName = `__federation_var_${moduleId.replace(
+                      /[@/\\.-]/g,
+                      ''
+                    )}`
+                    if (!hasStaticImported.has(moduleId)) {
+                      hasStaticImported.set(moduleId, afterImportName)
+                      magicString.overwrite(
+                        node.start,
+                        node.end,
+                        `const ${afterImportName} = await __federation_method_getRemote(${JSON.stringify(
+                          remote.id
+                        )} , ${JSON.stringify(modName)});`
+                      )
+                    }
+                    if (node.specifiers.length > 0) {
+                      const specifiers = node.specifiers
+                      let exportContent = ''
+                      let deconstructContent = ''
+                      specifiers.forEach((spec) => {
+                        const localName = spec.local.name
+                        const exportName = spec.exported.name
+                        const variableName = `${afterImportName}_${localName}`
+                        deconstructContent = deconstructContent.concat(
+                          `${localName}:${variableName},`
+                        )
+                        exportContent = exportContent.concat(
+                          `${variableName} as ${exportName},`
+                        )
+                      })
+                      magicString.append(
+                        `\n const {${deconstructContent.slice(
+                          0,
+                          deconstructContent.length - 1
+                        )}} = ${afterImportName}; \n`
+                      )
+                      magicString.append(
+                        `\n export {${exportContent.slice(
+                          0,
+                          exportContent.length - 1
+                        )}}; `
+                      )
                     }
                     break
                   }
@@ -291,23 +349,27 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       `${normalizePath(viteDevServer.config.root)}[/\\\\]`
     )
     let cacheDir = viteDevServer.config.cacheDir
-    cacheDir = `${cacheDir === null || cacheDir === void 0
+    cacheDir = `${
+      cacheDir === null || cacheDir === void 0
         ? 'node_modules/.vite'
         : normalizePath(cacheDir).split(regExp)[1]
-      }`
+    }`
     const res: string[] = []
     if (shared.length) {
       const cwdPath = normalizePath(process.cwd())
 
       for (const item of shared) {
-        const moduleInfo = await this.resolve(item[0], undefined, { skipSelf: true })
+        const moduleInfo = await this.resolve(item[0], undefined, {
+          skipSelf: true
+        })
 
         if (!moduleInfo) continue
 
         const moduleFilePath = normalizePath(moduleInfo.id)
         const idx = moduleFilePath.indexOf(cwdPath)
 
-        const relativePath = idx === 0 ? moduleFilePath.slice(cwdPath.length) : null
+        const relativePath =
+          idx === 0 ? moduleFilePath.slice(cwdPath.length) : null
 
         const sharedName = item[0]
         const obj = item[1]
@@ -346,9 +408,9 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     // Set host name to localhost when possible, unless the user explicitly asked for '127.0.0.1'
     const name =
       (optionsHost !== '127.0.0.1' && host === '127.0.0.1') ||
-        host === '0.0.0.0' ||
-        host === '::' ||
-        host === undefined
+      host === '0.0.0.0' ||
+      host === '::' ||
+      host === undefined
         ? 'localhost'
         : host
 

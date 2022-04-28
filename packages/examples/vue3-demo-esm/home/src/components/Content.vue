@@ -4,6 +4,7 @@
   <div :class="[$style.red, $style.bold]">Red and bold</div>
 </template>
 <script>
+export const name = 'remoteExport'
 export default {
   created() {
     console.log(this.$style.red)

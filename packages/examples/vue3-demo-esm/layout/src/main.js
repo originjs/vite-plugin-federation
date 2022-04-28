@@ -1,7 +1,8 @@
 import { createApp} from "vue";
-import store from './store';
+import store ,{name} from './store';
 import Layout from "./Layout.vue";
 
+console.log(`name=${name}`);
 import HomeContent from "home/Content";
 import HomeButton from "home/Button";
 import HomeImages from  "home/Images";
