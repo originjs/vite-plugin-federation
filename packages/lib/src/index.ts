@@ -148,7 +148,6 @@ export default function federation(
     },
 
     outputOptions(outputOptions) {
-      outputOptions.manualChunks = outputOptions.manualChunks || {}
       for (const pluginHook of pluginList) {
         pluginHook.outputOptions?.call(this, outputOptions)
       }
