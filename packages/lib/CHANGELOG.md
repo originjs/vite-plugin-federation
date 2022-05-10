@@ -1,3 +1,17 @@
+## [1.1.6](https://github.com/originjs/vite-plugin-federation/compare/v1.1.5...v1.1.6) (2022-05-10)
+
+
+### Bug Fixes
+
+* vite 2.9.0 causes manualChunks failed ([#183](https://github.com/originjs/vite-plugin-federation/issues/183)) ([3fa77a3](https://github.com/originjs/vite-plugin-federation/commit/3fa77a3bd590627c2c9757015d546d68e69a9316))
+
+
+### Features
+
+* transformed AST node type ExportNamedDeclaration ([0d4b8c6](https://github.com/originjs/vite-plugin-federation/commit/0d4b8c6385060986b4ad54259e31015448dacfc1))
+
+
+
 ## [1.1.5](https://github.com/originjs/vite-plugin-federation/compare/v1.1.4...v1.1.5) (2022-04-26)
 
 
