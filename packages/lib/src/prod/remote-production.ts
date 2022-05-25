@@ -244,6 +244,9 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         let requiresRuntime = false
         walk(ast, {
           enter(node: any) {
+            if(node.type === 'Identifier' && node.name === '__federation_method_getRemote') {
+              requiresRuntime = true;
+            }
             if (
               (node.type === 'ImportExpression' ||
                 node.type === 'ImportDeclaration' ||
