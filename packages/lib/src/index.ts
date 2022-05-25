@@ -46,7 +46,7 @@ export default function federation(
     }
     builderInfo.isHost = !!(
       parsedOptions.prodRemote.length || parsedOptions.devRemote.length
-    ) || options.dynamicRemotes
+    ) || !!options.dynamicRemotes
     builderInfo.isRemote = !!(
       parsedOptions.prodExpose.length || parsedOptions.devExpose.length
     )

@@ -284,7 +284,7 @@ export function prodSharedPlugin(
       `
     },
     options(inputOptions) {
-      isHost = !!parsedOptions.prodRemote.length || options.dynamicRemotes
+      isHost = !!parsedOptions.prodRemote.length || !!options.dynamicRemotes
       isRemote = !!parsedOptions.prodExpose.length
 
       if (sharedNames.size) {
