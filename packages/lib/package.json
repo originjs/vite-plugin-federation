@@ -1,6 +1,6 @@
 {
   "name": "@dilesoft/vite-plugin-federation-dynamic",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "A Vite plugin which support Module Federation.",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
