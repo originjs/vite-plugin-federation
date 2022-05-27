@@ -1,6 +1,6 @@
 import {defineConfig} from 'vite'
 import {createVuePlugin} from 'vite-plugin-vue2'
-import federation from '@originjs/vite-plugin-federation'
+import federation from '@dilesoft/vite-plugin-federation-dynamic'
 
 // https://vitejs.dev/config/
 export default defineConfig({
