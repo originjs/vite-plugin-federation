@@ -8,7 +8,7 @@ Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-f
 Using npm:
 
 ```
-npm install @originjs/vite-plugin-federation --save-dev
+npm install @dilesoft/vite-plugin-federation-dynamic --save-dev
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ npm install @originjs/vite-plugin-federation --save-dev
 
 ```js
 import { defineConfig } from 'vite'
-import federation from "@originjs/vite-plugin-federation";
+import federation from "@dilesoft/vite-plugin-federation-dynamic";
 
 export default defineConfig({
   plugins: [
@@ -40,7 +40,7 @@ export default defineConfig({
 - for a Rollup project, in `rollup.config.js`:
 
 ```js
-import federation from '@originjs/vite-plugin-federation'
+import federation from '@dilesoft/vite-plugin-federation-dynamic'
 
 export default {
   input: 'src/index.js',

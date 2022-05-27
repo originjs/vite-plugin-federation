@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import federation from "@originjs/vite-plugin-federation";
+import federation from "@dilesoft/vite-plugin-federation-dynamic";
 import ElementPlus from 'unplugin-element-plus/vite'
 import copy from 'rollup-plugin-copy'
 import { createHtmlPlugin } from 'vite-plugin-html'

@@ -172,7 +172,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
         if (id === '\0virtual:__federation_lib_semver') {
           const federationId = (
-            await this.resolve('@originjs/vite-plugin-federation')
+            await this.resolve('@dilesoft/vite-plugin-federation-dynamic')
           )?.id
           const satisfyId = `${dirname(federationId!)}/satisfy.js`
           return readFileSync(satisfyId, { encoding: 'utf-8' })
@@ -244,8 +244,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         let requiresRuntime = false
         walk(ast, {
           enter(node: any) {
-            if(node.type === 'Identifier' && node.name === '__federation_method_getRemote') {
-              requiresRuntime = true;
+            if (
+              node.type === 'Identifier' &&
+              node.name === '__federation_method_getRemote'
+            ) {
+              requiresRuntime = true
             }
             if (
               (node.type === 'ImportExpression' ||

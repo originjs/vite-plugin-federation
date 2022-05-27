@@ -4,9 +4,9 @@
 <p align="center">
   <a href="https://bestpractices.coreinfrastructure.org/projects/5752"><img src="https://bestpractices.coreinfrastructure.org/projects/5752/badge"></a>
   <a href="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml"><img src="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build Status"></a>
-  <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/v/@originjs/vite-plugin-federation" alt="Version"></a>
+  <a href="https://www.npmjs.com/package/@dilesoft/vite-plugin-federation-dynamic"><img src="https://badgen.net/npm/v/@dilesoft/vite-plugin-federation-dynamic" alt="Version"></a>
   <a href="https://nodejs.org/en/about/releases/"><img src="https://img.shields.io/node/v/vite.svg" alt="Node Compatibility"></a>
-  <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
+  <a href="https://www.npmjs.com/package/@dilesoft/vite-plugin-federation-dynamic"><img src="https://badgen.net/npm/license/@dilesoft/vite-plugin-federation-dynamic" alt="License"></a>
  </p>
 
 一个支持模块联邦的 Vite 插件
@@ -21,7 +21,7 @@
 使用 npm:
 
 ```
-npm install @originjs/vite-plugin-federation --save-dev
+npm install @dilesoft/vite-plugin-federation-dynamic --save-dev
 ```
 
 ## 使用
@@ -34,7 +34,7 @@ npm install @originjs/vite-plugin-federation --save-dev
 
 ```js
 import { defineConfig } from 'vite'
-import federation from "@originjs/vite-plugin-federation";
+import federation from "@dilesoft/vite-plugin-federation-dynamic";
 
 export default defineConfig({
   plugins: [
@@ -57,7 +57,7 @@ export default defineConfig({
 - 使用 Rollup 构建的项目, 修改`rollup.config.js`文件:
 
 ```js
-import federation from '@originjs/vite-plugin-federation'
+import federation from '@dilesoft/vite-plugin-federation-dynamic'
 
 
 export default {
