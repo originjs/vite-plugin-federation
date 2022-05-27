@@ -11,7 +11,7 @@
     "layout"
   ],
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "workspace:*",
+    "@dilesoft/vite-plugin-federation-dynamic": "workspace:*",
     "kill-port": "^1.6.1"
   }
 }

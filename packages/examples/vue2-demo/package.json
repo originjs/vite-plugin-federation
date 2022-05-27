@@ -12,7 +12,7 @@
     "stop": "kill-port --port 5000,5001"
   },
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "workspace:*",
+    "@dilesoft/vite-plugin-federation-dynamic": "workspace:*",
     "kill-port": "^1.6.1"
   },
   "license": "MulanPSL-2.0"

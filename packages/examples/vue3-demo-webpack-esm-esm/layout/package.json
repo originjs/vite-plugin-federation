@@ -13,7 +13,7 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "workspace:*",
+    "@dilesoft/vite-plugin-federation-dynamic": "workspace:*",
     "@vitejs/plugin-vue": "^1.3.0",
     "@vue/compiler-sfc": "^3.1.5",
     "vite": "^2.5.0"

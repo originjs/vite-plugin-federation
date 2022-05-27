@@ -15,7 +15,7 @@
     "clean": "pnpm run clean"
   },
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "link:../../lib",
+    "@dilesoft/vite-plugin-federation-dynamic": "link:../../lib",
     "kill-port": "^1.6.1",
     "lerna": "^4.0.0"
   },

@@ -13,7 +13,7 @@
     "stop": "kill-port --port 5000,5001"
   },
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "workspace:*",
+    "@dilesoft/vite-plugin-federation-dynamic": "workspace:*",
     "http-server": "^13.0.1",
     "kill-port": "^1.6.1"
   }
