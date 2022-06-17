@@ -289,7 +289,7 @@ Static import is supported at this stage. The following shows the difference bet
 
 ``` javascript
 // dynamic import
-const myButton = defineAsyncComponent(() => import('remote/myButton));
+const myButton = defineAsyncComponent(() => import('remote/myButton'));
 app.component('my-button' , myButton);
 // or
 export default {
