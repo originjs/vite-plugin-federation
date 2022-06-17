@@ -118,6 +118,11 @@ function __federation_method_wrapDefault(module ,need){
 function __federation_method_getRemote(remoteName,  componentName){
   return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
 }
+window.__federation_method_getRemote = __federation_method_getRemote;
+window.importFederation = function (remoteApp, options, componentName) {
+    window.remotesMap[remoteApp] = options;
+    return window.__federation_method_getRemote(remoteApp, './' + componentName);
+}
 export {__federation_method_ensure, __federation_method_getRemote , __federation_method_unwrapDefault , __federation_method_wrapDefault}
 ;`
     },
@@ -194,6 +199,12 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         let requiresRuntime = false
         walk(ast, {
           enter(node: any) {
+            if (
+              node.type === 'Identifier' &&
+              node.name === 'importFederation'
+            ) {
+              requiresRuntime = true
+            }
             if (
               (node.type === 'ImportExpression' ||
                 node.type === 'ImportDeclaration' ||

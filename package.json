@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-federation",
+  "name": "@dilesoft/vite-plugin-federation-dynamic",
   "private": true,
   "workspaces": [
     "packages/**"

@@ -1,4 +1,4 @@
-import federation from "@originjs/vite-plugin-federation";
+import federation from "@dilesoft/vite-plugin-federation-dynamic";
 
 import pkg from "./package.json";
 

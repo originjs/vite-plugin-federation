@@ -4,9 +4,9 @@ English | [简体中文](./README-zh.md)
 <p align="center">
   <a href="https://bestpractices.coreinfrastructure.org/projects/5752"><img src="https://bestpractices.coreinfrastructure.org/projects/5752/badge"></a>
   <a href="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml"><img src="https://github.com/originjs/vite-plugin-federation/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build Status"></a>
-  <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/v/@originjs/vite-plugin-federation" alt="Version"></a>
+  <a href="https://www.npmjs.com/package/@dilesoft/vite-plugin-federation-dynamic"><img src="https://badgen.net/npm/v/@dilesoft/vite-plugin-federation-dynamic" alt="Version"></a>
   <a href="https://nodejs.org/en/about/releases/"><img src="https://img.shields.io/node/v/vite.svg" alt="Node Compatibility"></a>
-  <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
+  <a href="https://www.npmjs.com/package/@dilesoft/vite-plugin-federation-dynamic"><img src="https://badgen.net/npm/license/@dilesoft/vite-plugin-federation-dynamic" alt="License"></a>
  </p>
 A Vite plugin which support Module Federation.
 Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) feature.
@@ -20,7 +20,7 @@ Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-f
 Using npm:
 
 ```
-npm install @originjs/vite-plugin-federation --save-dev
+npm install @dilesoft/vite-plugin-federation-dynamic --save-dev
 ```
 
 ## Usage
@@ -30,7 +30,7 @@ The main steps in using federation are:
 
 ```js
 import { defineConfig } from 'vite'
-import federation from "@originjs/vite-plugin-federation";
+import federation from "@dilesoft/vite-plugin-federation-dynamic";
 
 export default defineConfig({
   plugins: [
@@ -53,7 +53,7 @@ export default defineConfig({
 - for a Rollup project, in `rollup.config.js`:
 
 ```js
-import federation from '@originjs/vite-plugin-federation'
+import federation from '@dilesoft/vite-plugin-federation-dynamic'
 
 
 export default {

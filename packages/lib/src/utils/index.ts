@@ -197,7 +197,8 @@ ${remotes
       }',from:'${remote.config.from}'}`
   )
   .join(',\n  ')}
-};`
+};
+window.remotesMap = remotesMap;`
 }
 
 export const REMOTE_FROM_PARAMETER = 'remoteFrom'
