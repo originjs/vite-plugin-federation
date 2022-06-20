@@ -8,7 +8,8 @@ import {
   parseRemoteOptions,
   Remote,
   removeNonRegLetter,
-  REMOTE_FROM_PARAMETER
+  REMOTE_FROM_PARAMETER,
+  getExposeImportName
 } from '../utils'
 import { builderInfo, parsedOptions } from '../public'
 import { basename, dirname } from 'path'
@@ -37,6 +38,7 @@ export function prodRemotePlugin(
   return {
     name: 'originjs:remote-production',
     virtualFile: {
+      // language=JS
       __federation__: `
 ${createRemotesMap(remotes)}
 const loadJS = async (url, fn) => {
@@ -190,14 +192,8 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
               id: expose[1].id,
               fileName: `${
                 builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-              }__federation_expose_${removeNonRegLetter(
-                expose[0],
-                nameCharReg
-              )}.js`,
-              name: `__federation_expose_${removeNonRegLetter(
-                expose[0],
-                nameCharReg
-              )}`,
+              }__federation_expose_${getExposeImportName(expose)}.js`,
+              name: `__federation_expose_${getExposeImportName(expose)}`,
               preserveSignature: 'allow-extension'
             })
           }
@@ -205,7 +201,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         if (id === '\0virtual:__remoteEntryHelper__') {
           for (const expose of parsedOptions.prodExpose) {
             code = code.replace(
-              `\${__federation_expose_${expose[0]}}`,
+              `\${__federation_expose_${getExposeImportName(expose)}}`,
               `./${basename(this.getFileName(expose[1].emitFile))}`
             )
           }

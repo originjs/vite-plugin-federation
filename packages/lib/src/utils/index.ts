@@ -7,6 +7,8 @@ import type {
   SharedRuntimeInfo,
   VitePluginFederationOptions
 } from '../../types'
+import { readFileSync } from 'fs'
+import { createHash } from 'crypto'
 import { parse, posix } from 'path'
 import type { PluginContext } from 'rollup'
 
@@ -58,15 +60,33 @@ export function parseExposeOptions(
 ): (string | ConfigTypeSet)[] {
   return parseOptions(
     options.exposes,
-    (item) => ({
-      import: item,
-      name: undefined
-    }),
+    (item) => {
+      return {
+        import: item,
+        name: undefined,
+        contentHash: createContentHash(item)
+      }
+    },
     (item) => ({
       import: Array.isArray(item.import) ? item.import : [item.import],
-      name: item.name || undefined
+      name: item.name || undefined,
+      contentHash: createContentHash(item.import) // throws error if "item.import" is array #196
     })
   )
+}
+
+export function createContentHash(path: string): string {
+  const content = readFileSync(path, { encoding: 'utf-8' })
+  return createHash('md5').update(content).digest('hex').toString().slice(0, 8)
+}
+
+const nameCharReg = new RegExp('[0-9a-zA-Z@_-]+')
+export function getExposeImportName(item: string | ConfigTypeSet): string {
+  if (typeof item === 'string') {
+    return item
+  }
+
+  return `${removeNonRegLetter(item[0], nameCharReg)}_${item[1].contentHash}`
 }
 
 export function parseRemoteOptions(

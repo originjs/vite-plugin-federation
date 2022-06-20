@@ -1,5 +1,10 @@
 import { resolve, parse, basename, extname } from 'path'
-import { getModuleMarker, normalizePath, parseExposeOptions } from '../utils'
+import {
+  getExposeImportName,
+  getModuleMarker,
+  normalizePath,
+  parseExposeOptions
+} from '../utils'
 import {
   builderInfo,
   DYNAMIC_LOADING_CSS,
@@ -29,7 +34,9 @@ export function prodExposePlugin(
     EXPOSES_MAP.set(item[0], exposeFilepath)
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
-      return __federation_import('\${__federation_expose_${item[0]}}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)
+      return __federation_import('\${__federation_expose_${getExposeImportName(
+        item
+      )}}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)
     },`
   }
 
@@ -41,6 +48,7 @@ export function prodExposePlugin(
     name: 'originjs:expose-production',
     virtualFile: {
       // code generated for remote
+      // language=JS
       __remoteEntryHelper__: `
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {${moduleMap}}
