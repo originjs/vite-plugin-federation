@@ -1,7 +1,6 @@
 {
   "name": "vite-plugin-federation",
   "private": true,
-  "version": "1.2.0",
   "workspaces": [
     "packages/**"
   ],
