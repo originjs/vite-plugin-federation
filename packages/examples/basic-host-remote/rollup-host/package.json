@@ -1,5 +1,5 @@
 {
-  "name": "rollup-host",
+  "name": "@basic-host-remote/rollup-host",
   "version": "1.0.0",
   "main": "dist",
   "private": true,

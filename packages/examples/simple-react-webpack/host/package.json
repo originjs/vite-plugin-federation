@@ -1,5 +1,5 @@
 {
-  "name": "host",
+  "name": "@simple-react-webpack/host",
   "version": "1.0.0",
   "main": "dist",
   "license": "MulanPSL-2.0",

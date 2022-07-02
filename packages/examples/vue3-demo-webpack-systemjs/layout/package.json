@@ -1,5 +1,5 @@
 {
-  "name": "@vue3-demo/layout-wbp-systemjs",
+  "name": "@vue3-demo-webpack-systemjs/layout",
   "private": true,
   "version": "1.0.0",
   "scripts": {

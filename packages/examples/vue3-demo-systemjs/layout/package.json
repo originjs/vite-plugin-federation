@@ -1,5 +1,5 @@
 {
-  "name": "@vue3-demo/layout-systemjs",
+  "name": "@vue3-demo-systemjs/layout-systemjs",
   "private": true,
   "version": "1.0.0",
   "scripts": {

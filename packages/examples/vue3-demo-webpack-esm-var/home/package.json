@@ -1,5 +1,5 @@
 {
-  "name": "@vue3-demo/home-wbp-esm-war",
+  "name": "@vue3-demo-webpack-esm-var/home",
   "private": true,
   "version": "1.0.0",
   "scripts": {
