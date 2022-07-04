@@ -1,5 +1,5 @@
 {
-  "name": "@vue3-demo/common-lib-systemjs",
+  "name": "@vue3-demo-systemjs/common-lib-systemjs",
   "private": true,
   "version": "1.0.0",
   "scripts": {

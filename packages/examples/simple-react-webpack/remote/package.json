@@ -1,5 +1,5 @@
 {
-  "name": "remote",
+  "name": "@simple-react-webpack/remote",
   "version": "0.0.0",
   "private": true,
   "scripts": {

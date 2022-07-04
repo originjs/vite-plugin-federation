@@ -7,8 +7,8 @@
     "remote-simple"
   ],
   "scripts": {
-    "build": "pnpm run build -r --filter ./",
-    "serve": "pnpm run serve --parallel --filter ./",
+    "build": "pnpm --filter '@vue2-demo/*' build",
+    "serve": "pnpm --parallel --filter '@vue2-demo/*' serve",
     "stop": "kill-port --port 5000,5001"
   },
   "devDependencies": {
