@@ -1,9 +1,9 @@
 {
-  "name": "vue3-demo-webpack-esm-var",
+  "name": "vue3-demo-webpack-esm-esm",
   "private": true,
   "scripts": {
-    "build": "pnpm run build -r --filter ./",
-    "serve": "pnpm run serve --parallel --filter ./",
+    "build": "pnpm --parallel --filter './*' build",
+    "serve": "pnpm --parallel --filter './*'  serve",
     "stop": "kill-port --port 5000,5001"
   },
   "workspaces": [

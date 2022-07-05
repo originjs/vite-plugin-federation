@@ -16,13 +16,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        node_version: [12, 14, 16]
-        include:
-          - os: macos-latest
-            node_version: 16
-          - os: windows-latest
-            node_version: 16
+        os: [ubuntu-latest,macos-latest]
+        node_version: [14, 16]
+#        include:
+#          - os: windows-latest
+#            node_version: 16
       fail-fast: false
 
     name: 'Build&Test: node-${{ matrix.node_version }}, ${{ matrix.os }}'
@@ -33,7 +31,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 6
+          version: 7
 
       - name: Cache pnpm modules
         uses: actions/cache@v2
@@ -69,7 +67,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 6
+          version: 7
 
       - name: Set node version to 16
         uses: actions/setup-node@v2

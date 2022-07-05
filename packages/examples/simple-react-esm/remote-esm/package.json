@@ -1,5 +1,5 @@
 {
-  "name": "remote-esm",
+  "name": "@simple-react-esm/remote-esm",
   "version": "1.0.0",
   "main": "dist",
   "license": "MulanPSL-2.0",

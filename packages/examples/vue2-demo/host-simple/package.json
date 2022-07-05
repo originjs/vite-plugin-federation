@@ -1,5 +1,5 @@
 {
-  "name": "host-simple",
+  "name": "@vue2-demo/host-simple",
   "private": true,
   "version": "0.0.0",
   "scripts": {

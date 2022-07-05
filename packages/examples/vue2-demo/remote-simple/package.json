@@ -1,5 +1,5 @@
 {
-  "name": "remote-simple",
+  "name": "@vue2-demo/remote-simple",
   "private": true,
   "version": "0.0.0",
   "scripts": {

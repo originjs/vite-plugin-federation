@@ -1,5 +1,5 @@
 {
-  "name": "@vue3-demo/css-modules-esm",
+  "name": "@vue3-demo-esm/css-modules-esm",
   "private": true,
   "version": "1.0.0",
   "scripts": {
