@@ -8,7 +8,9 @@ import {
   parseRemoteOptions,
   Remote,
   removeNonRegLetter,
-  REMOTE_FROM_PARAMETER
+  REMOTE_FROM_PARAMETER,
+  getExposeImportName,
+  createContentHash
 } from '../utils'
 import { builderInfo, parsedOptions } from '../public'
 import { basename, dirname } from 'path'
@@ -37,6 +39,7 @@ export function prodRemotePlugin(
   return {
     name: 'originjs:remote-production',
     virtualFile: {
+      // language=JS
       __federation__: `
 ${createRemotesMap(remotes)}
 const loadJS = async (url, fn) => {
@@ -184,20 +187,15 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             if (!expose[1].id) {
               // resolved the moduleId here for the reference somewhere else like #152
               expose[1].id = (await this.resolve(expose[1].import))?.id
+              expose[1].contentHash = createContentHash(expose[1].id)
             }
             expose[1].emitFile = this.emitFile({
               type: 'chunk',
               id: expose[1].id,
               fileName: `${
                 builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-              }__federation_expose_${removeNonRegLetter(
-                expose[0],
-                nameCharReg
-              )}.js`,
-              name: `__federation_expose_${removeNonRegLetter(
-                expose[0],
-                nameCharReg
-              )}`,
+              }__federation_expose_${getExposeImportName(expose)}.js`,
+              name: `__federation_expose_${getExposeImportName(expose)}`,
               preserveSignature: 'allow-extension'
             })
           }
