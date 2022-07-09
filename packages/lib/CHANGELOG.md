@@ -1,3 +1,12 @@
+## [1.1.7](https://github.com/originjs/vite-plugin-federation/compare/v1.1.6...v1.1.7) (2022-07-09)
+
+
+### Features
+
+* **dev:** added content hash for exposed modules ([#198](https://github.com/originjs/vite-plugin-federation/issues/198)) ([2182b31](https://github.com/originjs/vite-plugin-federation/commit/2182b316dd1cdff09de18c1d439cb32e3de21482))
+
+
+
 ## [1.1.6](https://github.com/originjs/vite-plugin-federation/compare/v1.1.5...v1.1.6) (2022-05-10)
 
 
