@@ -63,14 +63,12 @@ export function parseExposeOptions(
     (item) => {
       return {
         import: item,
-        name: undefined,
-        contentHash: createContentHash(item)
+        name: undefined
       }
     },
     (item) => ({
       import: Array.isArray(item.import) ? item.import : [item.import],
-      name: item.name || undefined,
-      contentHash: createContentHash(item.import) // throws error if "item.import" is array #196
+      name: item.name || undefined
     })
   )
 }
