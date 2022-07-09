@@ -345,35 +345,31 @@ import myButton from 'remote/myButton'
 
 ### FAQ
 
-#### 远程模块的某个组件无法正常显示，控制台显示“[Vue warn]: Invalid VNode type: Symbol() (symbol)”
+#### ERROR: `Top-level` await is not available in the configured target environment
 
-本地模块和远端模块加载各自的 vue 会导致引用多个 vue 的问题。
+这是因为插件使用了`top-level-await`特性，当设置的浏览器环境不支持该特性时就会出现该报错，解决办法是将`build.target`设置为`esnext`，你可以在https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await查看各个浏览器对该特性的支持情况。
 
-解决：
-
-保持本地模块与远程模块中共享的依赖版本相对一致。
-
-远程模块的 vite.config.ts
-
-```ts
-federation({
-  name: 'common-lib',
-  filename: 'remoteEntry.js',
-  exposes: {
-	'./CommonCounter': './src/components/CommonCounter.vue',
-	'./CommonHeader': './src/components/CommonHeader.vue'
-  },
-  shared: {
-	vue: {
-	  requiredVersion:'^2.0.0' // shared 强制使用了过低的版本，删除或修改为 ^3.0.0 即可
-	}
+```js
+ build: {
+    target: "esnext"
   }
-})
 ```
 
 
 
-#### 远程模块加载本地模块的共享依赖失败，例如`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
+#### 没有正常生成chunk？
+
+请检查是否使用`vite`的`dev`模式启动了项目，当前仅有完全纯净的host端才可以使用`dev`模式，`remote`端必须使用`build`模式才能使插件生效。
+
+
+
+#### React 使用federation的一些问题
+
+建议查看这个[Issue](https://github.com/originjs/vite-plugin-federation/issues/173)，这里包含了大多数`React`相关的问题
+
+
+
+#### 远程模块加载本地模块的共享依赖失败，例如`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http:your url`
 
 原因：Vite 在启动服务时对于 IP、Port 有自动获取逻辑，在 Plugin 中还没有找到完全对应的获取逻辑，在部分情况下可能会出现获取失败。
 

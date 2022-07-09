@@ -332,35 +332,31 @@ import myButton from 'remote/myButton'
 
 ### FAQ
 
-#### The component of the remote module can not be displayed properly. The console displays“[Vue warn]: Invalid VNode type: Symbol() (symbol)”
+#### ERROR: `Top-level` await is not available in the configured target environment
 
-The loading of the respective `Vue`by local and remote modules causes the problem of referencing multiple `Vue`.
-
-Solutions：
-
-Keep the local module relatively consistent with the dependent version shared in the remote module.
-
-remote module's `vite.config.ts`
+The solution is to set `build.target` to `esnext`, which you can find at https://developer.mozilla.org/en-US/docs/ Web/JavaScript/Reference/Operators/await to see the support for this feature in each browser.
 
 ```ts
-federation({
-  name: 'common-lib',
-  filename: 'remoteEntry.js',
-  exposes: {
-	'./CommonCounter': './src/components/CommonCounter.vue',
-	'./CommonHeader': './src/components/CommonHeader.vue'
-  },
-  shared: {
-	vue: {
-	  requiredVersion:'^2.0.0' // If you force the version to be too low, delete or modify it to ^ 3.0.0
-	}
+build: {
+    target: "esnext"
   }
-})
 ```
 
 
 
-#### The remote module failed to load the share of the local module, for example`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://localhost:8080/node_modules/.cacheDir/vue.js?v=4cd35ed0`
+#### is not generating chunk properly?
+
+Please check if you have started the project in `dev` mode with `vite`, currently only the fully pure host side can use `dev` mode, the `remote` side must use `build` mode to make the plugin take effect.
+
+
+
+#### React uses federation for some questions
+
+It is recommended to check this [Issue](https://github.com/originjs/vite-plugin-federation/issues/173), which contains most of the `React` related issues
+
+
+
+#### The remote module failed to load the share of the local module, for example`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://your url`
 
 Reason: Vite has auto fetch logic for `IP` and Port when starting the service, no full fetch logic has been found in the `Plugin`, and in some cases a fetch failure may occur.
 
