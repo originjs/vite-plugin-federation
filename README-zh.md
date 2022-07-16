@@ -14,7 +14,7 @@
 
 ## 应用与实践
 
-![image-20211210105354887](https://github.com/originjs/vite-plugin-federation/blob/main/packages/examples/vue3-advanced-demo/README-Preview-Image)
+![Preview](./README-Preview.gif)
 
 ## 安装
 
@@ -106,6 +106,8 @@ vue2 为例
     </div>
 </template>
 ```
+## 限制
+Federation当前依赖浏览器支持Top-level await特性，因此需要将配置文件中的build.target设置为next或类似的值，查看Top-level await的[浏览器兼容性](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#browser_compatibility)
 
 ## 配置项说明
 ### exposes

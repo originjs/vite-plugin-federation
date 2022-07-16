@@ -8,12 +8,13 @@ English | [简体中文](./README-zh.md)
   <a href="https://nodejs.org/en/about/releases/"><img src="https://img.shields.io/node/v/vite.svg" alt="Node Compatibility"></a>
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
  </p>
+
 A Vite plugin which support Module Federation.
-Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-federation/) feature.
+Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-federation )
 
 ## Application and practice
 
-![image-20211210105354887](https://github.com/originjs/vite-plugin-federation/blob/main/packages/examples/vue3-advanced-demo/README-Preview-Image)
+![Preview](./README-Preview.gif)
 
 ## Install
 
@@ -102,6 +103,9 @@ Vue2, for example
   </div>
 </template>
 ```
+
+## Limitations
+Federation currently relies on browsers to support the Top-level await, so you need to set `build.target` in the configuration file to `next` or a similar value. See [browser compatibility](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#browser_compatibility) 
 
 ## Configuration description
 
