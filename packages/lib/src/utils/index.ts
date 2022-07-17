@@ -78,15 +78,6 @@ export function createContentHash(path: string): string {
   return createHash('md5').update(content).digest('hex').toString().slice(0, 8)
 }
 
-const nameCharReg = new RegExp('[0-9a-zA-Z@_-]+')
-export function getExposeImportName(item: string | ConfigTypeSet): string {
-  if (typeof item === 'string') {
-    return item
-  }
-
-  return `${removeNonRegLetter(item[0], nameCharReg)}_${item[1].contentHash}`
-}
-
 export function parseRemoteOptions(
   options: VitePluginFederationOptions
 ): (string | ConfigTypeSet)[] {
@@ -219,3 +210,4 @@ ${remotes
 }
 
 export const REMOTE_FROM_PARAMETER = 'remoteFrom'
+export const NAME_CHAR_REG = new RegExp('[0-9a-zA-Z@_-]+')

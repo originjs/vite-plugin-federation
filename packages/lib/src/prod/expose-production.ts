@@ -1,10 +1,17 @@
-import { resolve, parse, basename, extname } from 'path'
-import { getModuleMarker, normalizePath, parseExposeOptions } from '../utils'
+import { resolve, parse, basename, extname, relative, dirname } from 'path'
+import {
+  getModuleMarker,
+  normalizePath,
+  parseExposeOptions,
+  removeNonRegLetter,
+  NAME_CHAR_REG
+} from '../utils'
 import {
   builderInfo,
   DYNAMIC_LOADING_CSS,
   DYNAMIC_LOADING_CSS_PREFIX,
   EXPOSES_MAP,
+  EXPOSES_KEY_MAP,
   EXTERNALS,
   parsedOptions,
   SHARED
@@ -27,6 +34,10 @@ export function prodExposePlugin(
     EXTERNALS.push(moduleName)
     const exposeFilepath = normalizePath(resolve(item[1].import))
     EXPOSES_MAP.set(item[0], exposeFilepath)
+    EXPOSES_KEY_MAP.set(
+      item[0],
+      `__federation_expose_${removeNonRegLetter(item[0], NAME_CHAR_REG)}`
+    )
     moduleMap += `\n"${item[0]}":()=>{
       ${DYNAMIC_LOADING_CSS}('${DYNAMIC_LOADING_CSS_PREFIX}${exposeFilepath}')
       return __federation_import('\${__federation_expose_${item[0]}}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
@@ -181,6 +192,27 @@ export function prodExposePlugin(
               .join(',')}]`
           }
         )
+
+        // replace the export file placeholder path to final chunk path
+        for (const expose of parsedOptions.prodExpose) {
+          const module = Object.keys(bundle).find((module) => {
+            const chunk = bundle[module]
+            return chunk.name === EXPOSES_KEY_MAP.get(expose[0])
+          })
+
+          if (module) {
+            const chunk = bundle[module]
+            const fileRelativePath = relative(
+              dirname(remoteEntryChunk.fileName),
+              chunk.fileName
+            )
+            const slashPath = fileRelativePath.replace(/\\/g, '/')
+            item.code = item.code.replace(
+              `\${__federation_expose_${expose[0]}}`,
+              `./${slashPath}`
+            )
+          }
+        }
 
         // remove all __f__dynamic_loading_css__ after replace
         let ast: AcornNode | null = null
