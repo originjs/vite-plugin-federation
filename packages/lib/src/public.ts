@@ -1,6 +1,7 @@
 import type { ConfigTypeSet } from 'types'
 // for generateBundle Hook replace
 export const EXPOSES_MAP = new Map()
+export const EXPOSES_KEY_MAP = new Map()
 export const SHARED = 'shared'
 export const DYNAMIC_LOADING_CSS = 'dynamicLoadingCss'
 export const DYNAMIC_LOADING_CSS_PREFIX = '__v__css__'

@@ -9,10 +9,9 @@ import {
   Remote,
   removeNonRegLetter,
   REMOTE_FROM_PARAMETER,
-  getExposeImportName,
-  createContentHash
+  NAME_CHAR_REG
 } from '../utils'
-import { builderInfo, parsedOptions } from '../public'
+import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
 import { basename, dirname } from 'path'
 import type { PluginHooks } from '../../types/pluginHooks'
 import { readFileSync } from 'fs'
@@ -21,7 +20,6 @@ const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
   ConfigTypeSet
 >()
-const nameCharReg = new RegExp('[0-9a-zA-Z@_-]+')
 
 export function prodRemotePlugin(
   options: VitePluginFederationOptions
@@ -135,7 +133,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
           if (!sharedInfo[1].emitFile) {
             const basename = `__federation_shared_${removeNonRegLetter(
               sharedInfo[0],
-              nameCharReg
+              NAME_CHAR_REG
             )}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
@@ -187,27 +185,14 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             if (!expose[1].id) {
               // resolved the moduleId here for the reference somewhere else like #152
               expose[1].id = (await this.resolve(expose[1].import))?.id
-              expose[1].contentHash = createContentHash(expose[1].id)
             }
             expose[1].emitFile = this.emitFile({
               type: 'chunk',
               id: expose[1].id,
-              fileName: `${
-                builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-              }__federation_expose_${getExposeImportName(expose)}.js`,
-              name: `__federation_expose_${getExposeImportName(expose)}`,
+              name: EXPOSES_KEY_MAP.get(expose[0]),
               preserveSignature: 'allow-extension'
             })
           }
-        }
-        if (id === '\0virtual:__remoteEntryHelper__') {
-          for (const expose of parsedOptions.prodExpose) {
-            code = code.replace(
-              `\${__federation_expose_${expose[0]}}`,
-              `./${basename(this.getFileName(expose[1].emitFile))}`
-            )
-          }
-          return code
         }
       }
 
