@@ -9,8 +9,8 @@
     "css-modules"
   ],
   "scripts": {
-    "build": "pnpm --parallel --filter './*' build ",
-    "serve": "pnpm --parallel --filter './*' serve",
+    "build": "pnpm --parallel --filter ./* build ",
+    "serve": "pnpm --parallel --filter ./* serve",
     "stop": "kill-port --port 5000,5001,5002,5003"
   },
   "devDependencies": {
