@@ -1,3 +1,12 @@
+## [1.1.8](https://github.com/originjs/vite-plugin-federation/compare/v1.1.7...v1.1.8) (2022-08-01)
+
+
+### Bug Fixes
+
+* update content hash calculate for export module ([e2bccc1](https://github.com/originjs/vite-plugin-federation/commit/e2bccc1cf58b9f18ac1a6c27e417e4f1a8870595))
+
+
+
 ## [1.1.7](https://github.com/originjs/vite-plugin-federation/compare/v1.1.6...v1.1.7) (2022-07-09)
 
 
