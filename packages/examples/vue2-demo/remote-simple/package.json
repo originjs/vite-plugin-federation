@@ -10,11 +10,10 @@
     "debug": "set DEBUG=vite:deps && vite build"
   },
   "devDependencies": {
-    "vite": "^2.5.1",
-    "vite-plugin-vue2": "^1.9.0"
+    "vite": "^3.0.3",
+    "@vitejs/plugin-vue2": "^1.1.2"
   },
   "dependencies": {
-    "vue": "^2.6.14",
-    "vue-template-compiler": "^2.6.14"
+    "vue": "^2.7.8"
   }
 }

@@ -8,6 +8,6 @@
     "serve": "http-server . -p 5000 --cors='*'"
   },
   "devDependencies": {
-    "rollup": "^2.60.0"
+    "rollup": "^2.77.2"
   }
 }

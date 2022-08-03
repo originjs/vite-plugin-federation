@@ -13,7 +13,7 @@
     "react-dom": "^16.13.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.3.0",
-    "vite": "^2.5.0"
+    "@vitejs/plugin-vue": "^3.0.1",
+    "vite": "^3.0.3"
   }
 }
