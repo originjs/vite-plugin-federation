@@ -8,14 +8,14 @@
   ],
   "scripts": {
     "start": "pnpm start",
-    "build": "pnpm --parallel --filter '@vue3-advanced-demo/*' build ",
-    "serve": "pnpm --parallel --filter '@vue3-advanced-demo/*' serve ",
+    "build": "pnpm --parallel --filter \"./**\" build ",
+    "serve": "pnpm --parallel --filter \"./**\" serve ",
     "restart": "pnpm run stop & lerna run build & lerna run serve --parallel --loglevel=silent & ",
     "stop": "kill-port --port 5004,5005",
     "clean": "pnpm run clean"
   },
   "devDependencies": {
-    "@originjs/vite-plugin-federation": "link:../../lib",
+    "@originjs/vite-plugin-federation": "workspace:*",
     "kill-port": "^1.6.1",
     "lerna": "^4.0.0"
   },
