@@ -342,7 +342,7 @@ import myButton from 'remote/myButton'
 
 #### ERROR: `Top-level` await is not available in the configured target environment
 
-The solution is to set `build.target` to `esnext`, which you can find at https://developer.mozilla.org/en-US/docs/ Web/JavaScript/Reference/Operators/await to see the support for this feature in each browser.
+The solution is to set `build.target` to `esnext`, which you can find at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await to see the support for this feature in each browser.
 
 ```ts
 build: {
