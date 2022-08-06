@@ -9,7 +9,7 @@
     "css-modules"
   ],
   "scripts": {
-    "start": "lerna run start",
+    "start": "pnpm start",
     "build": "pnpm --parallel --filter \"./**\" build",
     "serve": "pnpm --parallel --filter \"./**\" serve",
     "stop": "kill-port --port 5000,5001,5002,5003",

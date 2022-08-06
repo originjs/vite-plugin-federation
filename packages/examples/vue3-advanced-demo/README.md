@@ -8,7 +8,7 @@ This example demos consumption of federated modules from a vite bundle. `router-
 
 2. ```pnpm restart``` You can directly stop the 5004 and 5005 ports occupied by other applications, and compile and start the Host and Remote services
 
-3. `CTRL + C` can only stop the host server. You can run `yarn stop` to stop all services.
+3. `CTRL + C` can only stop the host server. You can run `pnpm stop` to stop all services.
 
 ### Advanced Demo
 We have added a Demo to show the combination of `Vite + Vue + Vuex + Vue Router + Element Plus + ECharts`.

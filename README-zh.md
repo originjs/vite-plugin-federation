@@ -268,15 +268,9 @@ remotes: {
 
 ## 构建
 
-vite-plugin-federation 在开发构建过程正需要依赖，建议全局安装。
+vite-plugin-federation 在开发构建过程中需要依赖，建议全局安装。
 
-- rollup
-- vite
-
-部分 example 需要依赖，建议全局安装。
-
-- lerna
-- rimraf
+- pnpm >=7.0.1
 
 Github CI 构建，非工程必备：
 

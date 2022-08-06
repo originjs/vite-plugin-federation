@@ -256,13 +256,7 @@ Only for the `remote` side, it specifies the required version of the `host share
 
 vite-plugin-federation dependencies are required during the development and build process, and global installation is recommended.
 
-- rollup
-- vite
-
-Part of example requires dependencies, recommended for global installation.
-
-- lerna
-- rimraf
+- pnpm >7.0
 
 Github CI build, not engineering required:
 

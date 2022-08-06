@@ -8,7 +8,7 @@
     "build": "vite build",
     "clean": "rm -rf dist",
     "stop": "kill-port --port 5004",
-    "restart": "yarn stop & yarn  build & yarn serve",
+    "restart": "pnpm stop & pnpm build & pnpm serve",
     "staging": "vite build --mode=staging",
     "pro": "vite build --mode=pro"
   },

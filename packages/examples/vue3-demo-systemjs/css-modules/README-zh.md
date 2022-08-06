@@ -3,9 +3,9 @@
 ---
 # 运行样例
 在 `packages/examples/vue3-demo` 文件夹下
-运行 `yarn` 来安装项目依赖。
-运行 `yarn build` 会编译 `common-lib`, `home`, `css-modules` and `layout` 子工程。
-运行 `yarn serve` 会重启端口对应服务 `common-lib`, `home`, `css-modules` and `layout` 分别对应端口 5002, 5001, 5002 and 5000。
+运行 `pnpm` 来安装项目依赖。
+运行 `pnpm build` 会编译 `common-lib`, `home`, `css-modules` and `layout` 子工程。
+运行 `pnpm serve` 会重启端口对应服务 `common-lib`, `home`, `css-modules` and `layout` 分别对应端口 5002, 5001, 5002 and 5000。
 
 - HOST (layout): [localhost:5000](http://localhost:5000/)
 - REMOTE (home): [localhost:5001](http://localhost:5001/)
