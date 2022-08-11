@@ -353,12 +353,19 @@ import myButton from 'remote/myButton'
 #### ERROR: `Top-level` await is not available in the configured target environment
 
 这是因为插件使用了`top-level-await`特性，当设置的浏览器环境不支持该特性时就会出现该报错，解决办法是将`build.target`设置为`esnext`，你可以在https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await查看各个浏览器对该特性的支持情况。
-
 ```js
  build: {
     target: "esnext"
   }
 ```
+或者设置成
+```js
+ build: {
+    target: ["chrome89", "edge89", "firefox89", "safari15"]
+ }
+```
+
+或者可以尝试使用插件[`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await)来消除`top-level-await`，在[vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)中演示了这种用法
 
 
 
