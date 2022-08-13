@@ -349,8 +349,14 @@ build: {
     target: "esnext"
   }
 ```
+or
+```js
+ build: {
+    target: ["chrome89", "edge89", "firefox89", "safari15"]
+ }
+```
 
-
+Or you can try using the plugin [`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await) to eliminate `top-level-await`, as demonstrated in [vue3-demo- esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm) demonstrates this usage
 
 #### is not generating chunk properly?
 
