@@ -1,5 +1,5 @@
 // test cases from https://devhints.io/semver
-
+import { describe, expect, test } from 'vitest'
 import { satisfy } from '../src/utils/semver'
 
 const version = '1.2.3'

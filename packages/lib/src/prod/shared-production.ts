@@ -12,7 +12,7 @@ import MagicString from 'magic-string'
 import { join, sep, resolve, basename } from 'path'
 import { readdirSync, statSync } from 'fs'
 import type {
-  OutputOptions,
+  NormalizedOutputOptions,
   PluginContext,
   OutputChunk,
   RenderedChunk
@@ -52,7 +52,7 @@ export function prodSharedPlugin(
     this: PluginContext,
     code,
     chunk: OutputChunk | RenderedChunk,
-    options: OutputOptions
+    options: NormalizedOutputOptions
   ) {
     const ast = this.parse(code)
     const magicString = new MagicString(code)
@@ -464,7 +464,7 @@ export function prodSharedPlugin(
         return aIndex - bIndex
       })
 
-      const manualChunkFunc = (id: string, obj: unknown) => {
+      const manualChunkFunc = (id: string) => {
         //  if id is in shared dependencies, return id ,else return vite function value
         const find = parsedOptions.prodShared.find((arr) =>
           arr[1].dependencies.has(id)
@@ -476,7 +476,7 @@ export function prodSharedPlugin(
       if (typeof outputOption.manualChunks === 'function') {
         outputOption.manualChunks = new Proxy(outputOption.manualChunks, {
           apply(target, thisArg, argArray) {
-            const result = manualChunkFunc(argArray[0], argArray[1])
+            const result = manualChunkFunc(argArray[0])
             return result ? result : target(argArray[0], argArray[1])
           }
         })

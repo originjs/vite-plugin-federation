@@ -1,6 +1,6 @@
-const path = require('path')
-
-const { ModuleFederationPlugin } = require('webpack').container
+const path = require('path');
+const { ModuleFederationPlugin } = require('webpack').container;
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 
 /** @type {import('webpack').Configuration} */
@@ -50,7 +50,10 @@ module.exports = {
           requiredVersion: '^16.12.0'
         }
       }
-    })
+    }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "./index.html"),
+    }),
   ],
   devServer: {
     static: {

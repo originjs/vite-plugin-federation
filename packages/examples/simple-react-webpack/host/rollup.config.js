@@ -20,7 +20,10 @@ export default {
     }),
     federation({
       remotes: {
-        remote_app: 'http://localhost:5001/remoteEntry.js'
+        remote_app: {
+          external: 'http://localhost:5001/remoteEntry.js',
+          from: 'webpack'
+        }
       },
       shared: {
         react: {
@@ -31,7 +34,7 @@ export default {
         'react-dom': {
           singleton: true,
           requiredVersion: pkg.dependencies['react-dom'],
-          version:'16.14.0'
+          version: '16.14.0'
         }
       }
     })

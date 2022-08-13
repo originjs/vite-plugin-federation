@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@originjs/vite-plugin-federation": "workspace:*",
-    "kill-port": "^1.6.1"
+    "kill-port": "^2.0.1"
   },
   "license": "MulanPSL-2.0"
 }

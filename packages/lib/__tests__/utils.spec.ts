@@ -5,6 +5,7 @@ import {
   removeNonRegLetter
 } from '../src/utils'
 import type { ExposesObject } from '../types'
+import { expect, test } from 'vitest'
 
 test('remove nonLetter', () => {
   const includeUnderline = 'user_name'

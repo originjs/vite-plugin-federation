@@ -15,7 +15,7 @@
   "devDependencies": {
     "@originjs/vite-plugin-federation": "workspace:*",
     "http-server": "^13.0.1",
-    "kill-port": "^1.6.1"
+    "kill-port": "^2.0.1"
   }
 }
 
