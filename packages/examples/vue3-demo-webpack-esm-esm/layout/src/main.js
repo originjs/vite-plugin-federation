@@ -6,8 +6,6 @@ import HomeContent from  "home/Content";
 const HomeButton = defineAsyncComponent(() => import("home/Button"));
 const app = createApp(Layout);
 
-
-
 app.component("home-content", HomeContent);
 app.component("home-button", HomeButton);
 

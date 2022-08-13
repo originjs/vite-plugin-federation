@@ -17,7 +17,7 @@ export default defineConfig({
     testTimeout: timeout,
     hookTimeout: timeout,
     globals: true,
-    reporters: 'dot',
+    reporters: 'default',
     onConsoleLog(log) {
       if (log.match(/experimental|jit engine|emitted file|tailwind/i))
         return false

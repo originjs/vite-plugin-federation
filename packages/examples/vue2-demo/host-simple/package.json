@@ -8,7 +8,7 @@
     "serve": "vite preview --port 5000 --strictPort"
   },
   "devDependencies": {
-    "vite": "^3.0.3",
+    "vite": "^3.0.7",
     "@vitejs/plugin-vue2": "^1.1.2"
   },
   "dependencies": {

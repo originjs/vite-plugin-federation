@@ -1,3 +1,5 @@
+import { browserLogs, page } from '~utils'
+import { expect, test } from 'vitest'
 
 test.skip('should have no 404s', () => {
   browserLogs.forEach((msg) => {
