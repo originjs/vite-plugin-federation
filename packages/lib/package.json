@@ -45,7 +45,7 @@
     "@rollup/plugin-virtual": "^2.0.3",
     "@types/estree": "^0.0.50",
     "conventional-changelog-cli": "^2.1.1",
-    "rollup": "^2.77.2",
+    "rollup": "^3.0.0-3",
     "vite": "^3.0.7"
   }
 }
