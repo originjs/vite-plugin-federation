@@ -105,7 +105,10 @@ export function prodSharedPlugin(
                 prop?.root ? '.' : ''
               }./__federation_fn_import.js'\n`
             )
-            return magicString.toString()
+            return {
+              code: magicString.toString(),
+              map: magicString.generateMap(chunk.map)
+            }
           }
         }
         break
@@ -225,7 +228,10 @@ export function prodSharedPlugin(
             }
           })
           if (modify) {
-            return magicString.toString()
+            return {
+              code: magicString.toString(),
+              map: magicString.generateMap(chunk.map)
+            }
           }
         }
         break
