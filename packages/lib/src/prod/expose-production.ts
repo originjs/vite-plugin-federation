@@ -115,27 +115,20 @@ export function prodExposePlugin(
         })
       }
     },
-    renderChunk(code, chunk) {
-      if (chunk.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
-        remoteEntryChunk = chunk
-      }
-      return null
-    },
-    generateBundle(_options, bundle) {
-      // const moduleCssFileMap = getChunkCssRelation(bundle)
 
+    generateBundle(_options, bundle) {
       // replace import absolute path to chunk's fileName in remoteEntry.js
-      for (const file in bundle) {
-        const chunk = bundle[file]
-        if (chunk.type === 'chunk' && chunk.isEntry) {
-          if (!remoteEntryChunk && chunk.fileName === options.filename) {
+      if (!remoteEntryChunk) {
+        for (const file in bundle) {
+          const chunk = bundle[file]
+          if (chunk?.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
             remoteEntryChunk = chunk
+            break
           }
         }
       }
       // placeholder replace
       if (remoteEntryChunk) {
-        const item = remoteEntryChunk
         const filepathMap = new Map()
         const getFilename = (name) => parse(parse(name).name).name
         const cssBundlesMap: Map<string, OutputAsset | OutputChunk> =
@@ -146,7 +139,7 @@ export function prodExposePlugin(
               res.set(filename, bundle[name])
               return res
             }, new Map())
-        item.code = item.code.replace(
+        remoteEntryChunk.code = remoteEntryChunk.code.replace(
           new RegExp(`(["'])${DYNAMIC_LOADING_CSS_PREFIX}.*?\\1`, 'g'),
           (str) => {
             // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
@@ -207,7 +200,7 @@ export function prodExposePlugin(
               chunk.fileName
             )
             const slashPath = fileRelativePath.replace(/\\/g, '/')
-            item.code = item.code.replace(
+            remoteEntryChunk.code = remoteEntryChunk.code.replace(
               `\${__federation_expose_${expose[0]}}`,
               `./${slashPath}`
             )
@@ -217,14 +210,14 @@ export function prodExposePlugin(
         // remove all __f__dynamic_loading_css__ after replace
         let ast: AcornNode | null = null
         try {
-          ast = this.parse(item.code)
+          ast = this.parse(remoteEntryChunk.code)
         } catch (err) {
           console.error(err)
         }
         if (!ast) {
           return
         }
-        const magicString = new MagicString(item.code)
+        const magicString = new MagicString(remoteEntryChunk.code)
         // let cssFunctionName: string = DYNAMIC_LOADING_CSS
         walk(ast, {
           enter(node: any) {
@@ -240,7 +233,7 @@ export function prodExposePlugin(
             }
           }
         })
-        item.code = magicString.toString()
+        remoteEntryChunk.code = magicString.toString()
       }
     }
   }
