@@ -29,6 +29,7 @@ export default defineConfig({
     assetsInlineLimit: 40960,
     minify: true,
     cssCodeSplit: false,
+    sourcemap:true,
     rollupOptions: {
       output: {
         minifyInternalExports: false
