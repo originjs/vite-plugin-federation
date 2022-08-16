@@ -10,7 +10,7 @@ declare interface VitePluginFederationOptions {
   /**
    * Modules that should be exposed by this container. When provided, property name is used as public name, otherwise public name is automatically inferred from request.
    */
-  exposes?: (string | ExposesObject)[] | ExposesObject
+  exposes?: Exposes
 
   /**
    * The filename of the container as relative path inside the `output.path` directory.
@@ -55,7 +55,7 @@ declare interface VitePluginFederationOptions {
   /**
    * Container locations and request scopes from which modules should be resolved and loaded at runtime. When provided, property name is used as request scope, otherwise request scope is automatically inferred from container location.
    */
-  remotes?: (string | RemotesObject)[] | RemotesObject
+  remotes?: Remotes
 
   /**
    * The name of the runtime chunk. If set a runtime chunk with this name is created or an existing entrypoint is used as runtime.
@@ -70,7 +70,7 @@ declare interface VitePluginFederationOptions {
   /**
    * Modules that should be shared in the share scope. When provided, property names are used to match requested modules in this compilation.
    */
-  shared?: (string | SharedObject)[] | SharedObject
+  shared?: Shared
 
   /**
    * Current operating mode
@@ -99,7 +99,7 @@ declare interface SharedRuntimeInfo {
  * Modules that should be exposed by this container. Property names are used as public paths.
  */
 declare interface ExposesObject {
-  [index: string]: string | ExposesConfig | string[]
+  [index: string]: ExposesConfig | string | string[]
 }
 
 /**
