@@ -23,6 +23,7 @@ export default defineConfig({
     target: 'esnext',
     minify: true,
     cssCodeSplit: false,
+    sourcemap: true,
     rollupOptions: {
       output: {
         format: 'system',

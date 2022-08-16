@@ -329,10 +329,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
           )
         }
-        return {
-          code: magicString.toString(),
-          map: null
-        }
+        return magicString.toString()
       }
     }
   }
