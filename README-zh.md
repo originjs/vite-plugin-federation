@@ -252,7 +252,29 @@ remotes: {
 
 仅对 `remote` 端生效，规定所使用的 `host shared` 所需要的版本，当 `host` 端的版本不符合 `requiredVersion` 要求时，会使用自己的 `shared` 模块，前提是自己没有配置 `import=false` ，默认不启用该功能
 
+**** 
 
+#### `packagePath: string`
+`supportMode: only serve`
+
+允许自定义软件包通过packagePath共享（以前只限于node_modules下的软件包）。
+比如你只能定义类似的共享
+```js
+shared :{
+    packageName:{
+        ...
+    }
+}
+```
+packageName必须是node_modules下的一个包，如vue、react等，但你不能定义自己的包。
+但是现在你可以通过指定包的路径来共享一个自定义的包，比如说
+```js
+shared: {
+    packageName: {
+        packagePath:'./src/a/index.js'
+    }
+}
+```
 
 ## 例子
 + [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)

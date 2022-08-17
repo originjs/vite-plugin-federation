@@ -137,7 +137,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             )}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
-              id: sharedInfo[1].id ?? sharedInfo[0],
+              id: sharedInfo[1].id ?? sharedInfo[1].packagePath,
               fileName: `${
                 builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
               }${
