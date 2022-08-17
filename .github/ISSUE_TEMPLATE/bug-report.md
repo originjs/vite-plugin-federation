@@ -12,8 +12,8 @@ assignees: ''
 
 ### Versions
 
-- originjs: <!-- ex: v0.1.0 -->
-- node: <!-- ex: v12.14.0 -->
+- vite-plugin-federation: <!-- ex: v1.1.8 -->
+- vite: <!-- ex: v3.0.7 -->
 
 ### Reproduction
 
