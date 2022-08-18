@@ -67,7 +67,7 @@ export function parseExposeOptions(
       }
     },
     (item) => ({
-      import: Array.isArray(item.import) ? item.import : [item.import],
+      import: item.import,
       name: item.name || undefined
     })
   )
