@@ -240,6 +240,31 @@ Only works on `host` side, the version of the shared module provided is `version
 <br>
 
 Only for the `remote` side, it specifies the required version of the `host shared` used, when the version of the `host` side does not meet the `requiredVersion` requirement, it will use its own `shared` module, provided that it is not configured with `import=false`, which is not enabled by default
+
+**** 
+
+#### `packagePath: string`
+`supportMode: only serve`
+
+Allow custom packages to be shared via packagePath (previously limited to those under node_modules),
+For Example
+You can only define similar shared
+```js
+shared :{
+    packageName:{
+        ...
+    }
+}
+```
+packageName must be a package under node_modules, such as vue, react, etc., but you cannot define your own package.
+But now you can share a custom package by specifying the package path, for example
+```js
+shared: {
+    packageName: {
+        packagePath:'./src/a/index.js'
+    }
+}
+```
 ## Examples
 + [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
 + [simple-react-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)

@@ -2,7 +2,7 @@ import type { PluginHooks } from '../../types/pluginHooks'
 import {
   findDependencies,
   getModuleMarker,
-  parseOptions,
+  parseSharedOptions,
   removeNonRegLetter
 } from '../utils'
 import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
@@ -23,20 +23,11 @@ const sharedFileReg = /^__federation_shared_.+\.js$/
 export function prodSharedPlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
-  parsedOptions.prodShared = parseOptions(
-    options.shared || {},
-    () => ({
-      import: true,
-      shareScope: 'default'
-    }),
-    (value) => {
-      value.import = value.import ?? true
-      value.shareScope = value.shareScope || 'default'
-      return value
-    }
+  parsedOptions.prodShared = parseSharedOptions(options)
+  const shareName2Prop = new Map<string, any>()
+  parsedOptions.prodShared.forEach((value) =>
+    shareName2Prop.set(value[0], value[1])
   )
-  const sharedNames = new Set<string>()
-  parsedOptions.prodShared.forEach((value) => sharedNames.add(value[0]))
   const exposesModuleIdSet = new Set()
   EXPOSES_MAP.forEach((value) => {
     exposesModuleIdSet.add(`${value}.js`)
@@ -246,12 +237,12 @@ export function prodSharedPlugin(
       const moduleMap= ${getModuleMarker('moduleMap', 'var')}
       const moduleCache = Object.create(null);
       async function importShared(name,shareScope = 'default') {
-        return moduleCache[name] ? new Promise((r) => r(moduleCache[name])) : getProviderSharedModule(name, shareScope);
+        return moduleCache[name] ? new Promise((r) => r(moduleCache[name])) : (await getSharedFromRuntime(name, shareScope) || getSharedFromLocal(name));
       }
       async function __federation_import(name){
         return import(name);
       }
-      async function getProviderSharedModule(name,shareScope) {
+      async function getSharedFromRuntime(name,shareScope) {
         let module = null;
         if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
           const versionObj = globalThis.__federation_shared__[shareScope][name];
@@ -273,11 +264,9 @@ export function prodSharedPlugin(
         if(module){
           moduleCache[name] = module;
           return module;
-        }else{
-          return getConsumerSharedModule(name, shareScope);
         }
       }
-      async function getConsumerSharedModule(name , shareScope) {
+      async function getSharedFromLocal(name , shareScope) {
         if (moduleMap[name]?.import) {
           const module = (await moduleMap[name].get())()
           moduleCache[name] = module;
@@ -286,18 +275,18 @@ export function prodSharedPlugin(
           console.error(\`consumer config import=false,so cant use callback shared module\`)
         }
       }
-      export {importShared};
+      export {importShared , getSharedFromRuntime as importSharedRuntime , getSharedFromLocal as importSharedLocal};
       `
     },
     options(inputOptions) {
       isHost = !!parsedOptions.prodRemote.length
       isRemote = !!parsedOptions.prodExpose.length
 
-      if (sharedNames.size) {
+      if (shareName2Prop.size) {
         // remove item which is both in external and shared
         inputOptions.external = (inputOptions.external as [])?.filter(
           (item) => {
-            return !sharedNames.has(item)
+            return !shareName2Prop.has(item)
           }
         )
       }
@@ -323,25 +312,27 @@ export function prodSharedPlugin(
       const currentDir = resolve()
       for (const arr of parsedOptions.prodShared) {
         try {
-          const resolve = await this.resolve(arr[0])
+          const resolve = await this.resolve(arr[1].packagePath)
           arr[1].id = resolve?.id
         } catch (e) {
           //    try to resolve monoRepo
-          arr[1].removed = true
-          const dir = join(currentDir, 'node_modules', arr[0])
-          const dirStat = statSync(dir)
-          if (dirStat.isDirectory()) {
-            collectDirFn(dir, dirPaths)
-          } else {
-            this.error(`cant resolve "${arr[0]}"`)
-          }
+          if (!arr[1].manuallyPackagePathSetting) {
+            arr[1].removed = true
+            const dir = join(currentDir, 'node_modules', arr[0])
+            const dirStat = statSync(dir)
+            if (dirStat.isDirectory()) {
+              collectDirFn(dir, dirPaths)
+            } else {
+              this.error(`cant resolve "${arr[1].packagePath}"`)
+            }
 
-          if (dirPaths.length > 0) {
-            monoRepos.push({ arr: dirPaths, root: arr })
+            if (dirPaths.length > 0) {
+              monoRepos.push({ arr: dirPaths, root: arr })
+            }
           }
         }
 
-        if (isHost && !arr[1].version) {
+        if (isHost && !arr[1].manuallyPackagePathSetting && !arr[1].version) {
           const packageJsonPath = `${currentDir}${sep}node_modules${sep}${arr[0]}${sep}package.json`
           arr[1].version = (await import(packageJsonPath)).version
           if (!arr[1].version) {
@@ -473,7 +464,7 @@ export function prodSharedPlugin(
       const manualChunkFunc = (id: string) => {
         //  if id is in shared dependencies, return id ,else return vite function value
         const find = parsedOptions.prodShared.find((arr) =>
-          arr[1].dependencies.has(id)
+          arr[1].dependencies?.has(id)
         )
         return find ? find[0] : undefined
       }

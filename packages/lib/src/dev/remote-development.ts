@@ -148,7 +148,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
           const optimized = viteDevServer._optimizeDepsMetadata?.optimized
           if (optimized !== undefined) {
             for (const arr of parsedOptions.devShared) {
-              if (!arr[1].version) {
+              if (!arr[1].version && !arr[1].manuallyPackagePathSetting) {
                 const regExp = new RegExp(`node_modules[/\\\\]${arr[0]}[/\\\\]`)
                 const packageJsonPath = `${
                   optimized[arr[0]].src?.split(regExp)[0]
@@ -356,7 +356,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       const cwdPath = normalizePath(process.cwd())
 
       for (const item of shared) {
-        const moduleInfo = await this.resolve(item[0], undefined, {
+        const moduleInfo = await this.resolve(item[1].packagePath, undefined, {
           skipSelf: true
         })
 

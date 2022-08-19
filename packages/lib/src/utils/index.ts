@@ -4,7 +4,6 @@ import type {
   Remotes,
   RemotesConfig,
   Shared,
-  SharedRuntimeInfo,
   VitePluginFederationOptions
 } from '../../types'
 import { readFileSync } from 'fs'
@@ -40,19 +39,24 @@ export function findDependencies(
 
 export function parseSharedOptions(
   options: VitePluginFederationOptions
-): (string | (ConfigTypeSet & SharedRuntimeInfo))[] {
+): (string | ConfigTypeSet)[] {
   return parseOptions(
     options.shared || {},
-    () => ({
+    (value, key) => ({
       import: true,
-      shareScope: 'default'
+      shareScope: 'default',
+      packagePath: key,
+      // Whether the path is set manually
+      manuallyPackagePathSetting: true
     }),
-    (value) => {
+    (value, key) => {
       value.import = value.import ?? true
       value.shareScope = value.shareScope || 'default'
+      value.packagePath = value.packagePath || key
+      value.manuallyPackagePathSetting = value.packagePath !== key
       return value
     }
-  ) as (string | (ConfigTypeSet & SharedRuntimeInfo))[]
+  )
 }
 
 export function parseExposeOptions(

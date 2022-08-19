@@ -16,7 +16,18 @@ export default defineConfig({
         './Images': './src/components/Images.vue',
         './UnusedButton': './src/components/UnusedButton.vue'
       },
-      shared: ['vue', 'vuex']
+      shared: {
+        vue:{
+
+        },
+        vuex:{
+
+        },
+        // This is to test if the custom library can be SHARED, there is no real point
+        myStore:{
+          packagePath:'./src/store.js'
+        }
+      }
     }),
     topLevelAwait({
       // The export name of top-level await promise for each chunk module
