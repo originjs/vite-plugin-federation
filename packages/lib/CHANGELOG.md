@@ -1,3 +1,22 @@
+## [1.1.9](https://github.com/originjs/vite-plugin-federation/compare/v1.1.8...v1.1.9) (2022-08-19)
+
+
+### Bug Fixes
+
+* build warning when opening soucemap ([3a7385c](https://github.com/originjs/vite-plugin-federation/commit/3a7385ca35936c508223e7a40310825c275605dc))
+* exposes with object values ([#233](https://github.com/originjs/vite-plugin-federation/issues/233)) ([7ee9b53](https://github.com/originjs/vite-plugin-federation/commit/7ee9b53a69dfa4ffe01ba0f4fa8085953bf0115a)), closes [#196](https://github.com/originjs/vite-plugin-federation/issues/196)
+
+
+### Features
+
+* allow custom packages to be shared via packagePath (previously limited to those under node_modules) ([0d095ba](https://github.com/originjs/vite-plugin-federation/commit/0d095ba5efe49ef951a0ad302c32292a2271adfa))
+* change to vitest ([18c7906](https://github.com/originjs/vite-plugin-federation/commit/18c7906a4aa0345dc729d238577d3f397e39cd24))
+* change to vitest ([d50a9d1](https://github.com/originjs/vite-plugin-federation/commit/d50a9d1764f7d11fb3a6873d3703d23aa8a0dd2a))
+* support rollup v3.0 ([#230](https://github.com/originjs/vite-plugin-federation/issues/230)) ([5fb0a31](https://github.com/originjs/vite-plugin-federation/commit/5fb0a31f7ff0e09e17f31fd0d3621db5aa9e1226))
+* upgrade to vite 3.0 ([cf9c9ed](https://github.com/originjs/vite-plugin-federation/commit/cf9c9ed720aae6c7408235740c572d652a21b5ac))
+
+
+
 ## [1.1.8](https://github.com/originjs/vite-plugin-federation/compare/v1.1.7...v1.1.8) (2022-08-01)
 
 
