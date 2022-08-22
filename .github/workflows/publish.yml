@@ -41,6 +41,7 @@ jobs:
             Please refer to [CHANGELOG.md](https://github.com/originjs/vite-plugin-federation/blob/main/packages/lib/CHANGELOG.md) for details.
       - name: Publish to npm registry
         run: |
+          rm -rf packages/temp
           cd packages/lib
           npm publish --access public
         env:
