@@ -9,122 +9,223 @@ English | [简体中文](./README-zh.md)
   <a href="https://www.npmjs.com/package/@originjs/vite-plugin-federation"><img src="https://badgen.net/npm/license/@originjs/vite-plugin-federation" alt="License"></a>
  </p>
 
-A Vite plugin which support Module Federation.
-Inspired by Webpack [Module Federation](https://webpack.js.org/concepts/module-federation )
+A Vite/Rollup plugin which support Module Federation.
+Inspired by Webpack and compatible with [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/).
 
-## Application and practice
+## Running results
 
 ![Preview](./README-Preview.gif)
 
 ## Install
 
-Using npm:
-
 ```
 npm install @originjs/vite-plugin-federation --save-dev
 ```
 
-## Usage
-The main steps in using federation are:
-### Step 1: change the configuration
-- for a Vite project, in `vite.config.js`:
-
-```js
-import { defineConfig } from 'vite'
-import federation from "@originjs/vite-plugin-federation";
-
-export default defineConfig({
-  plugins: [
-    federation({
-      name: 'module-name',
-      filename: 'remoteEntry.js',
-      exposes: {
-        './Button': './src/Button.vue',
-      },
-      remotes:{
-          foo: 'remote_foo'
-      },
-      shared: ['vue']
-    })
-  ],
-})
+or
 
 ```
+yarn add @originjs/vite-plugin-federation --dev
+```
 
-- for a Rollup project, in `rollup.config.js`:
+## Usage
+Using the `Module Federation` usually requires more than 2 projects, one as the `host side` and one as the `remote side`.
+#### Step 1: Configure the remote side.
+- for a vite project, modify `vite.config.js`:
 
 ```js
-import federation from '@originjs/vite-plugin-federation'
-
-
+// vite.config.js
+import federation from "@originjs/vite-plugin-federation";
 export default {
-  input: 'src/index.js',
-  output: {
-    format: 'esm',
-    dir: 'dist'
-  },
-  plugins: [
-    federation({
-      filename: 'remoteEntry.js',
-      exposes: {
-        './Button': './src/button'
-      },
-      shared: ['react']
-    })
-  ]
+    plugins: [
+        federation({
+            name: 'remote-app',
+            filename: 'remoteEntry.js',
+            // Modules to expose
+            exposes: {
+                '. /Button': '. /src/Button.vue',
+            },
+            Share. ['vue']
+        })
+    ]
 }
 ```
 
-### Step 2: asynchronous references
+- for a rollup project, modify `rollup.config.js`:
 
-Vue2, for example
+```js
+// rollup.config.js
+import federation from '@originjs/vite-plugin-federation'
+export default {
+    input: 'src/index.js',
+    plugins: [
+        federation({
+            name: 'remote-app',
+            filename: 'remoteEntry.js',
+            // Modules to expose
+            exposes: {
+                '. /Button': '. /src/button'.
+            },
+            Share. ['vue']
+        })
+    ]
+}
+```
+
+#### Step 2: Configure the host side
+
+- for a vite project, modify `vite.config.js`:
+
+```js
+// vite.config.js
+import federation from "@originjs/vite-plugin-federation";
+export default {
+    plugins: [
+        federation({
+            name: 'host-app',
+            remotes: {
+                remote_app: "http://localhost:5001/remoteEntry.js",
+            },
+            shared: ['vue']
+        })
+    ]
+}
+```
+
+- for a rollup project, modify `rollup.config.js`:
+
+```js
+// rollup.config.js
+import federation from '@originjs/vite-plugin-federation'
+export default {
+    input: 'src/index.js',
+    plugins: [
+        federation({
+            name: 'host-app',
+            remotes: {
+                remote_app: "http://localhost:5001/remoteEntry.js",
+            },
+            shared: ['vue']
+        })
+    ]
+}
+```
+
+#### Step 3: Using remote modules on the host side
+
+Using a Vue project as an example
+
+```js
+import { createApp, defineAsyncComponent } from "vue";
+const app = createApp(Layout);
+...
+const RemoteButton = defineAsyncComponent(() => import("remote_app/Button"));
+app.component("remote-button", RemoteButton);
+app.mount("#root");
+```
+Using remote components in templates
 
 ```vue
-<script>
-export default {
-  name: 'App',
-  components: {
-    RemoteButtonScoped: () => import('remote-simple/remote-simple-button-scoped'),
-  }
-}
-</script>
-```
-
-
-
-### Step 3: Use Remote module components
-
-Vue2, for example
-
-```
 <template>
-  <div>
-  		<RemoteButtonScoped />
-  </div>
+    <div>
+        <RemoteButton />
+    </div>
 </template>
 ```
 
-## Limitations
-Federation currently relies on browsers to support the Top-level await, so you need to set `build.target` in the configuration file to `next` or a similar value. See [browser compatibility](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#browser_compatibility) 
+## Example projects
 
-## Configuration description
+| Examples                                                                                                                                | Host                                  | Remote                              |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------- |
+| [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)                   | `rollup`+`esm`                        | `rollup`+`esm`                      |
+| [react-in-vue](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/react-in-vue)                             | `vite`+`esm`                          | `vite`+`esm`                        |
+| [simple-react-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)                     | `rollup`+`esm`                        | `rollup`+`esm`                      |
+| [simple-react-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-systemjs)           | `rollup`+`systemjs`                   | `rollup`+`systemjs`                 |
+| [simple-react-webpack](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-webpack)             | `rollup`+`systemjs`                   | `webpack`+`systemjs`                |
+| [vue2-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue2-demo)                                   | `vite`+`esm`                          | `vite`+`esm`                        |
+| [vue3-advanced-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-advanced-demo)                 | `vite`+`esm` <br/>`vue-router`/`vuex` | `vite`+`esm`<br/>`vue-router`/`vuex |
+| [vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)                           | `vite`+`esm`                          | `vite`+`esm`                        |
+| [vue3-demo-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-systemjs)                 | `vite`+`systemjs`                     | `vite`+`systemjs`                   |
+| [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm)   | `vite/webpack`+`esm`                  | `vite/webpack`+`esm`                |
+| [vue3-demo-webpack-esm-var](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-var)   | `vite`+`esm`                          | `webpack`+`var`                     |
+| [vue3-demo-webpack-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-systemjs) | `vite`+`systemjs`                     | `webpack`+`systemjs`                |
 
-### exposes
-#### `name: string`
+## Features
+### Integration with Webpack
+It is now possible to use Module Federation without the restrictions of `Vite` and `Webpack`! That is, you can choose to use the components exposed by `vite-plugin-federation` in `Webpack` or the components exposed by `Webpack ModuleFederationPlugin` in `Vite`. But you need to pay attention to the configuration in `remotes`, for different frameworks you need to specify `remotes.from` and `remotes.format` to make them work better. A couple of example projects can be found here.
 
-<br>
+* [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm)
 
+* [vue3-demo-webpack-esm-var](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-var)
+
+* [vue3-demo-webpack-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-systemjs)
+
+⚠️ **Note:**
+1. `Vite` is relatively easy to use with the `Webpack` component, but `Webpack` is best used with the `vite-plugin-federation` component using the `esm` format, as the other formats lack complete test cases for now.
+
+2. It is not recommended to mix `Vite` and `Webpack` in `React` projects, as there is no guarantee that `Vite/Rollup` and `Webpack` will generate the same `chunk` when packaging `commonjs`, which may cause problems with `shared`.
+
+### Vite Dev mode
+
+As Vite is built on esbuild in dev development mode, we provide separate support for dev mode to take advantage of Vite's high performance development server in the case of remote module deployment.
+
+⚠️ **Note:**
+
+* Only the Host side supports dev mode, the Remote side requires the RemoteEntry.js package to be generated using `vite build`. This is because Vite Dev mode is **Bundleless** and you can use `vite build --watch` to achieve a hot update effect.
+
+### Static import
+
+Static import and dynamic import of components are supported, the following shows the difference between the two methods, you can see examples of dynamic import and static import in the project in `examples`, here is a simple example.
+
++ Vue
+
+```javascript
+// dynamic import
+const myButton = defineAsyncComponent(() => import('remote/myButton));
+app.component('my-button' , myButton);
+// or
+export default {
+  name: 'App',
+  components: {
+    myButton: () => import('remote/myButton'),
+  }
+}
+```
+```javascript
+// static import
+import myButton from 'remote/myButton';
+app.component('my-button' , myButton);
+// or
+export default {
+  name: 'App',
+  components: {
+    myButton: myButton
+  }
+}
+```
+
++ React
+
+```js
+// dynamic import
+const myButton = React.lazy(() => import('remote/myButton'))
+
+// static import
+import myButton from 'remote/myButton'
+```
+
+⚠️ **Note:**
+* Static imports may rely on the browser `Top-level await` feature, so you will need to set build.target in the configuration file to `next` or use the plugin [`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await). You can see the [browser compatibility](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#browser_) of top-level await here compatibility)
+* 
+## Configuration
+
+### `name: string`
 Required as the module name of the remote module.
 
-****
-
-#### `filename:string`
-
-<br>
-
+### `filename:string`
 As the entry file of the remote module, not required, default is `remoteEntry.js`
-
-As the remote module, the list of components exposed to the public, required for the remote module.
+### `exposes`
+* As the remote module, the list of components exposed to the public, required for the remote module.
 ```js
 exposes: {
 // 'externally exposed component name': 'externally exposed component address'
@@ -132,24 +233,23 @@ exposes: {
         '. /remote-simple-section': '. /src/components/Section.vue'
 },
 ```
-### remotes
+
+----
+### `remotes`
 
 The remote module entry file referenced as a local module
-> configuration information
+
 #### `external:string|Promise<string>`
+* remote module address, e.g. https://localhost:5011/remoteEntry.js
+* You can simply configure it as follows
 
-<br>
-
-remote module address, e.g. https://localhost:5011/remoteEntry.js
-You can simply configure it as follows
-
-  ```js
+```js
   remotes: {
     // 'remote module name': 'remote module entry file address'
     'remote-simple': 'http://localhost:5011/remoteEntry.js',
 }
-  ```
-Or do a slightly more complex configuration, if you need to use other fields
+```
+* Or do a slightly more complex configuration, if you need to use other fields
 ``` javascript
 remotes: {
     remote-simple: {
@@ -159,14 +259,8 @@ remotes: {
 }
 ```
 #### `enternalType: 'url'|'promise'`
-
-`default: 'url'`
-
-<br>
-
-set the type of external
-
-If you want to use a dynamic url address, you can set the `external` as `promise`, but please note that you need to set the `externalType` as 'promise' at the same time, and please ensure that the code of the `promise` part is correct, otherwise the package may fail,here is a simple example.
+* `default: 'url'`
+* Set the type of external. If you want to use a dynamic url address, you can set the `external` as `promise`, but please note that you need to set the `externalType` as 'promise' at the same time, and please ensure that the code of the `promise` part is correct, otherwise the package may fail,here is a simple example.
 
 ``` js
 remotes: {
@@ -185,68 +279,40 @@ remotes: {
 }
 ```
 
-
-
-***
 #### `format:'esm'|'systemjs'|'var'`
 
-`default:'esm'`
-<br>
-Specify the format of the remote component, this is more effective when the host and the remote use different packaging formats, for example the host uses vite + esm and the remote uses webpack + var, in which case you need to specify `type` : `'var'`
-
-****
+* `default:'esm'`
+* Specify the format of the remote component, this is more effective when the host and the remote use different packaging formats, for example the host uses vite + esm and the remote uses webpack + var, in which case you need to specify `type` : `'var'`
 
 #### `from` : `'vite'|'webpack'`
 
-`default : 'vite'`
-<br>
+* `default : 'vite'`
+* Specify the source of the remote component, from `vite-plugin-federation` select `vite`, from `webpack` select `webpack`
 
-Specify the source of the remote component, from `vite-plugin-federation` select `vite`, from `webpack` select `webpack`
-
-### shared
+----
+### `shared`
 
 Dependencies shared by local and remote modules. Local modules need to configure the dependencies of all used remote modules; remote modules need to configure the dependencies of externally provided components.
-> configuration information
+
 #### `import: boolean`
 
-`default: true`
-
-<br>
-
-The default is `true`, whether to add shared to the module, only for the `remote` side, `remote` will reduce some of the packaging time when this configuration is turned on, because there is no need to package some of the `shared`, but once there is no `shared` module available on the `host` side, it will report an error directly, because there is no fallback module available
-
-****
+* `default: true`
+* The default is `true`, whether to add shared to the module, only for the `remote` side, `remote` will reduce some of the packaging time when this configuration is turned on, because there is no need to package some of the `shared`, but once there is no `shared` module available on the `host` side, it will report an error directly, because there is no fallback module available
 
 #### `shareScope: string`
 
-`default: 'default'`
-
-<br>
-
-Default is `defualt`, the shared domain name, just keep the `remote` and `host` sides the same
-
-****
+* `default: 'default'`
+* Default is `defualt`, the shared domain name, just keep the `remote` and `host` sides the same
 
 #### `version: string`
-
-<br>
-
 Only works on `host` side, the version of the shared module provided is `version` of the `package.json` file in the shared package by default, you need to configure it manually only if you can't get `version` by this method
 
-****
-
 #### `requiredVersion: string`
-
-<br>
-
 Only for the `remote` side, it specifies the required version of the `host shared` used, when the version of the `host` side does not meet the `requiredVersion` requirement, it will use its own `shared` module, provided that it is not configured with `import=false`, which is not enabled by default
 
-**** 
-
 #### `packagePath: string`
-`supportMode: only serve`
-
-Allow custom packages to be shared via packagePath (previously limited to those under node_modules),
+* `supportMode: only serve`
+* Allow custom packages to be shared via packagePath (previously limited to those under node_modules),
 For Example
 You can only define similar shared
 ```js
@@ -256,7 +322,7 @@ shared :{
     }
 }
 ```
-packageName must be a package under node_modules, such as vue, react, etc., but you cannot define your own package.
+* packageName must be a package under node_modules, such as vue, react, etc., but you cannot define your own package.
 But now you can share a custom package by specifying the package path, for example
 ```js
 shared: {
@@ -265,101 +331,10 @@ shared: {
     }
 }
 ```
-## Examples
-+ [basic-host-remote](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/basic-host-remote)
-+ [simple-react-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)
-+ [simple-react-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-systemjs)
-+ [vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)
-+ [vue3-demo-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-systemjs)
-+ [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm)
-+ [vue3-demo-webpack-esm-var](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-var)
-+ [vue3-demo-webpack-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-systemjs)
-+ [vue3-advanced-demo](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-advanced-demo)
 
+## FAQ
 
-## Construct
-
-vite-plugin-federation dependencies are required during the development and build process, and global installation is recommended.
-
-- pnpm >7.0
-
-Github CI build, not engineering required:
-
-- playwright-chromium
-
-
-## Development mode
-
-Since Vite is esbuild-based in development mode, we provide separate support for the development mode to leverage Vite’s high-performance development capabilities in the case of remote module deployment. And note that only Host supports the dev mode and Remote supports only build mode
-
-## Integration with webpack
-
-⚠️: Please don't use heterogeneous components in `React` projects (e.g. `vite` using `webpack` components or vice versa), because there is no guarantee that `vite/rollup` and `webpack` will convert `export` consistent `chunk` when packaging the `commonjs` framework, which is a prerequisite for using ` shared` is a prerequisite for using
-
-Now you can use `federation` without the restrictions of `vite` and `webpack`, that is, you can choose to use the `vit-plugin-federation` component in `webpack` or the `webpack-module- federation` in `vite`, but you need to pay attention to the configuration in `remotes`, for different frameworks you need to specify `remotes.from` and `remotes.format` to make them work better, the currently supported format pairings are as follows.
-
-| host                     | remote                   | demo                                                                                                                                  |
-| ------------------------ | ------------------------ |---------------------------------------------------------------------------------------------------------------------------------------|
-| `rollup/vite`+`esm`      | `rollup/vite`+`esm`      | [simple-react-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/simple-react-esm)                   |
-| `rollup/vite`+`systemjs` | `rollup/vite`+`systemjs` | [vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)                         |
-| `rollup/vite`+`systemjs` | `webpack`+`systemjs`     | [vue3-demo-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-systemjs)               |
-| `rollup/vite`+`esm`      | `webpack`+`var`          | [vue3-demo-webpack-esm-var](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-var) |
-| `rollup/vite`+`esm`      | `webpack`+`esm`          | [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm) |
-
-⚠️: `vite` is relatively easy to use with `webpack` components, but `vite-plugin-federation` components are better in `esm` format when `webpack` uses `vite` components, because other formats temporarily lack test cases to complete the test
-
-## Static Import
-
-Static import is supported at this stage. The following shows the difference between the two methods. You can see `examples` of dynamic import and static import in each project in examples, and here is a simple example.
-
-+ Vue
-
-``` javascript
-// dynamic import
-const myButton = defineAsyncComponent(() => import('remote/myButton'));
-app.component('my-button' , myButton);
-// or
-export default {
-  name: 'App',
-  components: {
-    myButton: () => import('remote/myButton'),
-  }
-}
-
-
-// static import
-import myButton from 'remote/myButton';
-app.component('my-button' , myButton);
-// or
-export default {
-  name: 'App',
-  components: {
-    myButton: myButton
-  }
-
-```
-
-
-
-+ React
-
-``` js
-// dynamic import
-const myButton = React.lazy(() => import('remote/myButton'))
-
-// static import
-import myButton from 'remote/myButton'
-```
-
-
-
-
-
-
-
-### FAQ
-
-#### ERROR: `Top-level` await is not available in the configured target environment
+### ERROR: `Top-level` await is not available in the configured target environment
 
 The solution is to set `build.target` to `esnext`, which you can find at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await to see the support for this feature in each browser.
 
@@ -377,19 +352,19 @@ or
 
 Or you can try using the plugin [`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await) to eliminate `top-level-await`, as demonstrated in [vue3-demo- esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm) demonstrates this usage
 
-#### is not generating chunk properly?
+### Is not generating chunk properly?
 
 Please check if you have started the project in `dev` mode with `vite`, currently only the fully pure host side can use `dev` mode, the `remote` side must use `build` mode to make the plugin take effect.
 
 
 
-#### React uses federation for some questions
+### React uses federation for some questions
 
 It is recommended to check this [Issue](https://github.com/originjs/vite-plugin-federation/issues/173), which contains most of the `React` related issues
 
 
 
-#### The remote module failed to load the share of the local module, for example`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://your url`
+### The remote module failed to load the share of the local module, for example`localhost/:1 Uncaught (in promise) TypeError: Failed to fetch dynamically imported module: http://your url`
 
 Reason: Vite has auto fetch logic for `IP` and Port when starting the service, no full fetch logic has been found in the `Plugin`, and in some cases a fetch failure may occur.
 
@@ -410,8 +385,6 @@ export default defineConfig({
 }
 ```
 
-
-
 ## Wiki
 
-[Design framework](https://github.com/originjs/vite-plugin-federation/wiki)
+[Detailed design](https://github.com/originjs/vite-plugin-federation/wiki)

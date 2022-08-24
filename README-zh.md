@@ -32,7 +32,7 @@ yarn add @originjs/vite-plugin-federation --dev
 
 使用Module Federation通常需要2个以上的工程，一个作为Host端，一个作为Remote端。
 
-#### 步骤一：Remote端配置
+#### 步骤一：Remote端配置暴露的模块
 
 * 使用Vite构建的项目，修改`vite.config.js`
   
@@ -44,6 +44,7 @@ export default {
         federation({
             name: 'remote-app',
             filename: 'remoteEntry.js',
+            // 需要暴露的模块
             exposes: {
                 './Button': './src/Button.vue',
             },
@@ -63,6 +64,7 @@ export default {
         federation({
             name: 'remote-app',
             filename: 'remoteEntry.js',
+            // 需要暴露的模块
             exposes: {
                 './Button': './src/button'
             },
@@ -108,7 +110,7 @@ export default {
 }
 ```
 
-### 步骤三：Host端使用远程模块
+#### 步骤三：Host端使用远程模块
 
 以Vue项目为例
 
@@ -152,7 +154,7 @@ app.mount("#root");
 
 ### 与 Webpack 集成
 
-现在可以不受 `Vite` 和 `Webpack` 的限制而使用Module Federation了! 也就是说，你可以选择在 `Webpack` 中使用 `vite-plugin-federation` 暴露的组件，也可以选择在 `Vite` 中使用 `Webpack ModuleFederationPlugin` 暴露的组件。但需要注意 `remotes` 中的配置，对于不同的打包框架，你需要指定 `remotes.from` 和 `remotes.format`属性 ，使它们更好地工作，具体可以参考如下几个示例工程：
+现在可以不受 `Vite` 和 `Webpack` 的限制而使用Module Federation了! 也就是说，你可以选择在 `Webpack` 中使用 `vite-plugin-federation` 暴露的组件，也可以选择在 `Vite` 中使用 `Webpack ModuleFederationPlugin` 暴露的组件。但需要注意对于不同的打包框架，你需要指定 `remotes.from` 和 `remotes.format`属性以便使它们更好地工作。具体可以参考如下几个示例工程：
 
 * [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm)
 
@@ -172,11 +174,11 @@ app.mount("#root");
 
 ⚠️**注意：**
 
-* 只有Host端支持dev模式，Remote端需要使用`vite build`生成RemoteEntry.js包。这是由于Vite Dev模式是不打包的**Bundleless**，您可以使用`vite build --watch`到达类似热更新的效果。
+* 只有Host端支持dev模式，Remote端需要使用`vite build`生成RemoteEntry.js包。这是由于Vite Dev模式是**Bundleless**不打包的，您可以使用`vite build --watch`到达类似热更新的效果。
 
 ### 静态导入
 
-支持组件的静态导入和动态导入，下面展示两种方式的区别，你可以在`examples`中的每个项目看到动态导入和静态导入的例子，下面是一个简单的示例：
+支持组件的静态导入和动态导入，下面展示两种方式的区别，你可以在`examples`中的项目中看到动态导入和静态导入的例子，下面是一个简单的示例：
 
 + Vue
 
@@ -191,8 +193,8 @@ export default {
     myButton: () => import('remote/myButton'),
   }
 }
-
-
+```
+```javascript
 // static import
 import myButton from 'remote/myButton';
 app.component('my-button' , myButton);
@@ -202,6 +204,7 @@ export default {
   components: {
     myButton: myButton
   }
+}
 ```
 
 + React
@@ -215,7 +218,8 @@ import myButton from 'remote/myButton'
 ```
 ⚠️**注意：**
 
-* 静态导入可能会依赖到浏览器`Top-level await`特性，因此需要将配置文件中的build.target设置为`next`或使用插件[`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await)。查看Top-level await的[浏览器兼容性](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#browser_compatibility)
+* 静态导入可能会依赖到浏览器`Top-level await`特性，因此需要将配置文件中的build.target设置为`next`或使用插件[`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await)。您可以在此查看Top-level await的[浏览器兼容性](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#browser_compatibility)
+
 ## 配置项说明
 
 ### `name：string`
@@ -223,7 +227,7 @@ import myButton from 'remote/myButton'
 
 ### `filename：string`
 * 作为远程模块的入口文件，非必填，默认为`remoteEntry.js`
-### exposes
+### `exposes`
 
 * 作为远程模块，对外暴露的组件列表，远程模块必填。
 ```js
@@ -235,7 +239,7 @@ exposes: {
 ```
 
 ----
-### remotes
+### `remotes`
 作为本地模块，引用的远端模块入口文件
 
 #### `external:string|Promise<string>`
@@ -294,7 +298,7 @@ remotes: {
 * 指定远程组件的来源，来源于 `vite-plugin-federation` 选择 `vite`，来源于 `webpack` 选择 `webpack`
 
 ----
-### shared
+### `shared`
 
 本地模块和远程模块共享的依赖。本地模块需配置所有使用到的远端模块的依赖；远端模块需要配置对外提供的组件的依赖。
 
@@ -340,9 +344,9 @@ shared: {
 }
 ```
 
-### FAQ
+## FAQ
 
-#### ERROR: `Top-level` await is not available in the configured target environment
+### ERROR: `Top-level` await is not available in the configured target environment
 
 这是因为依赖到了浏览器的`top-level-await`特性，当设置的浏览器环境不支持该特性时就会出现该报错，解决办法是将`build.target`设置为`esnext`，你可以在[这里查看](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await)各个浏览器对该特性的支持情况。
 
@@ -355,11 +359,11 @@ shared: {
 
 或者使用插件[`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await)来消除`top-level-await`，在[vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-esm)中演示了这种用法
 
-#### 没有正常生成chunk？
+### 没有正常生成chunk？
 
 请检查是否使用`vite`的`dev`模式启动了项目，当前仅有完全纯净的host端才可以使用`dev`模式，`remote`端必须使用`build`模式才能使插件生效。
 
-#### React 使用federation的一些问题
+### React 使用federation的一些问题
 
 建议查看这个[Issue](https://github.com/originjs/vite-plugin-federation/issues/173)，这里包含了大多数`React`相关的问题
 
