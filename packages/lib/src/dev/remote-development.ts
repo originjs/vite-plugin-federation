@@ -143,7 +143,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     },
     async transform(this: TransformPluginContext, code: string, id: string) {
       if (builderInfo.isHost && !builderInfo.isRemote) {
-        if (!browserHash || browserHash.length === 0) {
+        if (viteDevServer && (!browserHash || browserHash.length === 0)) {
           browserHash = viteDevServer._optimizeDepsMetadata?.browserHash
           const optimized = viteDevServer._optimizeDepsMetadata?.optimized
           if (optimized !== undefined) {
