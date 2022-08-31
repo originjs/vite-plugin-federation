@@ -66,7 +66,7 @@ export default {
             exposes: {
                 '. /Button': '. /src/button'.
             },
-            Share. ['vue']
+            shared: ['vue']
         })
     ]
 }
