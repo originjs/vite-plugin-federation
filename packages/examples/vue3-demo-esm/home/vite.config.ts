@@ -20,7 +20,7 @@ export default defineConfig({
         vue:{
 
         },
-        vuex:{
+        pinia:{
 
         },
         // This is to test if the custom library can be SHARED, there is no real point

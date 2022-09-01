@@ -13,7 +13,6 @@
 <script>
 import {ref} from "vue";
 import ElementPlus from "./components/ElementPlus.vue";
-// vuex demo
 import ProductList from './components/ProductList.vue'
 import ShoppingCart from './components/ShoppingCart.vue'
 

@@ -16,7 +16,7 @@ export default defineConfig({
                     format: 'var'
                 }
             },
-            shared: ['vue', 'vuex']
+            shared: ['vue', 'pinia']
         })
     ],
     build: {

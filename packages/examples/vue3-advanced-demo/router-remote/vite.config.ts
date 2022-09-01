@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
                     './ProductList': './src/components/ProductList.vue',
                     './ShoppingCart': './src/components/ShoppingCart.vue'
                 },
-                shared: ["vue", "vue-router", "element-plus", "vuex"]
+                shared: ["vue", "vue-router", "element-plus", "pinia"]
             }),
             createHtmlPlugin({
                 inject: {

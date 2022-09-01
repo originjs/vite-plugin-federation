@@ -20,7 +20,7 @@ export default defineConfig(({mode}) => {
                         from: 'vite'
                     },
                 },
-                shared: ["vue", "vue-router", "element-plus", "vuex"]
+                shared: ["vue", "vue-router", "element-plus", "pinia"]
             }),
             createHtmlPlugin({
                 inject: {

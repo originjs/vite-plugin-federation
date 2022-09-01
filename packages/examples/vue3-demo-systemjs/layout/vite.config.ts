@@ -19,7 +19,7 @@ export default defineConfig({
         'common-lib': 'http://localhost:5002/assets/remoteEntry.js',
         'css-modules': 'http://localhost:5003/assets/remoteEntry.js'
       },
-      shared: ['vue', 'vuex']
+      shared: ['vue', 'pinia']
     })
   ],
   build: {

@@ -1,6 +1,6 @@
 <template>
   <div id="router-remote-element-plus">
-    <p id='cart-item' :class="$style.gray">cartItems from vuex: {{ cartCount }}</p>
+    <p id='cart-item' :class="$style.gray">cartItems from pinia: {{ cartCount }}</p>
     <el-button @click="increase">ElButton</el-button>
   </div>
 </template>

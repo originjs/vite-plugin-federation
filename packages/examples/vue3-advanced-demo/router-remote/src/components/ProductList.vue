@@ -19,7 +19,7 @@
 
 <script>
 import {onBeforeMount} from 'vue'
-import {mapActions, mapState, useStore} from 'vuex'
+import {mapActions, mapState, useStore} from 'pinia'
 import {ElButton} from 'element-plus'
 
 import products from '../store/modules/products'

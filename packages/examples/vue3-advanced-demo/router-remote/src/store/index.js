@@ -1,6 +1,6 @@
-import { createStore } from 'vuex';
+import { defineStore } from 'pinia';
 
-export default createStore({
+export default defineStore({
     state() {
         return {
             cartItems: 10

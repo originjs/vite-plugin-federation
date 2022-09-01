@@ -15,14 +15,13 @@
   "dependencies": {
     "echarts": "^5.2.1",
     "element-plus": "^1.1.0-beta.20",
-    "vue": "^3.2.0",
+    "vue": "^3.2.37",
     "vue-router": "^4.0.12",
-    "vuex": "^4.0.2"
+    "pinia": "^2.0.21"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^4.0.0",
     "@vitejs/plugin-vue": "^3.0.1",
-    "@vue/compiler-sfc": "^3.2.0",
     "rollup-plugin-copy": "^3.4.0",
     "unplugin-element-plus": "0.4.1",
     "vite": "^3.0.7",

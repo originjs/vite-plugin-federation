@@ -1,13 +1,13 @@
-import { createStore } from 'vuex';
+import { defineStore } from 'pinia';
 
+export const useStore = defineStore('main', {
+    state: () => ({
+        counter: 5
+    }),
 
-// This is just to test if the export from remote works, there is no real point
-export {name} from "home/Content";
-
-export default createStore({
-    state() {
-        return {
-            cartItems: 5
+    actions: {
+        increase() {
+            this.counter++
         }
     }
 });

@@ -1,13 +1,12 @@
 <template>
   <div :class="$style.green">{{ title }}</div>
-  <p id='cart-item' :class="$style.green">cartItems from vuex: {{cartCount}}</p>
+  <p id='cart-item' :class="$style.green">cartItems from pinia: {{cartCount}}</p>
   <div :class="[$style.green, $style.bold]">green and bold</div>
 </template>
 <script>
+import { useStore } from '../store'
+
 export default {
-  created() {
-    console.log(this.$store.state.cartItems)
-  },
   data() {
     return {
       title: 'Layout Component in Action..'
@@ -15,7 +14,8 @@ export default {
   },
   computed:{
     cartCount() {
-      return this.$store.state.cartItems
+      const store = useStore();
+      return store.counter
     }
   }
 }

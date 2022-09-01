@@ -19,7 +19,6 @@ test('Webpack Button', async () => {
   ).toBe('Webpack Button')
 })
 
-
 // Using vite components webpack
 
 test('should have no 404s in webpack part', () => {
@@ -27,6 +26,7 @@ test('should have no 404s in webpack part', () => {
     expect(msg).not.toMatch('404')
   })
 })
+
 test('Vite Button', async () => {
   await page.goto('127.0.0.1:5001')
   expect(

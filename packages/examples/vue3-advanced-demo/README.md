@@ -11,7 +11,7 @@ This example demos consumption of federated modules from a vite bundle. `router-
 3. `CTRL + C` can only stop the host server. You can run `pnpm stop` to stop all services.
 
 ### Advanced Demo
-We have added a Demo to show the combination of `Vite + Vue + Vuex + Vue Router + Element Plus + ECharts`.
+We have added a Demo to show the combination of `Vite + Vue + Pinia + Vue Router + Element Plus + ECharts`.
 We ported part of the Vuex example from [vuex's official example](https://github.com/vuejs/vuex/tree/4.0/examples/classic/shopping-cart) as a functional verification.
 
 - HOST (router-host): [localhost:5004](http://localhost:5004/)
@@ -21,8 +21,5 @@ Similarly, we can launch the Dev mode on the Host side for development.
 - HOST (router-host): [localhost:5104](http://localhost:5104/)
 ```bash
 cd packages/examples/vue3-advanced-demo/router-host
-yarn dev
+pnpm run dev
 ```
-
-### Preview
-![image-20211210105354887](README-Preview-Image)

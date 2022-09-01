@@ -15,7 +15,7 @@ export default defineConfig({
         './Images': './src/components/Images.vue',
         './UnusedButton': './src/components/UnusedButton.vue'
       },
-      shared: ['vue', 'vuex']
+      shared: ['vue', 'pinia']
     })
   ],
   build: {
