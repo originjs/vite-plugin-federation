@@ -229,8 +229,8 @@ As the entry file of the remote module, not required, default is `remoteEntry.js
 ```js
 exposes: {
 // 'externally exposed component name': 'externally exposed component address'
-    '. /remote-simple-button': '. /src/components/Button.vue',
-        '. /remote-simple-section': '. /src/components/Section.vue'
+    './remote-simple-button': './src/components/Button.vue',
+        './remote-simple-section': './src/components/Section.vue'
 },
 ```
 
@@ -327,7 +327,7 @@ But now you can share a custom package by specifying the package path, for examp
 ```js
 shared: {
     packageName: {
-        packagePath:'./src/a/index.js'
+        packagePath: './src/a/index.js'
     }
 }
 ```
