@@ -3,15 +3,16 @@
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "router-host",
-    "router-remote"
+    "team-red",
+    "team-blue",
+    "team-green"
   ],
   "scripts": {
     "start": "pnpm start",
     "build": "pnpm --parallel --filter \"./**\" build ",
     "serve": "pnpm --parallel --filter \"./**\" serve ",
     "restart": "pnpm stop & pnpm build & pnpm serve",
-    "stop": "kill-port --port 5004,5005",
+    "stop": "kill-port --port 5001,5002,5003",
     "clean": "pnpm run clean"
   },
   "devDependencies": {

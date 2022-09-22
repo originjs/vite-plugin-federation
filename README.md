@@ -43,7 +43,7 @@ export default {
             filename: 'remoteEntry.js',
             // Modules to expose
             exposes: {
-                '. /Button': '. /src/Button.vue',
+                './Button': './src/Button.vue',
             },
             shared: ['vue']
         })
@@ -64,7 +64,7 @@ export default {
             filename: 'remoteEntry.js',
             // Modules to expose
             exposes: {
-                '. /Button': '. /src/button'.
+                './Button': './src/button'.
             },
             shared: ['vue']
         })
@@ -84,7 +84,7 @@ export default {
         federation({
             name: 'host-app',
             remotes: {
-                remote_app: "http://localhost:5001/remoteEntry.js",
+                remote_app: "http://localhost:5001/assets/remoteEntry.js",
             },
             shared: ['vue']
         })
@@ -120,7 +120,7 @@ import { createApp, defineAsyncComponent } from "vue";
 const app = createApp(Layout);
 ...
 const RemoteButton = defineAsyncComponent(() => import("remote_app/Button"));
-app.component("remote-button", RemoteButton);
+app.component("RemoteButton", RemoteButton);
 app.mount("#root");
 ```
 Using remote components in templates
