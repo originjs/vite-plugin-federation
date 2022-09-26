@@ -181,7 +181,7 @@ Static import and dynamic import of components are supported, the following show
 
 ```javascript
 // dynamic import
-const myButton = defineAsyncComponent(() => import('remote/myButton));
+const myButton = defineAsyncComponent(() => import('remote/myButton'));
 app.component('my-button' , myButton);
 // or
 export default {

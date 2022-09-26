@@ -331,9 +331,11 @@ importers:
     specifiers:
       '@originjs/vite-plugin-federation': workspace:*
       kill-port: ^2.0.1
+      vite-plugin-css-injected-by-js: ^2.1.0
     devDependencies:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 2.0.1
+      vite-plugin-css-injected-by-js: 2.1.0
 
   packages/examples/vue3-advanced-demo/team-blue:
     specifiers:
@@ -7962,6 +7964,12 @@ packages:
   /vary/1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
+
+  /vite-plugin-css-injected-by-js/2.1.0:
+    resolution: {integrity: sha512-p5Tn63xfYd1j4Hhnn9YuVMF3t7eLpiHejKNcIeGOWNU60bsw8WXmLQSVGtraw3C6qNz5LnF3S8R1SQLe4/LBYw==}
+    peerDependencies:
+      vite: '>2.0.0-0'
+    dev: true
 
   /vite-plugin-top-level-await/1.1.1_vite@3.0.7:
     resolution: {integrity: sha512-il7YijMxjvQxx33I/mf5n+xUJscxcTqRSwPGck/jw92hUyGwjsJnIBYBcKRS+vhOtsJ5g+8xANoBEKx9G1NSEQ==}

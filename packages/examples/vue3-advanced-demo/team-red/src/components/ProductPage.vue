@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BasketInfo from 'team-blue/BasketInfo'
 import BuyButton from 'team-blue/BuyButton'
+import Recommendations from 'team-green/Recommendations'
 import { reactive } from 'vue'
 import { product } from '../product'
 
@@ -9,7 +10,6 @@ const variant = reactive(product.variants[0])
 </script>
 
 <template>
-  <div>
     <h1 id="store">The Model Store</h1>
     <BasketInfo />
     <div id="image">
@@ -28,17 +28,9 @@ const variant = reactive(product.variants[0])
     </div>
     <BuyButton :item="variant.sku" />
     <Recommendations item="fendt" />
-  </div>
 </template>
 
 <style>
-
-.green-recos {
-  display: block;
-  outline: 3px dashed forestgreen;
-  width: 100%;
-}
-
 * {
   box-sizing: border-box;
   font-family: "Helvetica Neue", Arial, sans-serif;

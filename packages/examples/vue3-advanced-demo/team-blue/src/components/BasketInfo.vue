@@ -37,4 +37,10 @@ const count = computed(() => 1)
   outline: 3px dashed royalblue;
   padding: 5px;
 }
+
+.blue-buy {
+  display: block;
+  outline: 3px dashed royalblue;
+  padding: 5px;
+}
 </style>
