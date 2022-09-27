@@ -1,5 +1,7 @@
 <script setup lang="ts">
 //import { ElButton } from 'element-plus'
+import { useStore } from '../store'
+const store = useStore();
 
 const prices: { [key: string]: any } = {
     porsche: '66,00 €',
@@ -11,6 +13,7 @@ defineProps<{ item: string }>()
 
 function addToCart(product: string) {
     console.log(product)
+    store.buy()
 }
 
 </script>

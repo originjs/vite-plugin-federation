@@ -1,16 +1,22 @@
 <script setup lang="ts">
-import { computed } from "vue"
-const count = computed(() => 1)
+import { computed } from 'vue'
+import { useStore } from '../store'
+const store = useStore();
+
+const basketClass = computed(() => ({
+  empty: store.items === 0,
+  filled: store.items > 0
+}))
 </script>
 
 <template>
   <div className="blue-basket" id="basket">
-    <div>basket: {{ count }} item(s)</div>
+    <div :class="basketClass">basket: {{ store.items }} item(s)</div>
   </div>
 </template>
 
 <style>
-  #basket {
+#basket {
   align-self: baseline;
   grid-area: basket;
   justify-self: end;

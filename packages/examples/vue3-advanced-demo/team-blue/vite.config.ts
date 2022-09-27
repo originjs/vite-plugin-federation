@@ -17,7 +17,7 @@ export default defineConfig({
           './BasketInfo': './src/components/BasketInfo.vue',
           './BuyButton': './src/components/BuyButton.vue',
       },
-      shared: ['vue']
+      shared: ['vue', 'pinia']
     })
   ],
   build: {

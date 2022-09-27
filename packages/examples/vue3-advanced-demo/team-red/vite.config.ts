@@ -14,7 +14,7 @@ export default defineConfig({
         "team-blue": "http://localhost:5002/assets/remoteEntry.js",
         "team-green": "http://localhost:5003/assets/remoteEntry.js",
       },
-      shared: ['vue']
+      shared: ['vue','pinia']
   })
   ],
   build:{

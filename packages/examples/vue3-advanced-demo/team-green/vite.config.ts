@@ -14,7 +14,7 @@ export default defineConfig({
       exposes: {
           './Recommendations': './src/components/Recommendations.vue',
       },
-      shared: ['vue']
+      shared: ['vue', 'pinia']
     })
   ],
   base: 'http://127.0.0.1:5003',

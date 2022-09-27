@@ -4,30 +4,35 @@ import BuyButton from 'team-blue/BuyButton'
 import Recommendations from 'team-green/Recommendations'
 import { reactive } from 'vue'
 import { product } from '../product'
+import { useStore } from '../store'
+const count = useStore();
+const variant = reactive(Object.assign({}, product.variants[0]))
 
-const variant = reactive(product.variants[0])
-
+function clickProduct(sku: string) {
+  const [variant2] = product.variants.filter((v) => sku === v.sku);
+  Object.assign(variant, variant2)
+}
 </script>
 
 <template>
-    <h1 id="store">The Model Store</h1>
-    <BasketInfo />
-    <div id="image">
-      <div>
-        <img :src="variant.image" :alt="variant.name" />
-      </div>
+  <h1 id="store">The Model Store</h1>
+  <BasketInfo />
+  <div id="image">
+    <div>
+      <img :src="variant.image" :alt="variant.name" />
     </div>
-    <h2 id="name">
-      {{product.name}} <small>{{variant.name}}</small>
-    </h2>
-    <div id="options">
-      <button v-for="variant in product.variants" :key="variant.sku" type="button">
-        <img :src="variant.thumb" :alt="variant.name" />
-      </button>
+  </div>
+  <h2 id="name">
+    {{product.name}} <small>{{variant.name}}</small>
+  </h2>
+  <div id="options">
+    <button v-for="varia in product.variants" :key="varia.sku" type="button" @click="clickProduct(varia.sku)">
+      <img :src="varia.thumb" :alt="varia.name" />
+    </button>
 
-    </div>
-    <BuyButton :item="variant.sku" />
-    <Recommendations item="fendt" />
+  </div>
+  <BuyButton :item="variant.sku" />
+  <Recommendations :item="variant.sku" />
 </template>
 
 <style>
