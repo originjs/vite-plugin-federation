@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { allRecommendations } from '../recos';
-const props = defineProps<{ item: string}>()
-const recommendations: Array<{ image: string; id: string }> = allRecommendations[props.item] || [];
+import { ref } from 'vue';
+import { allRecommendations } from '../recos'
+import { currentItemStore } from '../store'
+
+const recommendations = ref<Array<{ image: string; id: string }>>([])
+recommendations.value = allRecommendations['porsche']
+
+const store = currentItemStore()
+store.$subscribe((mutation, state) => {
+  recommendations.value = allRecommendations[state.sku]
+})
+
 </script>
 
 <template>

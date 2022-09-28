@@ -4,13 +4,14 @@ import BuyButton from 'team-blue/BuyButton'
 import Recommendations from 'team-green/Recommendations'
 import { reactive } from 'vue'
 import { product } from '../product'
-import { useStore } from '../store'
-const count = useStore();
+import { currentItemStore } from '../store'
+const currentStore = currentItemStore();
 const variant = reactive(Object.assign({}, product.variants[0]))
 
 function clickProduct(sku: string) {
   const [variant2] = product.variants.filter((v) => sku === v.sku);
   Object.assign(variant, variant2)
+  currentStore.sku = sku
 }
 </script>
 
@@ -32,7 +33,7 @@ function clickProduct(sku: string) {
 
   </div>
   <BuyButton :item="variant.sku" />
-  <Recommendations :item="variant.sku" />
+  <Recommendations/>
 </template>
 
 <style>
