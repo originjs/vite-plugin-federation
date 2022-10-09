@@ -258,7 +258,7 @@ remotes: {
     }
 }
 ```
-#### `enternalType: 'url'|'promise'`
+#### `externalType: 'url'|'promise'`
 * `default: 'url'`
 * Set the type of external. If you want to use a dynamic url address, you can set the `external` as `promise`, but please note that you need to set the `externalType` as 'promise' at the same time, and please ensure that the code of the `promise` part is correct, otherwise the package may fail,here is a simple example.
 
