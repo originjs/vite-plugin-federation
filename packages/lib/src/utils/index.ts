@@ -47,7 +47,7 @@ export function parseSharedOptions(
       shareScope: 'default',
       packagePath: key,
       // Whether the path is set manually
-      manuallyPackagePathSetting: true
+      manuallyPackagePathSetting: false
     }),
     (value, key) => {
       value.import = value.import ?? true
