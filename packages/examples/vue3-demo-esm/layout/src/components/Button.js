@@ -1,4 +1,5 @@
-import {h} from "vue";
+import { h } from "vue";
+import { useStore } from '../store'
 
 const button = {
     name: "btn-component",
@@ -18,7 +19,8 @@ const button = {
                     'font-size': '16px'
                 },
                 onClick: () => {
-                    this.$store.state.cartItems++
+                    const store = useStore();
+                    store.increase();
                 }
             },
             "Hello Layout Button"

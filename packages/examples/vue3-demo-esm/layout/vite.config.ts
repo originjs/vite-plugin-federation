@@ -25,7 +25,7 @@ export default defineConfig({
                 },
                 'css-modules': 'http://localhost:5003/assets/remoteEntry.js'
             },
-            shared: ['vue', 'vuex']
+            shared: ['vue', 'pinia']
         })
     ],
     build: {

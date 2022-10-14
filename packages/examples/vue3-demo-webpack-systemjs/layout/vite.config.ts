@@ -13,7 +13,7 @@ export default defineConfig({
       remotes: {
         home: 'http://localhost:5001/remoteEntry.js'
       },
-      shared: ['vue', 'vuex']
+      shared: ['vue', 'pinia']
     })
   ],
   build: {

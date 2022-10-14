@@ -13,9 +13,9 @@ test('remote button', async () => {
   ).toBe('Hello Layout Button')
 })
 
-test('check vuex data', async () => {
+test('check pinia data', async () => {
   expect(
     await page.textContent('#cart-item')
-  ).toBe('cartItems from vuex: 5')
+  ).toBe('cartItems from pinia: 5')
 })
 
