@@ -4,7 +4,6 @@ export default function addButton(root){
     eleBtn.appendChild(eleText);
     eleBtn.onclick = function (){
         // Defines what to do after the event is triggered
-        console.log(import.meta)
         alert(this.value);
     };
     eleBtn.className = 'remote-btn'
