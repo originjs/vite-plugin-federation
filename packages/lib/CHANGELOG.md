@@ -1,3 +1,13 @@
+## [1.1.10](https://github.com/originjs/vite-plugin-federation/compare/v1.1.9...v1.1.10) (2022-10-14)
+
+
+### Bug Fixes
+
+* viteDevServer may be undefined in Nuxt ([#240](https://github.com/originjs/vite-plugin-federation/issues/240)) ([415e2b5](https://github.com/originjs/vite-plugin-federation/commit/415e2b5e92ebfb07328df6d3599d1fb08717f2b7)), closes [#239](https://github.com/originjs/vite-plugin-federation/issues/239)
+* wrong version of shared lib ([ec1b8ed](https://github.com/originjs/vite-plugin-federation/commit/ec1b8ed426d1b75fd617d4c63617e915a9343037))
+
+
+
 ## [1.1.9](https://github.com/originjs/vite-plugin-federation/compare/v1.1.8...v1.1.9) (2022-08-19)
 
 
