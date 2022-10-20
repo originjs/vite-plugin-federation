@@ -1,0 +1,3 @@
+# pnpm-workspace.yaml
+packages:
+  - 'packages/*'
