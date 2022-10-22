@@ -13,12 +13,12 @@ import { join, sep, resolve, basename } from 'path'
 import { readdirSync, statSync } from 'fs'
 import type {
   NormalizedOutputOptions,
-  PluginContext,
   OutputChunk,
-  RenderedChunk
+  PluginContext
 } from 'rollup'
 import { sharedFileName2Prop } from './remote-production'
-const sharedFileReg = /^__federation_shared_.+\.js$/
+const sharedFileNameReg = /^__federation_shared_.+\.js$/
+const shareFilePathReg = /__federation_shared_.+\.js$/
 
 export function prodSharedPlugin(
   options: VitePluginFederationOptions
@@ -36,18 +36,18 @@ export function prodSharedPlugin(
   let isRemote
   const id2Prop = new Map<string, any>()
 
-  const moduleCheckedSet = new Set<string>()
-  const moduleNeedToTransformSet = new Set<string>() // record modules that import shard libs, and refered in chunk tranform logic
-
   const transformImportFn = function (
     this: PluginContext,
     code,
-    chunk: OutputChunk | RenderedChunk,
+    chunk: OutputChunk,
     options: NormalizedOutputOptions
   ) {
     const ast = this.parse(code)
     const magicString = new MagicString(code)
+    // flag import shared replace
     let modify = false
+    // flag delete invalid import
+    let remove = false
     switch (options.format) {
       case 'es':
         {
@@ -55,33 +55,39 @@ export function prodSharedPlugin(
             enter(node: any) {
               if (
                 node.type === 'ImportDeclaration' &&
-                sharedFileReg.test(basename(node.source.value))
+                sharedFileNameReg.test(basename(node.source.value))
               ) {
                 const sharedName = sharedFileName2Prop.get(
                   basename(node.source.value)
                 )?.[0]
                 if (sharedName) {
                   const declaration: (string | never)[] = []
-                  node.specifiers?.forEach((specify) => {
-                    declaration.push(
-                      `${
-                        specify.imported?.name
-                          ? `${
-                              specify.imported.name === specify.local.name
-                                ? specify.local.name
-                                : `${specify.imported.name}:${specify.local.name}`
-                            }`
-                          : `default:${specify.local.name}`
-                      }`
-                    )
-                  })
+                  if (!node.specifiers?.length) {
+                    //  invalid import , like import './__federation_shared_lib.js' , and remove it
+                    magicString.remove(node.start, node.end)
+                    remove = true
+                  } else {
+                    node.specifiers.forEach((specify) => {
+                      declaration.push(
+                        `${
+                          specify.imported?.name
+                            ? `${
+                                specify.imported.name === specify.local.name
+                                  ? specify.local.name
+                                  : `${specify.imported.name}:${specify.local.name}`
+                              }`
+                            : `default:${specify.local.name}`
+                        }`
+                      )
+                    })
+                  }
                   if (declaration.length) {
                     magicString.overwrite(
                       node.start,
                       node.end,
                       `const {${declaration.join(
                         ','
-                      )}} = await importShared('${sharedName}')`
+                      )}} = await importShared('${sharedName}')\n`
                     )
                     modify = true
                   }
@@ -96,6 +102,13 @@ export function prodSharedPlugin(
                 prop?.root ? '.' : ''
               }./__federation_fn_import.js'\n`
             )
+            return {
+              code: magicString.toString(),
+              map: magicString.generateMap(chunk.map)
+            }
+          }
+          if (remove) {
+            //  only remove code , dont insert import {importShared} from 'xxx'
             return {
               code: magicString.toString(),
               map: magicString.generateMap(chunk.map)
@@ -126,7 +139,7 @@ export function prodSharedPlugin(
                   let removeLast = false
                   chunk.imports.forEach((importName, index) => {
                     const baseName = basename(importName)
-                    if (sharedFileReg.test(baseName)) {
+                    if (sharedFileNameReg.test(baseName)) {
                       importIndex.push({
                         index: index,
                         name: sharedFileName2Prop.get(baseName)?.[0]
@@ -189,16 +202,46 @@ export function prodSharedPlugin(
                           insertPos,
                           `var  ${varName} = await __federation_import('${item.name}');\n`
                         )
+                        // get para name
+                        const paramName =
+                          setters.value.elements[item.index].params[0].name
                         // replace it with sharedImport
                         setters.value.elements[item.index].body.body.forEach(
                           (setFn) => {
-                            magicString.appendLeft(
-                              insertPos,
-                              `${setFn.expression.left.name} = ${varName}.${
-                                setFn.expression.right.property.name ??
-                                setFn.expression.right.property.value
-                              };\n`
-                            )
+                            if (
+                              setFn.expression.type === 'AssignmentExpression'
+                            ) {
+                              magicString.appendLeft(
+                                insertPos,
+                                `${setFn.expression.left.name} = ${varName}.${
+                                  setFn.expression.right.property.name ??
+                                  setFn.expression.right.property.value
+                                };\n`
+                              )
+                            } else if (
+                              setFn.expression.type === 'SequenceExpression'
+                            ) {
+                              setFn.expression.expressions.forEach(
+                                (assignStatement) => {
+                                  if (
+                                    assignStatement.right.type ===
+                                      'MemberExpression' &&
+                                    assignStatement.right.object.name ===
+                                      paramName
+                                  ) {
+                                    magicString.appendLeft(
+                                      insertPos,
+                                      `${
+                                        assignStatement.left.name
+                                      } = ${varName}.${
+                                        assignStatement.right.property.name ??
+                                        assignStatement.right.property.value
+                                      };\n`
+                                    )
+                                  }
+                                }
+                              )
+                            }
                           }
                         )
                       })
@@ -484,59 +527,29 @@ export function prodSharedPlugin(
         outputOption.manualChunks = manualChunkFunc
       }
 
-      // handle expose component import other components which may import shared
-      if (
-        isRemote &&
-        parsedOptions.prodShared.length &&
-        parsedOptions.prodExpose.length
-      ) {
-        // start collect exposed modules and their dependency modules which imported shared libs
-        const exposedModuleIds = parsedOptions.prodExpose
-          .filter((item) => !!item?.[1]?.id)
-          .map((item) => item[1]['id'])
-        const sharedLibIds = new Set(
-          parsedOptions.prodShared
-            .map((item) => item?.[1]?.id)
-            .filter((item) => !!item)
-        )
-
-        const addDeps = (id) => {
-          if (moduleCheckedSet.has(id)) return
-          moduleCheckedSet.add(id)
-          const info = this.getModuleInfo(id)
-          if (!info) return
-          const dependencyModuleIds = [
-            ...info.importedIds,
-            ...info.dynamicallyImportedIds
-          ]
-          const isImportSharedLib = dependencyModuleIds.some((id) =>
-            sharedLibIds.has(id)
-          )
-          if (isImportSharedLib) {
-            moduleNeedToTransformSet.add(id)
-          }
-          dependencyModuleIds.forEach(addDeps)
-        }
-
-        exposedModuleIds.forEach(addDeps)
-      }
       return outputOption
     },
-    renderChunk: function (code, chunk, options) {
-      if (!isRemote) return null
-      // means that there's no module import shared libs
-      if (moduleNeedToTransformSet.size === 0) return null
-      const relatedModules = Object.keys(chunk.modules)
-
-      if (relatedModules.some((id) => moduleNeedToTransformSet.has(id))) {
-        const transformedCode = transformImportFn.apply(this, [
-          code,
-          chunk,
-          options
-        ])
-        if (transformedCode) return transformedCode
+    generateBundle(options, bundle) {
+      if (!isRemote) {
+        return
       }
-      return null
+      for (const key in bundle) {
+        const chunk = bundle[key]
+        if (chunk.type === 'chunk') {
+          const importShared = chunk.imports?.some((name) =>
+            shareFilePathReg.test(name)
+          )
+          if (importShared) {
+            const transformedCode = transformImportFn.apply(this, [
+              chunk.code,
+              chunk,
+              options
+            ])
+            chunk.code = transformedCode?.code ?? chunk.code
+            chunk.map = transformedCode?.map ?? chunk.map
+          }
+        }
+      }
     }
   }
 }
