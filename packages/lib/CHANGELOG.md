@@ -1,3 +1,12 @@
+## [1.1.11](https://github.com/originjs/vite-plugin-federation/compare/v1.1.10...v1.1.11) (2022-10-24)
+
+
+### Features
+
+* remove invalid import and optimize shared replace ([a85a8ab](https://github.com/originjs/vite-plugin-federation/commit/a85a8abd66989767781162a9e729e674dd231ff8))
+
+
+
 ## [1.1.10](https://github.com/originjs/vite-plugin-federation/compare/v1.1.9...v1.1.10) (2022-10-14)
 
 
