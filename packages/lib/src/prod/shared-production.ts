@@ -87,7 +87,7 @@ export function prodSharedPlugin(
                       node.end,
                       `const {${declaration.join(
                         ','
-                      )}} = await importShared('${sharedName}')\n`
+                      )}} = await importShared('${sharedName}');\n`
                     )
                     modify = true
                   }
@@ -100,7 +100,7 @@ export function prodSharedPlugin(
             magicString.prepend(
               `import {importShared} from '${
                 prop?.root ? '.' : ''
-              }./__federation_fn_import.js'\n`
+              }./__federation_fn_import.js';\n`
             )
             return {
               code: magicString.toString(),
