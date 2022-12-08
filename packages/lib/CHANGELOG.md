@@ -1,3 +1,12 @@
+## [1.1.12](https://github.com/originjs/vite-plugin-federation/compare/v1.1.11...v1.1.12) (2022-12-08)
+
+
+### Bug Fixes
+
+* importShared is not a function ([#275](https://github.com/originjs/vite-plugin-federation/issues/275)) ([0b3dfbd](https://github.com/originjs/vite-plugin-federation/commit/0b3dfbdb2d0da4e0116ecf43cbcaf0c2fb025af8))
+
+
+
 ## [1.1.11](https://github.com/originjs/vite-plugin-federation/compare/v1.1.10...v1.1.11) (2022-10-24)
 
 
