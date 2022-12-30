@@ -43,8 +43,6 @@ export function prodExposePlugin(
       return __federation_import('\${__federation_expose_${item[0]}}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
   }
 
-  let remoteEntryChunk
-
   let viteConfigResolved: ResolvedConfig
 
   return {
@@ -118,13 +116,12 @@ export function prodExposePlugin(
 
     generateBundle(_options, bundle) {
       // replace import absolute path to chunk's fileName in remoteEntry.js
-      if (!remoteEntryChunk) {
-        for (const file in bundle) {
-          const chunk = bundle[file]
-          if (chunk?.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
-            remoteEntryChunk = chunk
-            break
-          }
+      let remoteEntryChunk
+      for (const file in bundle) {
+        const chunk = bundle[file]
+        if (chunk?.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
+          remoteEntryChunk = chunk
+          break
         }
       }
       // placeholder replace
