@@ -170,18 +170,21 @@ export function prodExposePlugin(
             const depCssFiles: Set<string> = new Set()
             const addDepCss = (bundleName) => {
               const theBundle = bundle[bundleName] as any
-              for (const cssFileName of theBundle.viteMetadata.importedCss.values()) {
-                const filename = getFilename(cssFileName)
-                const cssBundle = cssBundlesMap.get(filename)
-                if (cssBundle) {
-                  depCssFiles.add(cssBundle.fileName)
+              if (theBundle && theBundle.viteMetadata) {
+                for (const cssFileName of theBundle.viteMetadata.importedCss.values()) {
+                  const cssBundle = cssBundlesMap.get(getFilename(cssFileName))
+                  if (cssBundle) {
+                    depCssFiles.add(cssBundle.fileName)
+                  }
                 }
               }
               if (theBundle && theBundle.imports && theBundle.imports.length) {
                 theBundle.imports.forEach((name) => addDepCss(name))
               }
             }
+
             ;[fileBundle.fileName, ...fileBundle.imports].forEach(addDepCss)
+
             return `[${[...depCssFiles]
               .map((d) => JSON.stringify(basename(d)))
               .join(',')}]`
