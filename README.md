@@ -11,7 +11,9 @@ English | [简体中文](./README-zh.md)
 
 A Vite/Rollup plugin which support Module Federation.
 Inspired by Webpack and compatible with [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/).
+## Star History
 
+[![Star History Chart](https://api.star-history.com/svg?repos=originjs/vite-plugin-federation&type=Date)](https://star-history.com/#originjs/vite-plugin-federation&Date)
 ## Running results
 
 ![Preview](./README-Preview.gif)
