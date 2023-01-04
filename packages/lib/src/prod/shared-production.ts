@@ -337,6 +337,26 @@ export function prodSharedPlugin(
     },
 
     async buildStart() {
+      // Cannot emit chunks after module loading has finished, so emitFile first.
+      if (parsedOptions.prodShared.length && isRemote) {
+        this.emitFile({
+          fileName: `${
+            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }__federation_fn_import.js`,
+          type: 'chunk',
+          id: '__federation_fn_import',
+          preserveSignature: 'strict'
+        })
+        this.emitFile({
+          fileName: `${
+            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }__federation_lib_semver.js`,
+          type: 'chunk',
+          id: '__federation_lib_semver',
+          preserveSignature: 'strict'
+        })
+      }
+
       // forEach and collect dir
       const collectDirFn = (filePath: string, collect: string[]) => {
         const files = readdirSync(filePath)
@@ -419,22 +439,6 @@ export function prodSharedPlugin(
         for (const prod of parsedOptions.prodShared) {
           id2Prop.set(prod[1].id, prod[1])
         }
-        this.emitFile({
-          fileName: `${
-            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-          }__federation_fn_import.js`,
-          type: 'chunk',
-          id: '__federation_fn_import',
-          preserveSignature: 'strict'
-        })
-        this.emitFile({
-          fileName: `${
-            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-          }__federation_lib_semver.js`,
-          type: 'chunk',
-          id: '__federation_lib_semver',
-          preserveSignature: 'strict'
-        })
       }
     },
     outputOptions: function (outputOption) {
