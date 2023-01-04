@@ -6,6 +6,7 @@ import type {
 } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
+import { readFileSync } from 'fs'
 import type { AcornNode, TransformPluginContext } from 'rollup'
 import type { Hostname, ViteDevServer } from '../../types/viteDevServer'
 import {
@@ -154,7 +155,10 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                   optimized[arr[0]].src?.split(regExp)[0]
                 }node_modules/${arr[0]}/package.json`
                 try {
-                  arr[1].version = (await import(packageJsonPath)).version
+                  const json = JSON.parse(
+                    readFileSync(packageJsonPath, { encoding: 'utf-8' })
+                  )
+                  arr[1].version = json.version
                   arr[1].version.length
                 } catch (e) {
                   this.error(

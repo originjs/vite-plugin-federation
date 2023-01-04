@@ -10,7 +10,7 @@ import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { join, sep, resolve, basename } from 'path'
-import { readdirSync, statSync } from 'fs'
+import { readdirSync, readFileSync, statSync } from 'fs'
 import type {
   NormalizedOutputOptions,
   OutputChunk,
@@ -377,7 +377,10 @@ export function prodSharedPlugin(
 
         if (isHost && !arr[1].manuallyPackagePathSetting && !arr[1].version) {
           const packageJsonPath = `${currentDir}${sep}node_modules${sep}${arr[0]}${sep}package.json`
-          arr[1].version = (await import(packageJsonPath)).version
+          const json = JSON.parse(
+            readFileSync(packageJsonPath, { encoding: 'utf-8' })
+          )
+          arr[1].version = json.version
           if (!arr[1].version) {
             this.error(
               `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
