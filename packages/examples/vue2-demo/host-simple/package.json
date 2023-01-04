@@ -12,6 +12,6 @@
     "@vitejs/plugin-vue2": "^1.1.2"
   },
   "dependencies": {
-    "vue": "^2.7.8"
+    "vue": "^2.7.14"
   }
 }

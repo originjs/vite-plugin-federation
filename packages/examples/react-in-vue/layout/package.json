@@ -7,7 +7,7 @@
     "serve": "vite preview --port 5000 --strictPort"
   },
   "dependencies": {
-    "vue": "^3.2.37",
+    "vue": "^3.2.45",
     "react": "^16.13.0",
     "react-dom": "^16.13.0"
   },

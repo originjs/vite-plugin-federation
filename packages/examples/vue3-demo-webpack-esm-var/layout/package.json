@@ -9,7 +9,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "vue": "^3.2.37",
+    "vue": "^3.2.45",
     "pinia": "^2.0.21"
   },
   "devDependencies": {
