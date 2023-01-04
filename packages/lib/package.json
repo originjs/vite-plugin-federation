@@ -43,8 +43,8 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path ."
   },
   "dependencies": {
-    "estree-walker": "^1.0.1",
-    "magic-string": "^0.25.7"
+    "estree-walker": "^3.0.2",
+    "magic-string": "^0.27.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",

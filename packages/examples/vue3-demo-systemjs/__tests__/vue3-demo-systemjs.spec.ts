@@ -7,10 +7,17 @@ test('should have no 404s', () => {
   })
 })
 
+test('layout button', async () => {
+  expect(
+    await page.textContent('#btn-layout')
+  ).toBe('Hello Layout Button')
+
+})
+
 test('remote button', async () => {
   expect(
     await page.textContent('#btn-remote')
-  ).toBe('Hello Layout Button')
+  ).toBe('Hello Remote Button')
 })
 
 test('check pinia data', async () => {

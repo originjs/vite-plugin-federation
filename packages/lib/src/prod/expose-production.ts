@@ -118,7 +118,7 @@ export function prodExposePlugin(
       // replace import absolute path to chunk's fileName in remoteEntry.js
       let remoteEntryChunk
       for (const file in bundle) {
-        const chunk = bundle[file]
+        const chunk = bundle[file] as OutputChunk
         if (chunk?.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
           remoteEntryChunk = chunk
           break

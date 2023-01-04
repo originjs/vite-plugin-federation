@@ -735,14 +735,14 @@ importers:
       '@rollup/plugin-virtual': ^3.0.1
       '@types/estree': ^0.0.50
       conventional-changelog-cli: ^2.1.1
-      estree-walker: ^1.0.1
-      magic-string: ^0.25.7
+      estree-walker: ^3.0.2
+      magic-string: ^0.27.0
       rollup: ^3.9.1
       typescript: ^4.9.4
       vite: ^4.0.3
     dependencies:
-      estree-walker: 1.0.1
-      magic-string: 0.25.9
+      estree-walker: 3.0.2
+      magic-string: 0.27.0
     devDependencies:
       '@rollup/plugin-node-resolve': 15.0.1_rollup@3.9.1
       '@rollup/plugin-typescript': 10.0.1_esmavzhadgk2idmxtiodxm33ma
@@ -751,6 +751,688 @@ importers:
       conventional-changelog-cli: 2.2.2
       rollup: 3.9.1
       typescript: 4.9.4
+      vite: 4.0.3
+
+  packages/temp:
+    specifiers: {}
+
+  packages/temp/basic-host-remote:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      http-server: ^13.0.1
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      http-server: 13.1.0
+      kill-port: 2.0.1
+
+  packages/temp/basic-host-remote/rollup-host:
+    specifiers:
+      rollup: ^3.9.1
+    devDependencies:
+      rollup: 3.9.1
+
+  packages/temp/basic-host-remote/rollup-remote:
+    specifiers:
+      rollup: ^3.9.1
+    devDependencies:
+      rollup: 3.9.1
+
+  packages/temp/react-in-vue:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/react-in-vue/home:
+    specifiers:
+      '@vitejs/plugin-react-refresh': ^1.3.6
+      react: ^17.0.0
+      react-dom: ^17.0.0
+      vite: ^4.0.3
+    dependencies:
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    devDependencies:
+      '@vitejs/plugin-react-refresh': 1.3.6
+      vite: 4.0.3
+
+  packages/temp/react-in-vue/layout:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      react: ^16.13.0
+      react-dom: ^16.13.0
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      react: 16.14.0
+      react-dom: 16.14.0_react@16.14.0
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/react-vite:
+    specifiers:
+      '@originjs/vite-plugin-federation': ^1.1.10
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/react-vite/packages/app:
+    specifiers:
+      '@types/react': ^18.0.17
+      '@types/react-dom': ^18.0.6
+      '@vitejs/plugin-react': ^3.0.0
+      react: ^18.2.0
+      react-dom: ^18.2.0
+      vite: ^4.0.3
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    devDependencies:
+      '@types/react': 18.0.21
+      '@types/react-dom': 18.0.6
+      '@vitejs/plugin-react': 3.0.0_vite@4.0.3
+      vite: 4.0.3
+
+  packages/temp/react-vite/packages/shared:
+    specifiers:
+      '@types/react': ^18.0.17
+      '@types/react-dom': ^18.0.6
+      '@vitejs/plugin-react': ^3.0.0
+      react: ^18.2.0
+      react-dom: ^18.2.0
+      vite: ^4.0.3
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    devDependencies:
+      '@types/react': 18.0.21
+      '@types/react-dom': 18.0.6
+      '@vitejs/plugin-react': 3.0.0_vite@4.0.3
+      vite: 4.0.3
+
+  packages/temp/simple-react-esm:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      http-server: ^13.0.1
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      http-server: 13.1.0
+      kill-port: 2.0.1
+
+  packages/temp/simple-react-esm/host-esm:
+    specifiers:
+      '@babel/core': ^7.20.7
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.18.6
+      '@rollup/plugin-babel': ^6.0.3
+      '@rollup/plugin-commonjs': ^24.0.0
+      '@rollup/plugin-node-resolve': ^15.0.1
+      '@rollup/plugin-replace': ^5.0.2
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^3.9.1
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.20.7
+      '@babel/preset-env': 7.14.8_@babel+core@7.20.7
+      '@babel/preset-react': 7.18.6_@babel+core@7.20.7
+      '@rollup/plugin-babel': 6.0.3_un3bux72fyqlypc4vkcwfivuxu
+      '@rollup/plugin-commonjs': 24.0.0_rollup@3.9.1
+      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.9.1
+      '@rollup/plugin-replace': 5.0.2_rollup@3.9.1
+      rollup: 3.9.1
+
+  packages/temp/simple-react-esm/remote-esm:
+    specifiers:
+      '@babel/core': ^7.20.7
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.18.6
+      '@rollup/plugin-babel': ^6.0.3
+      '@rollup/plugin-commonjs': ^24.0.0
+      '@rollup/plugin-node-resolve': ^15.0.1
+      '@rollup/plugin-replace': ^5.0.2
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^3.9.1
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.20.7
+      '@babel/preset-env': 7.14.8_@babel+core@7.20.7
+      '@babel/preset-react': 7.18.6_@babel+core@7.20.7
+      '@rollup/plugin-babel': 6.0.3_un3bux72fyqlypc4vkcwfivuxu
+      '@rollup/plugin-commonjs': 24.0.0_rollup@3.9.1
+      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.9.1
+      '@rollup/plugin-replace': 5.0.2_rollup@3.9.1
+      rollup: 3.9.1
+
+  packages/temp/simple-react-systemjs:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      http-server: ^13.0.1
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      http-server: 13.1.0
+      kill-port: 2.0.1
+
+  packages/temp/simple-react-systemjs/host-systemjs:
+    specifiers:
+      '@babel/core': ^7.20.7
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.18.6
+      '@rollup/plugin-babel': ^6.0.3
+      '@rollup/plugin-commonjs': ^24.0.0
+      '@rollup/plugin-node-resolve': ^15.0.1
+      '@rollup/plugin-replace': ^5.0.2
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^3.9.1
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.20.7
+      '@babel/preset-env': 7.14.8_@babel+core@7.20.7
+      '@babel/preset-react': 7.18.6_@babel+core@7.20.7
+      '@rollup/plugin-babel': 6.0.3_un3bux72fyqlypc4vkcwfivuxu
+      '@rollup/plugin-commonjs': 24.0.0_rollup@3.9.1
+      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.9.1
+      '@rollup/plugin-replace': 5.0.2_rollup@3.9.1
+      rollup: 3.9.1
+
+  packages/temp/simple-react-systemjs/remote-systemjs:
+    specifiers:
+      '@babel/core': ^7.20.7
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.18.6
+      '@rollup/plugin-babel': ^6.0.3
+      '@rollup/plugin-commonjs': ^24.0.0
+      '@rollup/plugin-node-resolve': ^15.0.1
+      '@rollup/plugin-replace': ^5.0.2
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^3.9.1
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.20.7
+      '@babel/preset-env': 7.14.8_@babel+core@7.20.7
+      '@babel/preset-react': 7.18.6_@babel+core@7.20.7
+      '@rollup/plugin-babel': 6.0.3_un3bux72fyqlypc4vkcwfivuxu
+      '@rollup/plugin-commonjs': 24.0.0_rollup@3.9.1
+      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.9.1
+      '@rollup/plugin-replace': 5.0.2_rollup@3.9.1
+      rollup: 3.9.1
+
+  packages/temp/simple-react-webpack:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      http-server: ^13.0.1
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      http-server: 13.1.0
+      kill-port: 2.0.1
+
+  packages/temp/simple-react-webpack/host:
+    specifiers:
+      '@babel/core': ^7.20.7
+      '@babel/preset-env': 7.14.8
+      '@babel/preset-react': ^7.18.6
+      '@rollup/plugin-babel': ^6.0.3
+      '@rollup/plugin-commonjs': ^24.0.0
+      '@rollup/plugin-node-resolve': ^15.0.1
+      '@rollup/plugin-replace': ^5.0.2
+      cross-env: ^7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1
+      rollup: ^3.9.1
+    dependencies:
+      cross-env: 7.0.3
+      react: 16.13.1
+      react-dom: 16.13.1_react@16.13.1
+    devDependencies:
+      '@babel/core': 7.20.7
+      '@babel/preset-env': 7.14.8_@babel+core@7.20.7
+      '@babel/preset-react': 7.18.6_@babel+core@7.20.7
+      '@rollup/plugin-babel': 6.0.3_un3bux72fyqlypc4vkcwfivuxu
+      '@rollup/plugin-commonjs': 24.0.0_rollup@3.9.1
+      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.9.1
+      '@rollup/plugin-replace': 5.0.2_rollup@3.9.1
+      rollup: 3.9.1
+
+  packages/temp/simple-react-webpack/remote:
+    specifiers:
+      '@babel/core': ^7.20.7
+      '@babel/preset-react': ^7.18.6
+      babel-loader: ^9.1.0
+      npm-run-all: 4.1.5
+      react: ^16.13.1
+      react-dom: ^16.13.1
+      serve: ^14.0.0
+      webpack: ^5.75.0
+      webpack-cli: ^5.0.1
+      webpack-dev-server: ^4.11.1
+    dependencies:
+      react: 16.14.0
+      react-dom: 16.14.0_react@16.14.0
+    devDependencies:
+      '@babel/core': 7.20.7
+      '@babel/preset-react': 7.18.6_@babel+core@7.20.7
+      babel-loader: 9.1.0_lkd654lvpl423ugsqn5olungie
+      npm-run-all: 4.1.5
+      serve: 14.0.1
+      webpack: 5.75.0_webpack-cli@5.0.1
+      webpack-cli: 5.0.1_uaydpeuxkjjcxdbyfgk36cjdxi
+      webpack-dev-server: 4.11.1_rjsyjcrmk25kqsjzwkvj3a2evq
+
+  packages/temp/vue2-demo:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/vue2-demo/host-simple:
+    specifiers:
+      '@vitejs/plugin-vue2': ^2.2.0
+      vite: ^4.0.3
+      vue: ^2.7.14
+    dependencies:
+      vue: 2.7.14
+    devDependencies:
+      '@vitejs/plugin-vue2': 2.2.0_vite@4.0.3+vue@2.7.14
+      vite: 4.0.3
+
+  packages/temp/vue2-demo/remote-simple:
+    specifiers:
+      '@vitejs/plugin-vue2': ^2.2.0
+      vite: ^4.0.3
+      vue: ^2.7.14
+    dependencies:
+      vue: 2.7.14
+    devDependencies:
+      '@vitejs/plugin-vue2': 2.2.0_vite@4.0.3+vue@2.7.14
+      vite: 4.0.3
+
+  packages/temp/vue3-advanced-demo:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+      vite-plugin-css-injected-by-js: ^2.2.0
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+      vite-plugin-css-injected-by-js: 2.2.0
+
+  packages/temp/vue3-advanced-demo/team-blue:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      element-plus: ^2.2.15
+      pinia: ^2.0.21
+      typescript: ^4.9.4
+      unplugin-element-plus: 0.4.1
+      vite: ^4.0.3
+      vue: ^3.2.45
+      vue-router: ^4.1.5
+      vue-tsc: ^0.39.5
+    dependencies:
+      element-plus: 2.2.15_vue@3.2.45
+      pinia: 2.0.21_prq2uz4lho2pwp6irk4cfkrxwu
+      vue: 3.2.45
+      vue-router: 4.1.5_vue@3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      typescript: 4.9.4
+      unplugin-element-plus: 0.4.1_vite@4.0.3
+      vite: 4.0.3
+      vue-tsc: 0.39.5_typescript@4.9.4
+
+  packages/temp/vue3-advanced-demo/team-green:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      typescript: ^4.9.4
+      vite: ^4.0.3
+      vue: ^3.2.45
+      vue-tsc: ^0.39.5
+    dependencies:
+      pinia: 2.0.21_prq2uz4lho2pwp6irk4cfkrxwu
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      typescript: 4.9.4
+      vite: 4.0.3
+      vue-tsc: 0.39.5_typescript@4.9.4
+
+  packages/temp/vue3-advanced-demo/team-red:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      element-plus: ^2.2.15
+      pinia: ^2.0.21
+      typescript: ^4.9.4
+      unplugin-element-plus: 0.4.1
+      vite: ^4.0.3
+      vue: ^3.2.45
+      vue-router: ^4.1.5
+      vue-tsc: ^0.39.5
+    dependencies:
+      element-plus: 2.2.15_vue@3.2.45
+      pinia: 2.0.21_prq2uz4lho2pwp6irk4cfkrxwu
+      vue: 3.2.45
+      vue-router: 4.1.5_vue@3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      typescript: 4.9.4
+      unplugin-element-plus: 0.4.1_vite@4.0.3
+      vite: 4.0.3
+      vue-tsc: 0.39.5_typescript@4.9.4
+
+  packages/temp/vue3-demo-esm:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/vue3-demo-esm/common-lib:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      vite: ^4.0.3
+      vite-plugin-top-level-await: ^1.1.1
+      vue: ^3.2.45
+    dependencies:
+      vite-plugin-top-level-await: 1.1.1_vite@4.0.3
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-esm/css-modules:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      autoprefixer: ^10.3.2
+      postcss: ^8.3.0
+      vite: ^4.0.3
+      vite-plugin-top-level-await: ^1.1.1
+      vue: ^3.2.45
+    dependencies:
+      vite-plugin-top-level-await: 1.1.1_vite@4.0.3
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      autoprefixer: 10.4.7_postcss@8.4.20
+      postcss: 8.4.20
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-esm/home:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vite-plugin-top-level-await: ^1.1.1
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vite-plugin-top-level-await: 1.1.1_vite@4.0.3
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-esm/layout:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-systemjs:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/vue3-demo-systemjs/common-lib:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-systemjs/css-modules:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      autoprefixer: ^10.3.2
+      postcss: ^8.3.0
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      autoprefixer: 10.4.7_postcss@8.4.20
+      postcss: 8.4.20
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-systemjs/home:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-systemjs/layout:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-webpack-esm-esm:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/vue3-demo-webpack-esm-esm/home:
+    specifiers:
+      '@babel/core': ^7.20.7
+      babel-loader: ^9.1.0
+      css-loader: ^6.7.1
+      file-loader: ^6.2.0
+      html-webpack-plugin: ^5.3.2
+      mini-css-extract-plugin: ^2.6.1
+      serve: ^14.0.0
+      url-loader: ^4.1.1
+      vue: ^3.2.45
+      vue-loader: ^17.0.0
+      webpack: ^5.75.0
+      webpack-cli: ^5.0.1
+    dependencies:
+      '@babel/core': 7.20.7
+      babel-loader: 9.1.0_lkd654lvpl423ugsqn5olungie
+      serve: 14.0.1
+      vue: 3.2.45
+    devDependencies:
+      css-loader: 6.7.1_webpack@5.75.0
+      file-loader: 6.2.0_webpack@5.75.0
+      html-webpack-plugin: 5.3.2_webpack@5.75.0
+      mini-css-extract-plugin: 2.6.1_webpack@5.75.0
+      url-loader: 4.1.1_p5dl6emkcwslbw72e37w4ug7em
+      vue-loader: 17.0.0_webpack@5.75.0
+      webpack: 5.75.0_webpack-cli@5.0.1
+      webpack-cli: 5.0.1_webpack@5.75.0
+
+  packages/temp/vue3-demo-webpack-esm-esm/layout:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vue: 3.2.45
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../../lib
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-webpack-esm-var:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/vue3-demo-webpack-esm-var/home:
+    specifiers:
+      '@babel/core': ^7.20.7
+      babel-loader: ^9.1.0
+      css-loader: 6.3.0
+      file-loader: 6.2.0
+      html-webpack-plugin: 5.3.2
+      mini-css-extract-plugin: 2.6.1
+      serve: ^14.0.0
+      url-loader: 4.1.1
+      vue: ^3.2.45
+      vue-loader: 17.0.0
+      webpack: ^5.75.0
+      webpack-cli: ^5.0.1
+      webpack-dev-server: ^4.11.1
+    dependencies:
+      '@babel/core': 7.20.7
+      babel-loader: 9.1.0_lkd654lvpl423ugsqn5olungie
+      serve: 14.0.1
+      vue: 3.2.45
+    devDependencies:
+      css-loader: 6.3.0_webpack@5.75.0
+      file-loader: 6.2.0_webpack@5.75.0
+      html-webpack-plugin: 5.3.2_webpack@5.75.0
+      mini-css-extract-plugin: 2.6.1_webpack@5.75.0
+      url-loader: 4.1.1_p5dl6emkcwslbw72e37w4ug7em
+      vue-loader: 17.0.0_webpack@5.75.0
+      webpack: 5.75.0_webpack-cli@5.0.1
+      webpack-cli: 5.0.1_uaydpeuxkjjcxdbyfgk36cjdxi
+      webpack-dev-server: 4.11.1_rjsyjcrmk25kqsjzwkvj3a2evq
+
+  packages/temp/vue3-demo-webpack-esm-var/layout:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vue: 3.2.45
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../../lib
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/temp/vue3-demo-webpack-systemjs:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/temp/vue3-demo-webpack-systemjs/home:
+    specifiers:
+      '@babel/core': ^7.20.7
+      babel-loader: ^9.1.0
+      css-loader: 6.3.0
+      file-loader: 6.2.0
+      html-webpack-plugin: 5.3.2
+      mini-css-extract-plugin: 2.6.1
+      serve: ^14.0.0
+      url-loader: 4.1.1
+      vue: ^3.2.45
+      vue-loader: 17.0.0
+      webpack: ^5.75.0
+      webpack-cli: ^5.0.1
+      webpack-dev-server: ^4.11.1
+    dependencies:
+      '@babel/core': 7.20.7
+      babel-loader: 9.1.0_lkd654lvpl423ugsqn5olungie
+      serve: 14.0.1
+      vue: 3.2.45
+    devDependencies:
+      css-loader: 6.3.0_webpack@5.75.0
+      file-loader: 6.2.0_webpack@5.75.0
+      html-webpack-plugin: 5.3.2_webpack@5.75.0
+      mini-css-extract-plugin: 2.6.1_webpack@5.75.0
+      url-loader: 4.1.1_p5dl6emkcwslbw72e37w4ug7em
+      vue-loader: 17.0.0_webpack@5.75.0
+      webpack: 5.75.0_webpack-cli@5.0.1
+      webpack-cli: 5.0.1_uaydpeuxkjjcxdbyfgk36cjdxi
+      webpack-dev-server: 4.11.1_rjsyjcrmk25kqsjzwkvj3a2evq
+
+  packages/temp/vue3-demo-webpack-systemjs/layout:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vue: 3.2.45
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../../lib
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
       vite: 4.0.3
 
 packages:
@@ -3673,6 +4355,22 @@ packages:
       postcss-value-parser: 4.2.0
     dev: true
 
+  /autoprefixer/10.4.7_postcss@8.4.20:
+    resolution: {integrity: sha512-ypHju4Y2Oav95SipEcCcI5J7CGPuvz8oat7sUtYj3ClK44bldfvtvcxK6IEK++7rqB7YchDGzweZIBG+SD0ZAA==}
+    engines: {node: ^10 || ^12 || >=14}
+    hasBin: true
+    peerDependencies:
+      postcss: ^8.1.0
+    dependencies:
+      browserslist: 4.21.1
+      caniuse-lite: 1.0.30001363
+      fraction.js: 4.2.0
+      normalize-range: 0.1.2
+      picocolors: 1.0.0
+      postcss: 8.4.20
+      postcss-value-parser: 4.2.0
+    dev: true
+
   /babel-loader/9.1.0_lkd654lvpl423ugsqn5olungie:
     resolution: {integrity: sha512-Antt61KJPinUMwHwIIz9T5zfMgevnfZkEVWYDWlG888fgdvRRGD0JTuf/fFozQnfT+uq64sk1bmdHDy/mOEWnA==}
     engines: {node: '>= 14.15.0'}
@@ -4888,12 +5586,12 @@ packages:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
 
-  /estree-walker/1.0.1:
-    resolution: {integrity: sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==}
-    dev: false
-
   /estree-walker/2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
+
+  /estree-walker/3.0.2:
+    resolution: {integrity: sha512-C03BvXCQIH/po+PNPONx/zSM9ziPr9weX8xNhYb/IJtdJ9z+L4z9VKPTB+UTHdmhnIopA2kc419ueyVyHVktwA==}
+    dev: false
 
   /esutils/2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
@@ -6119,7 +6817,6 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.14
-    dev: true
 
   /make-dir/3.1.0:
     resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}

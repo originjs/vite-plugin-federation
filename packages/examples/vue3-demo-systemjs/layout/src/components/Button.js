@@ -7,7 +7,7 @@ const button = {
         return h(
             "button",
             {
-                id: "btn-remote",
+                id: "btn-layout",
                 style: {
                     'background-color': '#4CAF50',
                     'border': 'none',

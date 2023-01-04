@@ -104,14 +104,20 @@ export function prodSharedPlugin(
             )
             return {
               code: magicString.toString(),
-              map: magicString.generateMap(chunk.map)
+              map: magicString.generateMap({
+                source: chunk.map?.file,
+                hires: true
+              })
             }
           }
           if (remove) {
             //  only remove code , dont insert import {importShared} from 'xxx'
             return {
               code: magicString.toString(),
-              map: magicString.generateMap(chunk.map)
+              map: magicString.generateMap({
+                source: chunk.map?.file,
+                hires: true
+              })
             }
           }
         }
@@ -264,7 +270,10 @@ export function prodSharedPlugin(
           if (modify) {
             return {
               code: magicString.toString(),
-              map: magicString.generateMap(chunk.map)
+              map: magicString.generateMap({
+                source: chunk.map?.file,
+                hires: true
+              })
             }
           }
         }
