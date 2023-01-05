@@ -12,9 +12,7 @@
  </p>
 
 支持模块联邦Module Federation的 Vite/Rollup 插件，可以与 [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) 兼容。
-## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=originjs/vite-plugin-federation&type=Date)](https://star-history.com/#originjs/vite-plugin-federation&Date)
 ## 运行效果
 
 ![Preview](./README-Preview.gif)
@@ -390,6 +388,9 @@ export default defineConfig({
   cacheDir: "node_modules/.cacheDir",
 }
 ```
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=originjs/vite-plugin-federation&type=Date)](https://star-history.com/#originjs/vite-plugin-federation&Date)
 
 ## Wiki
 
