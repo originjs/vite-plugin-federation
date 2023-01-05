@@ -42,11 +42,6 @@ function clickProduct(sku: string) {
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-aside {
-  border-top: 1px solid gray;
-  padding-top: 20px;
-}
-
 dl {
   display: grid;
   grid-column-gap: 15px;
@@ -63,7 +58,7 @@ dd {
   margin: 0;
 }
 
-#app {
+.main {
   display: grid;
   grid-column-gap: 20px;
   grid-gap: 20px;
@@ -73,7 +68,7 @@ dd {
 }
 
 @media only screen and (max-width: 999px) {
-  #app {
+  .main {
     grid-template-areas:
       "store basket"
       "image name"
@@ -85,7 +80,7 @@ dd {
 }
 
 @media only screen and (min-width: 1000px) {
-  #app {
+  .main {
     grid-template-areas:
       "store basket  reco"
       "image name    reco"
@@ -159,7 +154,7 @@ dd {
   max-width: 100%;
 }
 
-#app {
+.main {
   outline: 3px dashed orangered;
   padding: 15px;
 }
