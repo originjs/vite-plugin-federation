@@ -3,16 +3,13 @@ import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import federation from '@originjs/vite-plugin-federation'
 import replace from '@rollup/plugin-replace'
-import pkg from './package.json'
+import pkg from './package.json' assert { type: 'json' }
 
 export default {
   input: 'src/index.js',
   plugins: [
-    // injectProcessEnv({
-    //   NODE_ENV: 'production'
-    // }),
     resolve(),
-    babel(),
+    babel({ babelHelpers: 'bundled' }),
     commonjs(),
     replace({
       'process.env.NODE_ENV': JSON.stringify('production'),
@@ -21,26 +18,24 @@ export default {
     federation({
       filename: 'remoteEntry.js',
       exposes: {
-        './Button': 'src/button',
-        './Button1': 'src/button1'
+        './Button': './src/button.jsx',
+        './Button1': './src/button1.jsx'
       },
       shared: [
         {
           react: {
-            requiredVersion: '^1.0.0',
           },
           'react-dom': {
             requiredVersion: pkg.dependencies['react-dom'],
-            import:false
+            import: false
           }
         }
       ]
     })
   ],
   output: {
-    format: 'systemjs',
+    format: 'esm',
     dir: pkg.main,
-    minifyInternalExports: true
     // minifyInternalExports:false
   },
   // external: ['react', 'react-dom'],

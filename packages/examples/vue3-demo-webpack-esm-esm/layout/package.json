@@ -9,12 +9,12 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "vue": "^3.2.37",
+    "vue": "^3.2.45",
     "pinia": "^2.0.21"
   },
   "devDependencies": {
     "@originjs/vite-plugin-federation": "workspace:*",
-    "@vitejs/plugin-vue": "^3.0.1",
-    "vite": "^3.0.7"
+    "@vitejs/plugin-vue": "^4.0.0",
+    "vite": "^4.0.3"
   }
 }

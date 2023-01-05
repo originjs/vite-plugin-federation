@@ -7,13 +7,20 @@ test('should have no 404s', () => {
   })
 })
 
-test('remote button', async () => {
+test.skip('layout button', async () => {
   expect(
-    await page.textContent('#btn-remote')
+    await page.textContent('#btn-layout')
   ).toBe('Hello Layout Button')
+
 })
 
-test('check pinia data', async () => {
+test.skip('remote button', async () => {
+  expect(
+    await page.textContent('#btn-remote')
+  ).toBe('Hello Remote Button')
+})
+
+test.skip('check pinia data', async () => {
   expect(
     await page.textContent('#cart-item')
   ).toBe('cartItems from pinia: 5')

@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.green">{{ title }}</div>
-  <p id='cart-item' :class="$style.green">cartItems from pinia: {{cartCount}}</p>
+  <p id='cart-item-layout' :class="$style.green">cartItems from pinia: {{cartCount}}</p>
   <div :class="[$style.green, $style.bold]">green and bold</div>
 </template>
 

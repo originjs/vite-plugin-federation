@@ -10,7 +10,7 @@ import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { join, sep, resolve, basename } from 'path'
-import { readdirSync, statSync } from 'fs'
+import { readdirSync, readFileSync, statSync } from 'fs'
 import type {
   NormalizedOutputOptions,
   OutputChunk,
@@ -104,14 +104,20 @@ export function prodSharedPlugin(
             )
             return {
               code: magicString.toString(),
-              map: magicString.generateMap(chunk.map)
+              map: magicString.generateMap({
+                source: chunk.map?.file,
+                hires: true
+              })
             }
           }
           if (remove) {
             //  only remove code , dont insert import {importShared} from 'xxx'
             return {
               code: magicString.toString(),
-              map: magicString.generateMap(chunk.map)
+              map: magicString.generateMap({
+                source: chunk.map?.file,
+                hires: true
+              })
             }
           }
         }
@@ -264,7 +270,10 @@ export function prodSharedPlugin(
           if (modify) {
             return {
               code: magicString.toString(),
-              map: magicString.generateMap(chunk.map)
+              map: magicString.generateMap({
+                source: chunk.map?.file,
+                hires: true
+              })
             }
           }
         }
@@ -337,6 +346,26 @@ export function prodSharedPlugin(
     },
 
     async buildStart() {
+      // Cannot emit chunks after module loading has finished, so emitFile first.
+      if (parsedOptions.prodShared.length && isRemote) {
+        this.emitFile({
+          fileName: `${
+            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }__federation_fn_import.js`,
+          type: 'chunk',
+          id: '__federation_fn_import',
+          preserveSignature: 'strict'
+        })
+        this.emitFile({
+          fileName: `${
+            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
+          }__federation_lib_semver.js`,
+          type: 'chunk',
+          id: '__federation_lib_semver',
+          preserveSignature: 'strict'
+        })
+      }
+
       // forEach and collect dir
       const collectDirFn = (filePath: string, collect: string[]) => {
         const files = readdirSync(filePath)
@@ -377,7 +406,10 @@ export function prodSharedPlugin(
 
         if (isHost && !arr[1].manuallyPackagePathSetting && !arr[1].version) {
           const packageJsonPath = `${currentDir}${sep}node_modules${sep}${arr[0]}${sep}package.json`
-          arr[1].version = (await import(packageJsonPath)).version
+          const json = JSON.parse(
+            readFileSync(packageJsonPath, { encoding: 'utf-8' })
+          )
+          arr[1].version = json.version
           if (!arr[1].version) {
             this.error(
               `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
@@ -416,22 +448,6 @@ export function prodSharedPlugin(
         for (const prod of parsedOptions.prodShared) {
           id2Prop.set(prod[1].id, prod[1])
         }
-        this.emitFile({
-          fileName: `${
-            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-          }__federation_fn_import.js`,
-          type: 'chunk',
-          id: '__federation_fn_import',
-          preserveSignature: 'strict'
-        })
-        this.emitFile({
-          fileName: `${
-            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-          }__federation_lib_semver.js`,
-          type: 'chunk',
-          id: '__federation_lib_semver',
-          preserveSignature: 'strict'
-        })
       }
     },
     outputOptions: function (outputOption) {

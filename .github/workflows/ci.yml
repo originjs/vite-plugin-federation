@@ -17,10 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest,macos-latest,windows-latest]
-        node_version: [14, 16]
-#        include:
-#          - os: windows-latest
-#            node_version: 16
+        node_version: [16,18]
       fail-fast: false
 
     name: 'Build&Test: node-${{ matrix.node_version }}, ${{ matrix.os }}'
@@ -58,7 +55,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-    name: 'Lint: node-16, ubuntu-latest'
+    name: 'Lint: node-18, ubuntu-latest'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -69,10 +66,10 @@ jobs:
         with:
           version: 7
 
-      - name: Set node version to 16
+      - name: Set node version to 18
         uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install deps

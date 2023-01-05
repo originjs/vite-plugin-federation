@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "vite-plugin-top-level-await": "^1.1.1",
-    "vue": "^3.2.37"
+    "vue": "^3.2.45"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.0.1",
-    "vite": "^3.0.7"
+    "@vitejs/plugin-vue": "^4.0.0",
+    "vite": "^4.0.3"
   }
 }
