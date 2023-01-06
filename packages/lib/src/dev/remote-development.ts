@@ -343,7 +343,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     shared: (string | ConfigTypeSet)[],
     viteVersion: string | undefined
   ): Promise<string[]> {
-    const hostname = resolveHostname(viteDevServer.config.server.host)
+    const hostname = resolveHostname(viteDevServer.config.server)
     const protocol = viteDevServer.config.server.https ? 'https' : 'http'
     const port = viteDevServer.config.server.port ?? 5000
     const regExp = new RegExp(
@@ -388,9 +388,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     return res
   }
 
-  function resolveHostname(
-    optionsHost: string | boolean | undefined
-  ): Hostname {
+  function resolveHostname(serverOptions): Hostname {
+    const optionsHost = serverOptions.host
+    const optionOrigin = serverOptions.origin
+    // could be destructured
+
     let host: string | undefined
     if (
       optionsHost === undefined ||
@@ -406,14 +408,25 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       host = optionsHost
     }
 
-    // Set host name to localhost when possible, unless the user explicitly asked for '127.0.0.1'
-    const name =
-      (optionsHost !== '127.0.0.1' && host === '127.0.0.1') ||
+    // Set host name to origin hostname or to localhost when possible, unless the user explicitly asked for '127.0.0.1'
+    let name;
+    if (optionOrigin) {
+       // Keep hostname from url
+        if (optionOrigin.includes('://')) {
+          const [, hostname] = optionOrigin.split('://')
+          name = hostname
+        } else {
+          name = optionOrigin
+        }
+    } else if ((optionsHost !== '127.0.0.1' && host === '127.0.0.1') ||
       host === '0.0.0.0' ||
       host === '::' ||
       host === undefined
-        ? 'localhost'
-        : host
+    ) {
+      name = 'localhost'
+    } else {
+      name = host
+    }
 
     return { host, name }
   }
