@@ -333,6 +333,17 @@ shared: {
 }
 ```
 
+#### `generate : boolean`
+* `default: true` 
+* generate a shared chunk file or not , if you make sure that the host side has a share that can be used, then you can set not to generate a shared file on the remote side to reduce the size of the remote's chunk file, which is only effective on the remote side, the host side will generate a shared chunk no matter what.
+```js
+shared: {
+    packageName: {
+        generate: false
+    }
+}
+```
+
 ## FAQ
 
 ### ERROR: `Top-level` await is not available in the configured target environment

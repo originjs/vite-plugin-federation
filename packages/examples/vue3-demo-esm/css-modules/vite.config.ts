@@ -21,7 +21,11 @@ export default defineConfig({
       exposes: {
         './Button': './src/components/Button.vue'
       },
-      shared: ['vue']
+      shared: {
+        vue:{
+          generate:false
+        }
+      }
     }),
     topLevelAwait({
       // The export name of top-level await promise for each chunk module

@@ -143,7 +143,8 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
               }${
                 sharedInfo[1].root ? sharedInfo[1].root[0] + '/' : ''
               }${basename}`,
-              preserveSignature: 'allow-extension'
+              preserveSignature: 'allow-extension',
+              name: sharedInfo[0]
             })
             sharedFileName2Prop.set(basename, sharedInfo as ConfigTypeSet)
           }
@@ -151,6 +152,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
         if (id === '\0virtual:__federation_fn_import') {
           const moduleMapCode = parsedOptions.prodShared
+            .filter((shareInfo) => shareInfo[1].generate)
             .map(
               (sharedInfo) =>
                 `'${sharedInfo[0]}':{get:()=>()=>__federation_import('./${
