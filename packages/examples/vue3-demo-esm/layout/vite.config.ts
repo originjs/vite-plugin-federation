@@ -25,7 +25,14 @@ export default defineConfig({
                 },
                 'css-modules': 'http://localhost:5003/assets/remoteEntry.js'
             },
-            shared: ['vue', 'pinia']
+            shared: {
+                vue:{
+                    // This is an invalid configuration, because the generate attribute is not supported on the host side
+                    generate:false
+                },
+                pinia:{
+                }
+            }
         })
     ],
     build: {

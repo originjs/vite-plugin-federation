@@ -345,6 +345,17 @@ shared: {
 }
 ```
 
+#### `generate : boolean`
+* `default: true`
+* 是否生成shared chunk文件 ，如果你确定host端有一个可以使用的shared，那么你可以在remote端设置不生成共享文件，以减少remote端的块文件的大小，该配置只在remote有效，host端无论如何都会生成自己的shared。
+```js
+shared: {
+  packageName: {
+    generate: false
+  }
+}
+``
+
 ## FAQ
 
 ### ERROR: `Top-level` await is not available in the configured target environment

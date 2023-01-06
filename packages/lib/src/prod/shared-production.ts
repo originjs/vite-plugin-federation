@@ -18,7 +18,7 @@ import type {
 } from 'rollup'
 import { sharedFileName2Prop } from './remote-production'
 const sharedFileNameReg = /^__federation_shared_.+\.js$/
-const shareFilePathReg = /__federation_shared_.+\.js$/
+const sharedFilePathReg = /__federation_shared_.+\.js$/
 
 export function prodSharedPlugin(
   options: VitePluginFederationOptions
@@ -549,11 +549,21 @@ export function prodSharedPlugin(
       if (!isRemote) {
         return
       }
+      const needRemoveShared = new Set<string>()
       for (const key in bundle) {
         const chunk = bundle[key]
         if (chunk.type === 'chunk') {
+          const removeSharedChunk =
+            !isHost &&
+            sharedFilePathReg.test(chunk.fileName) &&
+            shareName2Prop.has(chunk.name) &&
+            !shareName2Prop.get(chunk.name).generate
+          if (removeSharedChunk) {
+            needRemoveShared.add(key)
+            continue
+          }
           const importShared = chunk.imports?.some((name) =>
-            shareFilePathReg.test(name)
+            sharedFilePathReg.test(name)
           )
           if (importShared) {
             const transformedCode = transformImportFn.apply(this, [
@@ -564,6 +574,11 @@ export function prodSharedPlugin(
             chunk.code = transformedCode?.code ?? chunk.code
             chunk.map = transformedCode?.map ?? chunk.map
           }
+        }
+      }
+      if (needRemoveShared.size !== 0) {
+        for (const key of needRemoveShared) {
+          delete bundle[key]
         }
       }
     }
