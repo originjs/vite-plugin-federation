@@ -1,17 +1,17 @@
-import {execa} from 'execa';
+import { execa } from 'execa';
 import { dirname, join, resolve } from 'node:path'
 import os from 'node:os'
 import fs from 'fs-extra'
 import { chromium } from 'playwright-chromium'
 import type { Browser, Page } from 'playwright-chromium'
 import type { File } from 'vitest'
-import { beforeAll,afterAll } from 'vitest'
+import { beforeAll, afterAll } from 'vitest'
 
 export const workspaceRoot = resolve(__dirname, '../')
 /**
  * Path to the test folder
  */
- export let testDir: string
+export let testDir: string
 
 export function slash(p: string): string {
   return p.replace(/\\/g, '/')
@@ -30,6 +30,7 @@ let err: Error
 let skipError: boolean
 
 beforeAll(async (s) => {
+  process.env.NODE_ENV = 'production'
   const suite = s as File
   // skip browser setup for non-examples tests
   if (!suite.filepath.includes('examples')) {
@@ -67,7 +68,7 @@ beforeAll(async (s) => {
     )?.[1]
     testDir = dirname(testPath)
 
-    
+
     // if this is a test placed under examples/xxx/__tests__
     // start a vite server in that directory.
     if (testName) {
