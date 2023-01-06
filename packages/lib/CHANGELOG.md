@@ -1,3 +1,19 @@
+## [1.1.13](https://github.com/originjs/vite-plugin-federation/compare/v1.1.12...v1.1.13) (2023-01-06)
+
+
+### Bug Fixes
+
+* Invalid remoteEntry.js when building in watch mode ([5fc029d](https://github.com/originjs/vite-plugin-federation/commit/5fc029df6a560c88adf7cbd047e9800c1fe10ee6)), closes [#253](https://github.com/originjs/vite-plugin-federation/issues/253)
+* the style is missing ([#302](https://github.com/originjs/vite-plugin-federation/issues/302)) ([9a71a45](https://github.com/originjs/vite-plugin-federation/commit/9a71a45c04a7e5bb069eada0a4899eda2f371235))
+* (resolveHostname) Resolve host name and respecting origin ([#308](https://github.com/originjs/vite-plugin-federation/issues/308)) ([f0578e](https://github.com/originjs/vite-plugin-federation/commit/f0578e2b02242c84e3570b3fb86c2d3c4888011b)) 
+
+
+### Features
+
+* add `shared.generate` to determine if a shared file needs to be generated on the remote side ([#311](https://github.com/originjs/vite-plugin-federation/issues/311)) ([5c6689b](https://github.com/originjs/vite-plugin-federation/commit/5c6689bbc7d54fcd15fde63e57906ec8e8ab01b2))
+
+
+
 ## [1.1.12](https://github.com/originjs/vite-plugin-federation/compare/v1.1.11...v1.1.12) (2022-12-08)
 
 
