@@ -16,7 +16,6 @@ export default defineConfig({
             shared: {
                 vue: {},
                 pinia: {},
-                // This is to test if the custom library can be SHARED, there is no real point
                 myStore: {
                     packagePath: './src/store.js',
                     import: false,
