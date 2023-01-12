@@ -15,7 +15,6 @@
 
 import type { PluginHooks } from '../../types/pluginHooks'
 import {
-  findDependencies,
   getModuleMarker,
   parseSharedOptions,
   removeNonRegLetter
@@ -24,7 +23,7 @@ import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import { join, sep, resolve, basename } from 'path'
+import { basename, join, resolve } from 'path'
 import { readdirSync, readFileSync, statSync } from 'fs'
 import type {
   NormalizedOutputOptions,
@@ -32,6 +31,7 @@ import type {
   PluginContext
 } from 'rollup'
 import { sharedFileName2Prop } from './remote-production'
+
 const sharedFileNameReg = /^__federation_shared_.+\.js$/
 const sharedFilePathReg = /__federation_shared_.+\.js$/
 
@@ -397,13 +397,18 @@ export function prodSharedPlugin(
       const monoRepos: { arr: string[]; root: string | ConfigTypeSet }[] = []
       const dirPaths: string[] = []
       const currentDir = resolve()
+      //  try to get every module package.json file
       for (const arr of parsedOptions.prodShared) {
-        try {
-          const resolve = await this.resolve(arr[1].packagePath)
-          arr[1].id = resolve?.id
-        } catch (e) {
-          //    try to resolve monoRepo
-          if (!arr[1].manuallyPackagePathSetting) {
+        if (isHost && !arr[1].version && !arr[1].manuallyPackagePathSetting) {
+          const packageJsonPath = (
+            await this.resolve(`${arr[1].packagePath}/package.json`)
+          )?.id
+          if (packageJsonPath) {
+            const packageJson = JSON.parse(
+              readFileSync(packageJsonPath, { encoding: 'utf-8' })
+            )
+            arr[1].version = packageJson.version
+          } else {
             arr[1].removed = true
             const dir = join(currentDir, 'node_modules', arr[0])
             const dirStat = statSync(dir)
@@ -417,17 +422,10 @@ export function prodSharedPlugin(
               monoRepos.push({ arr: dirPaths, root: arr })
             }
           }
-        }
 
-        if (isHost && !arr[1].manuallyPackagePathSetting && !arr[1].version) {
-          const packageJsonPath = `${currentDir}${sep}node_modules${sep}${arr[0]}${sep}package.json`
-          const json = JSON.parse(
-            readFileSync(packageJsonPath, { encoding: 'utf-8' })
-          )
-          arr[1].version = json.version
-          if (!arr[1].version) {
+          if (!arr[1].removed && !arr[1].version) {
             this.error(
-              `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
+              `No description file or no version in description file (usually package.json) of ${arr[0]}. Add version to description file, or manually specify version in shared config.`
             )
           }
         }
@@ -468,72 +466,6 @@ export function prodSharedPlugin(
     outputOptions: function (outputOption) {
       // remove rollup generated empty imports,like import './filename.js'
       outputOption.hoistTransitiveImports = false
-
-      // sort shared dep
-      const that = this
-      const priority: string[] = []
-      const depInShared = new Map()
-      parsedOptions.prodShared.forEach((value) => {
-        const shareName = value[0]
-        // pick every shared moduleId
-        const usedSharedModuleIds = new Set<string>()
-        const sharedModuleIds = new Map<string, string>()
-        // exclude itself
-        parsedOptions.prodShared
-          .filter((item) => item[0] !== shareName)
-          .forEach((item) => sharedModuleIds.set(item[1].id, item[0]))
-        depInShared.set(shareName, usedSharedModuleIds)
-        const deps = new Set<string>()
-        findDependencies.apply(that, [
-          value[1].id,
-          deps,
-          sharedModuleIds,
-          usedSharedModuleIds
-        ])
-        value[1].dependencies = deps
-      })
-      // judge dependencies priority
-      const orderByDepCount: Map<string, Set<string>>[] = []
-      depInShared.forEach((value, key) => {
-        if (!orderByDepCount[value.size]) {
-          orderByDepCount[value.size] = new Map()
-        }
-        orderByDepCount[value.size].set(key, value)
-      })
-
-      // dependency nothing is first,handle index = 0
-      if (orderByDepCount[0]) {
-        for (const key of orderByDepCount[0].keys()) {
-          priority.push(key)
-        }
-      }
-
-      // handle index >= 1
-      orderByDepCount
-        .filter((item, index) => item && index >= 1)
-        .forEach((item) => {
-          for (const entry of item.entries()) {
-            addDep(entry, priority, depInShared)
-          }
-        })
-
-      function addDep([key, value], priority, depInShared) {
-        for (const dep of value) {
-          if (!priority.includes(dep)) {
-            addDep([dep, depInShared.get(dep)], priority, depInShared)
-          }
-        }
-        if (!priority.includes(key)) {
-          priority.push(key)
-        }
-      }
-
-      // adjust the map order according to priority
-      parsedOptions.prodShared.sort((a, b) => {
-        const aIndex = priority.findIndex((value) => value === a[0])
-        const bIndex = priority.findIndex((value) => value === b[0])
-        return aIndex - bIndex
-      })
 
       const manualChunkFunc = (id: string) => {
         //  if id is in shared dependencies, return id ,else return vite function value

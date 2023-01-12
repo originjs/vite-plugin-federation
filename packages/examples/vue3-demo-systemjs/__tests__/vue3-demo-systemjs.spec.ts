@@ -1,5 +1,5 @@
-import { browserLogs, page } from '~utils'
-import { expect, test } from 'vitest'
+import {browserLogs, page} from '~utils'
+import {expect, test} from 'vitest'
 
 test('should have no 404s', () => {
   browserLogs.forEach((msg) => {
@@ -22,7 +22,7 @@ test('remote button', async () => {
 
 test('check pinia data', async () => {
   expect(
-    await page.textContent('#cart-item')
+    await page.textContent('#cart-item-layout')
   ).toBe('cartItems from pinia: 5')
 })
 
