@@ -1,0 +1,21 @@
+{
+  "name": "vue3-demo-esm-shared-store",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "home",
+    "common-lib",
+    "layout",
+    "css-modules"
+  ],
+  "scripts": {
+    "build": "pnpm --parallel --filter \"./**\" build ",
+    "serve": "pnpm --parallel --filter \"./**\" serve",
+    "stop": "kill-port --port 5000,5001,5002,5003"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "workspace:*",
+    "kill-port": "^2.0.1"
+  },
+  "license": "MulanPSL-2.0"
+}

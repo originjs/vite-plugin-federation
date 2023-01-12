@@ -1,0 +1,19 @@
+{
+  "name": "@vue3-demo-esm/layout-esm",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite --port 5000 --strictPort",
+    "serve": "vite preview --port 5000 --strictPort",
+    "build": "vite build",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "vue": "^3.2.45",
+    "pinia": "^2.0.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
+    "vite": "^4.0.3"
+  }
+}
