@@ -50,8 +50,14 @@ jobs:
       - name: Build vite-plugin-federation
         run: pnpm run build
 
-      - name: Test build
-        run: pnpm run test
+      - name: Unit test
+        run: pnpm run 'test:unit'
+
+      - name: Dev mode e2e test
+        run: pnpm run 'test:e2e-dev'
+
+      - name: Serve mode e2e test
+        run: pnpm run 'test:e2e-serve'
 
   lint:
     runs-on: ubuntu-latest

@@ -3,14 +3,16 @@
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "home",
-    "common-lib",
-    "layout",
-    "css-modules"
+    "host",
+    "remote-A",
+    "remote-B"
   ],
   "scripts": {
     "build": "pnpm --parallel --filter \"./**\" build ",
     "serve": "pnpm --parallel --filter \"./**\" serve",
+    "build:remotes": "pnpm --parallel --filter \"./remote-A\" --filter \"./remote-B\"  build",
+    "serve:remotes": "pnpm --parallel --filter \"./remote-A\" --filter \"./remote-B\"  serve",
+    "dev:hosts": "pnpm --filter \"./host\" dev",
     "stop": "kill-port --port 5000,5001,5002,5003"
   },
   "devDependencies": {

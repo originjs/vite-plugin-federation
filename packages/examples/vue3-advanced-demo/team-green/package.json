@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5003 --strictPort",
+    "dev": "vite --port 5001 --strictPort",
     "build": "vue-tsc --noEmit && vite build",
-    "serve": "vite preview --port 5003 --strictPort",
+    "serve": "vite preview --port 5001 --strictPort",
     "clean": "rm -rf dist",
-    "stop": "kill-port --port 5003"
+    "stop": "kill-port --port 5001"
   },
   "dependencies": {
     "vue": "^3.2.45",

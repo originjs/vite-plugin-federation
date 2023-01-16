@@ -4,6 +4,9 @@
   "scripts": {
     "build": "pnpm --parallel --filter \"./**\" build",
     "serve": "pnpm --parallel --filter \"./**\" serve ",
+    "build:remotes": "pnpm --filter \"./home\"  build",
+    "serve:remotes": "pnpm --filter \"./home\"  serve",
+    "dev:hosts": "pnpm --filter \"./layout\" dev",
     "stop": "kill-port --port 5000,5001"
   },
   "workspaces": [
