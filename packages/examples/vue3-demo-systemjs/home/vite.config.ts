@@ -21,7 +21,7 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 40960,
     target: 'esnext',
-    minify: true,
+    minify: false,
     cssCodeSplit: false,
     sourcemap: true,
     rollupOptions: {

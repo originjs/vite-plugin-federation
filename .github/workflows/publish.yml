@@ -27,8 +27,14 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Test
-        run: pnpm test
+      - name: Unit test
+        run: pnpm run 'test:unit'
+
+      - name: Dev mode e2e test
+        run: pnpm run 'test:e2e-dev'
+
+      - name: Serve mode e2e test
+        run: pnpm run 'test:e2e-serve'
 
       - name: Create Release for Tag
         id: release_tag

@@ -11,6 +11,9 @@
   "scripts": {
     "build": "pnpm --parallel --filter \"./**\" build ",
     "serve": "pnpm --parallel --filter \"./**\" serve",
+    "build:remotes": "pnpm --parallel --filter \"./home\" --filter \"./css-modules\" --filter \"./common-lib\"  build",
+    "serve:remotes": "pnpm --parallel --filter \"./home\" --filter \"./css-modules\" --filter \"./common-lib\"  serve",
+    "dev:hosts": "pnpm --filter \"./layout\" dev",
     "stop": "kill-port --port 5000,5001,5002,5003"
   },
   "devDependencies": {

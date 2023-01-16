@@ -1,5 +1,5 @@
 {
-  "name": "@vue3-demo-esm/home-esm",
+  "name": "@vue3-demo-esm-shared-store/remote-A",
   "private": true,
   "version": "1.0.0",
   "scripts": {

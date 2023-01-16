@@ -12,7 +12,7 @@ export default defineConfig({
       name: 'team-red',
       remotes: {
         "team-blue": "http://localhost:5002/assets/remoteEntry.js",
-        "team-green": "http://localhost:5003/assets/remoteEntry.js",
+        "team-green": "http://localhost:5001/assets/remoteEntry.js",
       },
       shared: ['vue','pinia']
   })

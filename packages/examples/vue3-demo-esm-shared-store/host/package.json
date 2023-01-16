@@ -1,5 +1,5 @@
 {
-  "name": "@vue3-demo-esm/layout-esm",
+  "name": "@vue3-demo-esm-shared-store/host",
   "private": true,
   "version": "1.0.0",
   "scripts": {

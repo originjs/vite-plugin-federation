@@ -19,9 +19,10 @@
     "lint": "eslint packages/*/{src,types}/**",
     "lint:fix": "eslint --fix",
     "build": "cd packages/lib && pnpm build",
-    "test": "npm-run-all test:unit test:e2e",
+    "test": "npm-run-all test:unit test:e2e-serve test:e2e-dev",
     "test:unit": "vitest run --coverage",
-    "test:e2e": "vitest run -c vitest.config.e2e.ts"
+    "test:e2e-serve": "vitest run -c vitest.config.e2e-serve.ts",
+    "test:e2e-dev": "vitest run -c vitest.config.e2e-dev.ts"
   },
   "devDependencies": {
     "@types/node": "^18.6.4",
