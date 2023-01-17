@@ -202,6 +202,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             if (!expose[1].id) {
               // resolved the moduleId here for the reference somewhere else like #152
               expose[1].id = (await this.resolve(expose[1].import))?.id
+              if (!expose[1].id) {
+                throw new Error(
+                  `Cannot find file ${expose[1].import}, please check your 'exposes.import' config.`
+                )
+              }
             }
             expose[1].emitFile = this.emitFile({
               type: 'chunk',
