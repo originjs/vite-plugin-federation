@@ -354,7 +354,7 @@ shared: {
     generate: false
   }
 }
-``
+```
 
 ## FAQ
 
