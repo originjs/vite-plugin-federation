@@ -1,3 +1,18 @@
+## [1.1.14](https://github.com/originjs/vite-plugin-federation/compare/v1.1.13...v1.1.14) (2023-01-19)
+
+
+### Bug Fixes
+
+* dev mode shared version is undefined ([9c21c15](https://github.com/originjs/vite-plugin-federation/commit/9c21c15679e97a00549ce597b83ebe15fa42744e))
+* got the wrong package.json file path in build mode ([#320](https://github.com/originjs/vite-plugin-federation/issues/320)) ([32e266e](https://github.com/originjs/vite-plugin-federation/commit/32e266e3ea30fa60bccad10dd37a574d34afefea))
+
+
+### Features
+
+* throw error when exposes.import is invalid ([#323](https://github.com/originjs/vite-plugin-federation/issues/323)) ([57c6bc5](https://github.com/originjs/vite-plugin-federation/commit/57c6bc500cd7dbe4231dd1f108bc6204a1bc6329))
+
+
+
 ## [1.1.13](https://github.com/originjs/vite-plugin-federation/compare/v1.1.12...v1.1.13) (2023-01-06)
 
 
