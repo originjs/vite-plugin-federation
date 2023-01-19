@@ -1,0 +1,22 @@
+{
+  "name": "vue3-demo-esm-expose-store",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "host",
+    "remote"
+  ],
+  "scripts": {
+    "build": "pnpm --parallel --filter \"./**\" build ",
+    "serve": "pnpm --parallel --filter \"./**\" serve",
+    "build:remotes": "pnpm --parallel --filter \"./remote\"  build",
+    "serve:remotes": "pnpm --parallel --filter \"./remote\"  serve",
+    "dev:hosts": "pnpm --filter \"./host\" dev",
+    "stop": "kill-port --port 5000,5001,5002,5003"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "workspace:*",
+    "kill-port": "^2.0.1"
+  },
+  "license": "MulanPSL-2.0"
+}
