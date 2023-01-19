@@ -96,7 +96,7 @@ async function __federation_method_ensure(remoteId) {
       });
     } else if (importTypes.includes(remote.format)) {
       // loading js with import(...)
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
         getUrl().then(url => {
           import(/* @vite-ignore */ url).then(lib => {
@@ -108,7 +108,7 @@ async function __federation_method_ensure(remoteId) {
               remote.inited = true;
             }
             resolve(remote.lib);
-          })
+          }).catch(reject)
         })
       })
     }
