@@ -450,6 +450,42 @@ importers:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 2.0.1
 
+  packages/examples/vue3-demo-esm-expose-store:
+    specifiers:
+      '@originjs/vite-plugin-federation': workspace:*
+      kill-port: ^2.0.1
+    devDependencies:
+      '@originjs/vite-plugin-federation': link:../../lib
+      kill-port: 2.0.1
+
+  packages/examples/vue3-demo-esm-expose-store/host:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
+  packages/examples/vue3-demo-esm-expose-store/remote:
+    specifiers:
+      '@vitejs/plugin-vue': ^4.0.0
+      pinia: ^2.0.21
+      vite: ^4.0.3
+      vite-plugin-top-level-await: ^1.1.1
+      vue: ^3.2.45
+    dependencies:
+      pinia: 2.0.21_vue@3.2.45
+      vite-plugin-top-level-await: 1.1.1_vite@4.0.3
+      vue: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue': 4.0.0_vite@4.0.3+vue@3.2.45
+      vite: 4.0.3
+
   packages/examples/vue3-demo-esm-shared-store:
     specifiers:
       '@originjs/vite-plugin-federation': workspace:*
