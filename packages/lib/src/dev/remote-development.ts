@@ -48,7 +48,6 @@ export function devRemotePlugin(
   }
 
   let viteDevServer: ViteDevServer
-  let browserHash: string | undefined
   return {
     name: 'originjs:remote-development',
     virtualFile: {
@@ -181,8 +180,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       if (id === '\0virtual:__federation__') {
         const scopeCode = await devSharedScopeCode.call(
           this,
-          parsedOptions.devShared,
-          browserHash
+          parsedOptions.devShared
         )
         return code.replace(getModuleMarker('shareScope'), scopeCode.join(','))
       }
@@ -344,8 +342,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
   async function devSharedScopeCode(
     this: TransformPluginContext,
-    shared: (string | ConfigTypeSet)[],
-    viteVersion: string | undefined
+    shared: (string | ConfigTypeSet)[]
   ): Promise<string[]> {
     const hostname = resolveHostname(viteDevServer.config.server)
     const protocol = viteDevServer.config.server.https ? 'https' : 'http'
