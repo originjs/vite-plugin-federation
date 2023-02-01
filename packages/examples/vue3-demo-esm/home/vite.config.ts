@@ -24,9 +24,9 @@ export default defineConfig({
           generate:false
         },
         // This is to test if the custom library can be SHARED, there is no real point
-        myStore:{
-          packagePath:'./src/store.js'
-        }
+        // myStore:{
+        //   packagePath:'./src/store.js'
+        // }
       }
     }),
     topLevelAwait({
