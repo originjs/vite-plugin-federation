@@ -136,6 +136,12 @@ export default function federation(
       if (v) {
         return v
       }
+      if (args[0] === '\0virtual:__federation_fn_import') {
+        return {
+          id: '\0virtual:__federation_fn_import',
+          moduleSideEffects: true
+        }
+      }
       return null
     },
 

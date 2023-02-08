@@ -11,10 +11,10 @@
 import {counterState} from 'remote-store/remoteStore'
 
 export default {
-    setup() {
-      let counter = counterState();
-      return {counter};
-  },
+  data(){
+    let counter = counterState()
+    return {counter}
+  }
 };
 </script>
 

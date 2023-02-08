@@ -54,92 +54,103 @@ export function prodRemotePlugin(
     virtualFile: {
       // language=JS
       __federation__: `
-${createRemotesMap(remotes)}
-const loadJS = async (url, fn) => {
-  const resolvedUrl = typeof url === 'function' ? await url() : url;
-  const script = document.createElement('script')
-  script.type = 'text/javascript';
-  script.onload = fn;
-  script.src = resolvedUrl;
-  document.getElementsByTagName('head')[0].appendChild(script);
-}
-const scriptTypes = ['var'];
-const importTypes = ['esm', 'systemjs']
-function get(name, ${REMOTE_FROM_PARAMETER}){
-  return __federation_import(name).then(module => ()=> {
-    if (${REMOTE_FROM_PARAMETER} === 'webpack') {
-      return Object.prototype.toString.call(module).indexOf('Module') > -1 && module.default ? module.default : module
-    }
-    return module
-  })
-}
-const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
-  return {
-    ${getModuleMarker('shareScope')}
-  }
-}
-async function __federation_import(name){
-  return import(name);
-}
-const initMap = Object.create(null);
-async function __federation_method_ensure(remoteId) {
-  const remote = remotesMap[remoteId];
-  if (!remote.inited) {
-    if (scriptTypes.includes(remote.format)) {
-      // loading js with script tag
-      return new Promise(resolve => {
-        const callback = () => {
-          if (!remote.inited) {
-            remote.lib = window[remoteId];
-            remote.lib.init(wrapShareModule(remote.from))
-            remote.inited = true;
-          }
-          resolve(remote.lib);
-        }
-        return loadJS(remote.url, callback);
-      });
-    } else if (importTypes.includes(remote.format)) {
-      // loading js with import(...)
-      return new Promise((resolve, reject) => {
-        const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
-        getUrl().then(url => {
-          import(/* @vite-ignore */ url).then(lib => {
-            if (!remote.inited) {
-              const shareScope = wrapShareModule(remote.from)
-              lib.init(shareScope);
-              remote.lib = lib;
-              remote.lib.init(shareScope);
-              remote.inited = true;
-            }
-            resolve(remote.lib);
-          }).catch(reject)
-        })
-      })
-    }
-  } else {
-    return remote.lib;
-  }
-}
+                ${createRemotesMap(remotes)}
+                const loadJS = async (url, fn) => {
+                    const resolvedUrl = typeof url === 'function' ? await url() : url;
+                    const script = document.createElement('script')
+                    script.type = 'text/javascript';
+                    script.onload = fn;
+                    script.src = resolvedUrl;
+                    document.getElementsByTagName('head')[0].appendChild(script);
+                }
+                const scriptTypes = ['var'];
+                const importTypes = ['esm', 'systemjs']
 
-function __federation_method_unwrapDefault(module) {
-  return (module?.__esModule || module?.[Symbol.toStringTag] === 'Module')?module.default:module
-}
+                function get(name, ${REMOTE_FROM_PARAMETER}) {
+                    return __federation_import(name).then(module => () => {
+                        if (${REMOTE_FROM_PARAMETER} === 'webpack') {
+                            return Object.prototype.toString.call(module).indexOf('Module') > -1 && module.default ? module.default : module
+                        }
+                        return module
+                    })
+                }
 
-function __federation_method_wrapDefault(module ,need){
-  if (!module?.default && need) {
-    let obj = Object.create(null);
-    obj.default = module;
-    obj.__esModule = true;
-    return obj;
-  }
-  return module; 
-}
+                const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
+                    return {
+                        ${getModuleMarker('shareScope')}
+                    }
+                }
 
-function __federation_method_getRemote(remoteName,  componentName){
-  return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
-}
-export {__federation_method_ensure, __federation_method_getRemote , __federation_method_unwrapDefault , __federation_method_wrapDefault}
-`
+                async function __federation_import(name) {
+                    return import(name);
+                }
+
+                const initMap = Object.create(null);
+
+                async function __federation_method_ensure(remoteId) {
+                    const remote = remotesMap[remoteId];
+                    if (!remote.inited) {
+                        if (scriptTypes.includes(remote.format)) {
+                            // loading js with script tag
+                            return new Promise(resolve => {
+                                const callback = () => {
+                                    if (!remote.inited) {
+                                        remote.lib = window[remoteId];
+                                        remote.lib.init(wrapShareModule(remote.from))
+                                        remote.inited = true;
+                                    }
+                                    resolve(remote.lib);
+                                }
+                                return loadJS(remote.url, callback);
+                            });
+                        } else if (importTypes.includes(remote.format)) {
+                            // loading js with import(...)
+                            return new Promise((resolve, reject) => {
+                                const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
+                                getUrl().then(url => {
+                                    import(/* @vite-ignore */ url).then(lib => {
+                                        if (!remote.inited) {
+                                            const shareScope = wrapShareModule(remote.from)
+                                            lib.init(shareScope);
+                                            remote.lib = lib;
+                                            remote.lib.init(shareScope);
+                                            remote.inited = true;
+                                        }
+                                        resolve(remote.lib);
+                                    }).catch(reject)
+                                })
+                            })
+                        }
+                    } else {
+                        return remote.lib;
+                    }
+                }
+
+                function __federation_method_unwrapDefault(module) {
+                    return (module?.__esModule || module?.[Symbol.toStringTag] === 'Module') ? module.default : module
+                }
+
+                function __federation_method_wrapDefault(module, need) {
+                    if (!module?.default && need) {
+                        let obj = Object.create(null);
+                        obj.default = module;
+                        obj.__esModule = true;
+                        return obj;
+                    }
+                    return module;
+                }
+
+                function __federation_method_getRemote(remoteName, componentName) {
+                    return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
+                }
+
+                export {
+                    __federation_method_ensure,
+                    __federation_method_getRemote,
+                    __federation_method_unwrapDefault,
+                    __federation_method_wrapDefault
+                }
+            `
     },
 
     async transform(this: TransformPluginContext, code: string, id: string) {
@@ -158,7 +169,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
               }${
                 sharedInfo[1].root ? sharedInfo[1].root[0] + '/' : ''
               }${basename}`,
-              preserveSignature: 'allow-extension',
+              preserveSignature: 'strict',
               name: sharedInfo[0]
             })
             sharedFileName2Prop.set(basename, sharedInfo as ConfigTypeSet)
@@ -232,7 +243,9 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
           })
           return code.replace(getModuleMarker('shareScope'), res.join(','))
         }
+      }
 
+      if (builderInfo.isHost || builderInfo.isShared) {
         let ast: AcornNode | null = null
         try {
           ast = this.parse(code)
@@ -246,8 +259,53 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         const magicString = new MagicString(code)
         const hasStaticImported = new Map<string, string>()
         let requiresRuntime = false
+        let needImportShared = false
+        let modify = false
         walk(ast, {
           enter(node: any) {
+            //     handle share, eg. replace import {a} from b  -> const a = importShared('b')
+            if (node.type === 'ImportDeclaration') {
+              const moduleName = node.source.value
+              if (
+                parsedOptions.prodShared.some(
+                  (sharedInfo) => sharedInfo[0] === moduleName
+                )
+              ) {
+                const declaration: (string | never)[] = []
+                if (!node.specifiers?.length) {
+                  //  invalid import , like import './__federation_shared_lib.js' , and remove it
+                  magicString.remove(node.start, node.end)
+                  modify = true
+                } else {
+                  node.specifiers.forEach((specify) => {
+                    declaration.push(
+                      `${
+                        specify.imported?.name
+                          ? `${
+                              specify.imported.name === specify.local.name
+                                ? specify.local.name
+                                : `${specify.imported.name}:${specify.local.name}`
+                            }`
+                          : `default:${specify.local.name}`
+                      }`
+                    )
+                  })
+                  needImportShared = true
+                }
+                if (declaration.length) {
+                  magicString.overwrite(
+                    node.start,
+                    node.end,
+                    `const {${declaration.join(
+                      ','
+                    )}} = await importShared('${moduleName}');\n`
+                  )
+                  needImportShared = true
+                }
+              }
+            }
+
+            // handle remote import , eg replace import {a} from 'remote/b' to dynamic import
             if (
               (node.type === 'ImportExpression' ||
                 node.type === 'ImportDeclaration' ||
@@ -384,7 +442,15 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
           )
         }
 
-        return magicString.toString()
+        if (needImportShared) {
+          magicString.prepend(
+            `import {importShared} from '\0virtual:__federation_fn_import';\n`
+          )
+        }
+
+        if (requiresRuntime || needImportShared || modify) {
+          return magicString.toString()
+        }
       }
     }
   }

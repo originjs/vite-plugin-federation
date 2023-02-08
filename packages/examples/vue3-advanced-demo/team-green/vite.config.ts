@@ -17,7 +17,7 @@ export default defineConfig({
       shared: ['vue', 'pinia']
     })
   ],
-  base: 'http://localhost:5003',
+  base: 'http://localhost:5001',
   build: {
     minify: false,
     target: ["chrome89", "edge89", "firefox89", "safari15"]
