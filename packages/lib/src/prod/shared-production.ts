@@ -70,6 +70,11 @@ export function prodSharedPlugin(
           }
         }
         if(module){
+          ${
+            builderInfo.isSystemjs
+              ? ''
+              : 'module = module.default ? module.default : module'
+          }
           moduleCache[name] = module;
           return module;
         }
@@ -77,6 +82,11 @@ export function prodSharedPlugin(
       async function getSharedFromLocal(name , shareScope) {
         if (moduleMap[name]?.import) {
           const module = (await moduleMap[name].get())()
+          ${
+            builderInfo.isSystemjs
+              ? ''
+              : 'module = module.default ? module.default : module'
+          }
           moduleCache[name] = module;
           return module;
         } else {

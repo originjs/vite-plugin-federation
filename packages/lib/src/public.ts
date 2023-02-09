@@ -30,7 +30,8 @@ export const builderInfo = {
   assetsDir: '',
   isHost: false,
   isRemote: false,
-  isShared: false
+  isShared: false,
+  isSystemjs: false
 }
 export const parsedOptions = {
   prodExpose: [] as (string | ConfigTypeSet)[],

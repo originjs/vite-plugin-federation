@@ -169,7 +169,7 @@ export function prodRemotePlugin(
               }${
                 sharedInfo[1].root ? sharedInfo[1].root[0] + '/' : ''
               }${basename}`,
-              preserveSignature: 'strict',
+              preserveSignature: 'allow-extension',
               name: sharedInfo[0]
             })
             sharedFileName2Prop.set(basename, sharedInfo as ConfigTypeSet)
@@ -259,11 +259,12 @@ export function prodRemotePlugin(
         const magicString = new MagicString(code)
         const hasStaticImported = new Map<string, string>()
         let requiresRuntime = false
-        let needImportShared = false
+        let hasImportShared = false
         let modify = false
+
         walk(ast, {
           enter(node: any) {
-            //     handle share, eg. replace import {a} from b  -> const a = importShared('b')
+            // handle share, eg. replace import {a} from b  -> const a = importShared('b')
             if (node.type === 'ImportDeclaration') {
               const moduleName = node.source.value
               if (
@@ -271,36 +272,48 @@ export function prodRemotePlugin(
                   (sharedInfo) => sharedInfo[0] === moduleName
                 )
               ) {
-                const declaration: (string | never)[] = []
+                const namedImportDeclaration: (string | never)[] = []
+                let defaultImportDeclaration: string | null = null
                 if (!node.specifiers?.length) {
-                  //  invalid import , like import './__federation_shared_lib.js' , and remove it
+                  // invalid import , like import './__federation_shared_lib.js' , and remove it
                   magicString.remove(node.start, node.end)
                   modify = true
                 } else {
                   node.specifiers.forEach((specify) => {
-                    declaration.push(
-                      `${
-                        specify.imported?.name
-                          ? `${
-                              specify.imported.name === specify.local.name
-                                ? specify.local.name
-                                : `${specify.imported.name}:${specify.local.name}`
-                            }`
-                          : `default:${specify.local.name}`
-                      }`
-                    )
+                    if (specify.imported?.name) {
+                      namedImportDeclaration.push(
+                        `${
+                          specify.imported.name === specify.local.name
+                            ? specify.imported.name
+                            : `${specify.imported.name}:${specify.local.name}`
+                        }`
+                      )
+                    } else if (builderInfo.isSystemjs) {
+                      namedImportDeclaration.push(
+                        `default:${specify.local.name}`
+                      )
+                    } else {
+                      defaultImportDeclaration = specify.local.name
+                    }
                   })
-                  needImportShared = true
+                  hasImportShared = true
                 }
-                if (declaration.length) {
+                if (defaultImportDeclaration) {
                   magicString.overwrite(
                     node.start,
                     node.end,
-                    `const {${declaration.join(
+                    `const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
+                  )
+                  hasImportShared = true
+                } else if (namedImportDeclaration.length) {
+                  magicString.overwrite(
+                    node.start,
+                    node.end,
+                    `const {${namedImportDeclaration.join(
                       ','
                     )}} = await importShared('${moduleName}');\n`
                   )
-                  needImportShared = true
+                  hasImportShared = true
                 }
               }
             }
@@ -442,13 +455,13 @@ export function prodRemotePlugin(
           )
         }
 
-        if (needImportShared) {
+        if (hasImportShared) {
           magicString.prepend(
             `import {importShared} from '\0virtual:__federation_fn_import';\n`
           )
         }
 
-        if (requiresRuntime || needImportShared || modify) {
+        if (requiresRuntime || hasImportShared || modify) {
           return magicString.toString()
         }
       }
