@@ -115,7 +115,7 @@ importers:
       '@originjs/vite-plugin-federation': link:../../lib
       kill-port: 2.0.1
 
-  packages/examples/react-vite/packages/app:
+  packages/examples/react-vite/host:
     specifiers:
       '@types/react': ^18.0.17
       '@types/react-dom': ^18.0.6
@@ -132,7 +132,7 @@ importers:
       '@vitejs/plugin-react': 3.0.0_vite@4.0.3
       vite: 4.0.3
 
-  packages/examples/react-vite/packages/shared:
+  packages/examples/react-vite/remote:
     specifiers:
       '@types/react': ^18.0.17
       '@types/react-dom': ^18.0.6
