@@ -61,22 +61,26 @@ export function prodSharedPlugin(
             const semver= await import('__federation_lib_semver');
             const fn = semver.satisfy;
             if (fn(versionKey, moduleMap[name].requiredVersion)) {
-               module = (await versionValue.get())();
+               module = await (await versionValue.get())();
             } else {
               console.log(\`provider support \${name}(\${versionKey}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})\`)
             }
           } else {
-            module = (await versionValue.get())();
+            module = await (await versionValue.get())();
           }
         }
         if(module){
+          if(module.default)
+            module = module.default
           moduleCache[name] = module;
           return module;
         }
       }
       async function getSharedFromLocal(name , shareScope) {
         if (moduleMap[name]?.import) {
-          const module = (await moduleMap[name].get())()
+          let module = await (await moduleMap[name].get())()
+          if(module.default)
+            module = module.default
           moduleCache[name] = module;
           return module;
         } else {

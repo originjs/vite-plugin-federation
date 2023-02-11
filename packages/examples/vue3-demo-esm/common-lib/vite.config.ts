@@ -29,6 +29,7 @@ export default defineConfig({
     })
   ],
   build: {
+    modulePreload: false,
     minify: false,
     cssCodeSplit: true,
     rollupOptions: {
