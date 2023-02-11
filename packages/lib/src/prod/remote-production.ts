@@ -288,10 +288,6 @@ export function prodRemotePlugin(
                             : `${specify.imported.name}:${specify.local.name}`
                         }`
                       )
-                    } else if (builderInfo.isSystemjs) {
-                      namedImportDeclaration.push(
-                        `default:${specify.local.name}`
-                      )
                     } else {
                       defaultImportDeclaration = specify.local.name
                     }

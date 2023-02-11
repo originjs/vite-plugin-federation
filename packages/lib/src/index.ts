@@ -86,13 +86,6 @@ export default function federation(
     enforce: 'post',
     // apply:'build',
     options(_options) {
-      if (
-        _options?.output[0]?.format === 'system' ||
-        _options?.output[0]?.format === 'systemjs'
-      ) {
-        builderInfo.isSystemjs = true
-      }
-
       // rollup doesnt has options.mode and options.command
       if (!registerCount++) {
         registerPlugins((options.mode = options.mode ?? 'production'), '')
