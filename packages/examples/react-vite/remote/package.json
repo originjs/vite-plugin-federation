@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --port 5001 --strictPort",
     "build": "vite build",
-    "preview": "vite preview --port 5001 --strictPort"
+    "preview": "vite preview --port 5001 --strictPort",
+    "serve": "vite preview --port 5001 --strictPort"
   },
   "dependencies": {
     "react": "^18.2.0",
