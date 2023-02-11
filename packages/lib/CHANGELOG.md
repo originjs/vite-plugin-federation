@@ -1,3 +1,13 @@
+# [1.2.0](https://github.com/originjs/vite-plugin-federation/compare/v1.1.14...v1.2.0) (2023-02-11)
+
+
+### Bug Fixes
+
+* added catch when loading js with import(...) ([#328](https://github.com/originjs/vite-plugin-federation/issues/328)) ([97ed8f7](https://github.com/originjs/vite-plugin-federation/commit/97ed8f7c74535260fa3d91a31b697ea4499eaccd))
+* shared lib load failed ([#338](https://github.com/originjs/vite-plugin-federation/issues/338)) ([49b6cae](https://github.com/originjs/vite-plugin-federation/commit/49b6caebbef899abf18cd8d62f64261aac6a18cd))
+
+
+
 ## [1.1.14](https://github.com/originjs/vite-plugin-federation/compare/v1.1.13...v1.1.14) (2023-01-19)
 
 
