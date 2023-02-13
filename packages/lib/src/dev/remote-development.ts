@@ -61,8 +61,6 @@ const loadJS = async (url, fn) => {
   script.src = resolvedUrl;
   document.getElementsByTagName('head')[0].appendChild(script);
 }
-const scriptTypes = ['var'];
-const importTypes = ['esm', 'systemjs']
 function get(name, ${REMOTE_FROM_PARAMETER}){
   return import(/* @vite-ignore */ name).then(module => ()=> {
     if (${REMOTE_FROM_PARAMETER} === 'webpack') {
@@ -80,7 +78,7 @@ const initMap = Object.create(null);
 async function __federation_method_ensure(remoteId) {
   const remote = remotesMap[remoteId];
   if (!remote.inited) {
-    if (scriptTypes.includes(remote.format)) {
+    if ('var' === remote.format) {
       // loading js with script tag
       return new Promise(resolve => {
         const callback = () => {
@@ -93,7 +91,7 @@ async function __federation_method_ensure(remoteId) {
         }
         return loadJS(remote.url, callback);
       });
-    } else if (importTypes.includes(remote.format)) {
+    } else if (['esm', 'systemjs'].includes(remote.format)) {
       // loading js with import(...)
       return new Promise((resolve, reject) => {
         const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);

@@ -21,6 +21,7 @@ import type {
   ResolvedConfig
 } from 'vite'
 import virtual from '@rollup/plugin-virtual'
+import { dirname } from 'path'
 import { prodRemotePlugin } from './prod/remote-production'
 import type { VitePluginFederationOptions } from '../types'
 import { builderInfo, DEFAULT_ENTRY_FILENAME, parsedOptions } from './public'
@@ -131,7 +132,7 @@ export default function federation(
       }
     },
 
-    resolveId(...args) {
+    async resolveId(...args) {
       const v = virtualMod.resolveId.call(this, ...args)
       if (v) {
         return v
@@ -141,6 +142,12 @@ export default function federation(
           id: '\0virtual:__federation_fn_import',
           moduleSideEffects: true
         }
+      }
+      if (args[0] === '__federation_fn_satisfy') {
+        const federationId = (
+          await this.resolve('@originjs/vite-plugin-federation')
+        )?.id
+        return await this.resolve(`${dirname(federationId!)}/satisfy.mjs`)
       }
       return null
     },
