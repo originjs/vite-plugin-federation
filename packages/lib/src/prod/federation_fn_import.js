@@ -8,6 +8,7 @@ async function importShared(name, shareScope = 'default') {
     ? new Promise((r) => r(moduleCache[name]))
     : (await getSharedFromRuntime(name, shareScope)) || getSharedFromLocal(name)
 }
+// eslint-disable-next-line
 async function __federation_import(name) {
   return import(name)
 }
@@ -36,7 +37,7 @@ async function getSharedFromRuntime(name, shareScope) {
     return module
   }
 }
-async function getSharedFromLocal(name, shareScope) {
+async function getSharedFromLocal(name) {
   if (moduleMap[name]?.import) {
     let module = await (await moduleMap[name].get())()
     if (module.default) module = module.default

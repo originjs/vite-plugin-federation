@@ -27,9 +27,8 @@ import {
   NAME_CHAR_REG
 } from '../utils'
 import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
-import { basename, dirname } from 'path'
+import { basename } from 'path'
 import type { PluginHooks } from '../../types/pluginHooks'
-import { readFileSync } from 'fs'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
