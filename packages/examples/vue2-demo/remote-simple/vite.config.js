@@ -17,7 +17,7 @@ export default defineConfig({
     })
   ],
   build: {
-    target: 'es2020',
+    target: ["chrome89", "edge89", "firefox89", "safari15"],
     minify: false,
     cssCodeSplit: true,
     rollupOptions: {

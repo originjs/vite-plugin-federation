@@ -14,12 +14,13 @@
 // *****************************************************************************
 
 import type { PluginHooks } from '../../types/pluginHooks'
-import { getModuleMarker, parseSharedOptions } from '../utils'
+import { parseSharedOptions } from '../utils'
 import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { basename, join, resolve } from 'path'
 import { readdirSync, readFileSync, statSync } from 'fs'
 const sharedFilePathReg = /__federation_shared_.+\.js$/
+import federation_fn_import from './federation_fn_import.js?raw'
 
 export function prodSharedPlugin(
   options: VitePluginFederationOptions
@@ -40,55 +41,7 @@ export function prodSharedPlugin(
   return {
     name: 'originjs:shared-production',
     virtualFile: {
-      __federation_lib_semver: 'void 0',
-      __federation_fn_import: `
-      const moduleMap= ${getModuleMarker('moduleMap', 'var')}
-      const moduleCache = Object.create(null);
-      async function importShared(name,shareScope = 'default') {
-        return moduleCache[name] ? new Promise((r) => r(moduleCache[name])) : (await getSharedFromRuntime(name, shareScope) || getSharedFromLocal(name));
-      }
-      async function __federation_import(name){
-        return import(name);
-      }
-      async function getSharedFromRuntime(name,shareScope) {
-        let module = null;
-        if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
-          const versionObj = globalThis.__federation_shared__[shareScope][name];
-          const versionKey = Object.keys(versionObj)[0];
-          const versionValue = Object.values(versionObj)[0];
-          if (moduleMap[name]?.requiredVersion) {
-            // judge version satisfy
-            const semver= await import('__federation_lib_semver');
-            const fn = semver.satisfy;
-            if (fn(versionKey, moduleMap[name].requiredVersion)) {
-               module = await (await versionValue.get())();
-            } else {
-              console.log(\`provider support \${name}(\${versionKey}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})\`)
-            }
-          } else {
-            module = await (await versionValue.get())();
-          }
-        }
-        if(module){
-          if(module.default)
-            module = module.default
-          moduleCache[name] = module;
-          return module;
-        }
-      }
-      async function getSharedFromLocal(name , shareScope) {
-        if (moduleMap[name]?.import) {
-          let module = await (await moduleMap[name].get())()
-          if(module.default)
-            module = module.default
-          moduleCache[name] = module;
-          return module;
-        } else {
-          console.error(\`consumer config import=false,so cant use callback shared module\`)
-        }
-      }
-      export {importShared , getSharedFromRuntime as importSharedRuntime , getSharedFromLocal as importSharedLocal};
-      `
+      __federation_fn_import: federation_fn_import
     },
     options(inputOptions) {
       isRemote = !!parsedOptions.prodExpose.length
@@ -115,14 +68,6 @@ export function prodSharedPlugin(
           }__federation_fn_import.js`,
           type: 'chunk',
           id: '__federation_fn_import',
-          preserveSignature: 'strict'
-        })
-        this.emitFile({
-          fileName: `${
-            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-          }__federation_lib_semver.js`,
-          type: 'chunk',
-          id: '__federation_lib_semver',
           preserveSignature: 'strict'
         })
       }

@@ -27,9 +27,8 @@ import {
   NAME_CHAR_REG
 } from '../utils'
 import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
-import { basename, dirname } from 'path'
+import { basename } from 'path'
 import type { PluginHooks } from '../../types/pluginHooks'
-import { readFileSync } from 'fs'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
@@ -63,8 +62,6 @@ export function prodRemotePlugin(
                     script.src = resolvedUrl;
                     document.getElementsByTagName('head')[0].appendChild(script);
                 }
-                const scriptTypes = ['var'];
-                const importTypes = ['esm', 'systemjs']
 
                 function get(name, ${REMOTE_FROM_PARAMETER}) {
                     return __federation_import(name).then(module => () => {
@@ -90,7 +87,7 @@ export function prodRemotePlugin(
                 async function __federation_method_ensure(remoteId) {
                     const remote = remotesMap[remoteId];
                     if (!remote.inited) {
-                        if (scriptTypes.includes(remote.format)) {
+                        if ('var' === remote.format) {
                             // loading js with script tag
                             return new Promise(resolve => {
                                 const callback = () => {
@@ -103,7 +100,7 @@ export function prodRemotePlugin(
                                 }
                                 return loadJS(remote.url, callback);
                             });
-                        } else if (importTypes.includes(remote.format)) {
+                        } else if (['esm', 'systemjs'].includes(remote.format)) {
                             // loading js with import(...)
                             return new Promise((resolve, reject) => {
                                 const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
@@ -196,14 +193,6 @@ export function prodRemotePlugin(
             getModuleMarker('moduleMap', 'var'),
             `{${moduleMapCode}}`
           )
-        }
-
-        if (id === '\0virtual:__federation_lib_semver') {
-          const federationId = (
-            await this.resolve('@originjs/vite-plugin-federation')
-          )?.id
-          const satisfyId = `${dirname(federationId!)}/satisfy.js`
-          return readFileSync(satisfyId, { encoding: 'utf-8' })
         }
       }
 
