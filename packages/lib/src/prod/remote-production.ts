@@ -281,24 +281,32 @@ export function prodRemotePlugin(
                       defaultImportDeclaration = specify.local.name
                     }
                   })
+
                   hasImportShared = true
-                }
-                if (defaultImportDeclaration) {
-                  magicString.overwrite(
-                    node.start,
-                    node.end,
-                    `const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
-                  )
-                  hasImportShared = true
-                } else if (namedImportDeclaration.length) {
-                  magicString.overwrite(
-                    node.start,
-                    node.end,
-                    `const {${namedImportDeclaration.join(
-                      ','
-                    )}} = await importShared('${moduleName}');\n`
-                  )
-                  hasImportShared = true
+
+                  if (
+                    defaultImportDeclaration &&
+                    namedImportDeclaration.length
+                  ) {
+                    // import a, {b} from 'c' -> const a = await importShared('c'); const {b} = a;
+                    const imports = namedImportDeclaration.join(',')
+                    const line = `const ${defaultImportDeclaration} = await importShared('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
+                    magicString.overwrite(node.start, node.end, line)
+                  } else if (defaultImportDeclaration) {
+                    magicString.overwrite(
+                      node.start,
+                      node.end,
+                      `const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
+                    )
+                  } else if (namedImportDeclaration.length) {
+                    magicString.overwrite(
+                      node.start,
+                      node.end,
+                      `const {${namedImportDeclaration.join(
+                        ','
+                      )}} = await importShared('${moduleName}');\n`
+                    )
+                  }
                 }
               }
             }
