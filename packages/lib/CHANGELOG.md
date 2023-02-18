@@ -1,3 +1,17 @@
+## [1.2.1](https://github.com/originjs/vite-plugin-federation/compare/v1.2.0...v1.2.1) (2023-02-18)
+
+
+### Bug Fixes
+
+* default and named import case ([#353](https://github.com/originjs/vite-plugin-federation/issues/353)) ([f389cf9](https://github.com/originjs/vite-plugin-federation/commit/f389cf92940b0e0e9200ae06c9a3371775619500))
+
+
+### Features
+
+* reduce lib semver chunk ([#350](https://github.com/originjs/vite-plugin-federation/issues/350)) ([381f383](https://github.com/originjs/vite-plugin-federation/commit/381f383355c6084da698427da362f2ca816988a5))
+
+
+
 # [1.2.0](https://github.com/originjs/vite-plugin-federation/compare/v1.1.14...v1.2.0) (2023-02-11)
 
 
