@@ -455,7 +455,10 @@ export function prodRemotePlugin(
         }
 
         if (requiresRuntime || hasImportShared || modify) {
-          return magicString.toString()
+          return {
+            code: magicString.toString(),
+            map: magicString.generateMap({ hires: true })
+          };
         }
       }
     }
