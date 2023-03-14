@@ -96,7 +96,10 @@ async function __federation_method_ensure(remoteId) {
       return new Promise((resolve, reject) => {
         const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
         getUrl().then(url => {
-          import(/* @vite-ignore */ url).then(lib => {
+          const importer = remote.format === 'systemjs'
+            ? System.import(/* @vite-ignore */ url)
+            : import(/* @vite-ignore */ url)
+          importer.then(lib => {
             if (!remote.inited) {
               const shareScope = wrapShareScope(remote.from)
               lib.init(shareScope);
@@ -125,7 +128,7 @@ function __federation_method_wrapDefault(module ,need){
     obj.__esModule = true;
     return obj;
   }
-  return module; 
+  return module;
 }
 
 function __federation_method_getRemote(remoteName,  componentName){
