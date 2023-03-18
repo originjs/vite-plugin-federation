@@ -228,6 +228,10 @@ import myButton from 'remote/myButton'
 
 ### `filename：string`
 * 作为远程模块的入口文件，非必填，默认为`remoteEntry.js`
+ 
+### `transformFileTypes:string[]`
+* 插件所需要处理的文件类型，绝大多数情况下无需配置，因为默认设置了这些类型`['.js','.ts','.jsx','.tsx','.mjs','.cjs','.vue','.svelte']`，当你自定义了一些文件类型时并且需要`vite-plugin-federation`插件处理时，请把它添加到数组配置中。
+
 ### `exposes`
 
 * 作为远程模块，对外暴露的组件列表，远程模块必填。
