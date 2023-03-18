@@ -26,6 +26,7 @@ import type { AcornNode, TransformPluginContext } from 'rollup'
 import type { Hostname, ViteDevServer } from '../../types/viteDevServer'
 import {
   createRemotesMap,
+  getFileExtname,
   getModuleMarker,
   normalizePath,
   parseRemoteOptions,
@@ -47,6 +48,20 @@ export function devRemotePlugin(
     })
   }
 
+  const needHandleFileType = [
+    '.js',
+    '.ts',
+    '.jsx',
+    '.tsx',
+    '.mjs',
+    '.cjs',
+    '.vue',
+    '.svelte'
+  ]
+  options.transformFileTypes = (options.transformFileTypes ?? [])
+    .concat(needHandleFileType)
+    .map((item) => item.toLowerCase())
+  const transformFileTypeSet = new Set(options.transformFileTypes)
   let viteDevServer: ViteDevServer
   return {
     name: 'originjs:remote-development',
@@ -181,6 +196,12 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
           parsedOptions.devShared
         )
         return code.replace(getModuleMarker('shareScope'), scopeCode.join(','))
+      }
+
+      // ignore some not need to handle file types
+      const fileExtname = getFileExtname(id)
+      if (!transformFileTypeSet.has((fileExtname ?? '').toLowerCase())) {
+        return
       }
 
       let ast: AcornNode | null = null

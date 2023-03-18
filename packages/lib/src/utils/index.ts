@@ -23,7 +23,7 @@ import type {
 } from '../../types'
 import { readFileSync } from 'fs'
 import { createHash } from 'crypto'
-import { parse, posix } from 'path'
+import path, { parse, posix } from 'path'
 import type { PluginContext } from 'rollup'
 
 export function findDependencies(
@@ -186,6 +186,10 @@ export function normalizePath(id: string): string {
   return posix.normalize(id.replace(/\\/g, '/'))
 }
 
+export function uniqueArr<T>(arr: T[]): T[] {
+  return Array.from(new Set(arr))
+}
+
 export function isSameFilepath(src: string, dest: string): boolean {
   if (!src || !dest) {
     return false
@@ -228,6 +232,17 @@ ${remotes
   )
   .join(',\n  ')}
 };`
+}
+
+/**
+ * get file extname from url
+ * @param url
+ */
+export function getFileExtname(url: string): string {
+  const fileNameAndParamArr = normalizePath(url).split('/')
+  const fileNameAndParam = fileNameAndParamArr[fileNameAndParamArr.length - 1]
+  const fileName = fileNameAndParam.split('?')[0]
+  return path.extname(fileName)
 }
 
 export const REMOTE_FROM_PARAMETER = 'remoteFrom'

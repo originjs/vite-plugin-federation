@@ -226,6 +226,11 @@ Required as the module name of the remote module.
 
 ### `filename:string`
 As the entry file of the remote module, not required, default is `remoteEntry.js`
+
+### `transformFileTypes:string[]`
+* In most cases, the file types that the plug-in needs to process do not need to be configured, because these types are set by default.['.js', '.ts', '.jsx', '.tsx', '.mjs', '.cjs', '.vue', '.svelte'],When you customize some file types and need the `vite-plugin-federation` plugin processing, please add it to the array configuration.
+
+
 ### `exposes`
 * As the remote module, the list of components exposed to the public, required for the remote module.
 ```js

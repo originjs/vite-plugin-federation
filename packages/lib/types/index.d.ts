@@ -18,6 +18,12 @@ declare interface VitePluginFederationOptions {
   filename?: string
 
   /**
+   * transform hook need to handle file types
+   * default ['.js','.ts','.jsx','.tsx','.mjs','.cjs','.vue','.svelte']
+   */
+  transformFileTypes?: string[]
+
+  /**
    * Options for library.
    */
   // library?: LibraryOptions
