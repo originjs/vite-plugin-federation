@@ -105,12 +105,6 @@ export function prodExposePlugin(
     }`
     },
 
-    options() {
-      // Split expose & shared module to separate chunks
-      // _options.preserveEntrySignatures = 'strict'
-      return null
-    },
-
     configResolved(config: ResolvedConfig) {
       viteConfigResolved = config
     },

@@ -15,7 +15,7 @@
 
 import type { PluginHooks } from '../../types/pluginHooks'
 import { parseSharedOptions } from '../utils'
-import { builderInfo, EXPOSES_MAP, parsedOptions } from '../public'
+import { builderInfo, parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { basename, join, resolve } from 'path'
 import { readdirSync, readFileSync, statSync } from 'fs'
@@ -30,10 +30,6 @@ export function prodSharedPlugin(
   parsedOptions.prodShared.forEach((value) =>
     shareName2Prop.set(value[0], value[1])
   )
-  const exposesModuleIdSet = new Set()
-  EXPOSES_MAP.forEach((value) => {
-    exposesModuleIdSet.add(`${value}.js`)
-  })
   let isHost
   let isRemote
   const id2Prop = new Map<string, any>()
