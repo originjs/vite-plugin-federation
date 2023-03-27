@@ -19,7 +19,7 @@
 
 ### Before submitting the PR, please make sure you do the following
 
-- [ ] Follow the [Commit Convention](https://github.com/originjs/vite-plugin-federation/blob/main/.github/commit-convention.md).
+- [ ] Read the [Code of Conduct](https://github.com/originjs/vite-plugin-federation/blob/main/CODE_OF_CONDUCT.md) and follow the [Commit Convention](https://github.com/originjs/vite-plugin-federation/blob/main/.github/commit-convention.md) guidelines.
 - [ ] Check that there isn't already a PR that solves the problem the same way to avoid creating a duplicate.
 - [ ] Provide a description in this PR that addresses **what** the PR is solving, or reference the issue that it solves (e.g. `fixes #123`).
 - [ ] Ideally, include relevant tests that fail without this PR but pass with it.
