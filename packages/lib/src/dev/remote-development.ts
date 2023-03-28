@@ -23,7 +23,7 @@ import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { readFileSync } from 'fs'
 import type { AcornNode, TransformPluginContext } from 'rollup'
-import type { Hostname, ViteDevServer } from '../../types/viteDevServer'
+import type { ViteDevServer } from '../../types/viteDevServer'
 import {
   createRemotesMap,
   getFileExtname,
@@ -363,9 +363,9 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     this: TransformPluginContext,
     shared: (string | ConfigTypeSet)[]
   ): Promise<string[]> {
-    const hostname = resolveHostname(viteDevServer.config.server)
-    const protocol = viteDevServer.config.server.https ? 'https' : 'http'
-    const port = viteDevServer.config.server.port ?? 5000
+    const serverConfiguration = viteDevServer.config.server
+    const protocol = serverConfiguration.https ? 'https' : 'http'
+    const port = serverConfiguration.port ?? 5173
     const regExp = new RegExp(
       `${normalizePath(viteDevServer.config.root)}[/\\\\]`
     )
@@ -396,10 +396,12 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         const obj = item[1]
         let str = ''
         if (typeof obj === 'object') {
+          const address =
+            serverConfiguration.origin ??
+            `${protocol}://${resolveHost(serverConfiguration)}:${port}`
           const url = relativePath
-            ? `'${protocol}://${hostname.name}:${port}${relativePath}'`
-            : `'${protocol}://${hostname.name}:${port}/${cacheDir}/${sharedName}.js?'`
-
+            ? `'${address}${relativePath}'`
+            : `'${address}/${cacheDir}/${sharedName}.js?'`
           str += `get:()=> get(${url}, ${REMOTE_FROM_PARAMETER})`
           res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
@@ -408,47 +410,18 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     return res
   }
 
-  function resolveHostname(serverOptions): Hostname {
-    const optionsHost = serverOptions.host
-    const optionOrigin = serverOptions.origin
-    // could be destructured
-
-    let host: string | undefined
+  function resolveHost(serverOptions): string {
+    const hostConfiguration = serverOptions.host
+    let host: string
+    //
     if (
-      optionsHost === undefined ||
-      optionsHost === false ||
-      optionsHost === 'localhost'
+      hostConfiguration === undefined ||
+      typeof hostConfiguration === 'boolean'
     ) {
-      // Use a secure default
-      host = '127.0.0.1'
-    } else if (optionsHost === true) {
-      // If passed --host in the CLI without arguments
-      host = undefined // undefined typically means 0.0.0.0 or :: (listen on all IPs)
+      host = 'localhost'
     } else {
-      host = optionsHost
+      host = hostConfiguration
     }
-
-    // Set host name to origin hostname or to localhost when possible, unless the user explicitly asked for '127.0.0.1'
-    let name
-    if (optionOrigin) {
-      // Keep hostname from url
-      if (optionOrigin.includes('://')) {
-        const [, hostname] = optionOrigin.split('://')
-        name = hostname
-      } else {
-        name = optionOrigin
-      }
-    } else if (
-      (optionsHost !== '127.0.0.1' && host === '127.0.0.1') ||
-      host === '0.0.0.0' ||
-      host === '::' ||
-      host === undefined
-    ) {
-      name = 'localhost'
-    } else {
-      name = host
-    }
-
-    return { host, name }
+    return host
   }
 }
