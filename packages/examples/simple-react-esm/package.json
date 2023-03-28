@@ -6,6 +6,10 @@
     "host-esm",
     "remote-esm"
   ],
+  "engines": {
+    "node": ">=16.14.0",
+    "pnpm": ">=7.0.1"
+  },
   "license": "MulanPSL-2.0",
   "scripts": {
     "build": "pnpm --parallel --filter \"./**\" build ",
@@ -18,4 +22,3 @@
     "kill-port": "^2.0.1"
   }
 }
-
