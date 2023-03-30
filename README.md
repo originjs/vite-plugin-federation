@@ -309,7 +309,7 @@ Dependencies shared by local and remote modules. Local modules need to configure
 #### `shareScope: string`
 
 * `default: 'default'`
-* Default is `defualt`, the shared domain name, just keep the `remote` and `host` sides the same
+* Default is `default`, the shared domain name, just keep the `remote` and `host` sides the same
 
 #### `version: string`
 Only works on `host` side, the version of the shared module provided is `version` of the `package.json` file in the shared package by default, you need to configure it manually only if you can't get `version` by this method
