@@ -1,3 +1,15 @@
+## [1.2.2](https://github.com/originjs/vite-plugin-federation/compare/v1.2.1...v1.2.2) (2023-04-08)
+
+
+### Bug Fixes
+
+* dev mode error because of not js type related files ([#372](https://github.com/originjs/vite-plugin-federation/issues/372)) ([9c19ef4](https://github.com/originjs/vite-plugin-federation/commit/9c19ef4de01b30d0e97722f50900906d5e58799f))
+* expose the module error which is under node_modules ([#377](https://github.com/originjs/vite-plugin-federation/issues/377)) ([8d7d85a](https://github.com/originjs/vite-plugin-federation/commit/8d7d85ae216f0193b0608830b2f607ff2560c364))
+* generate correct source_map when use remote code ([#366](https://github.com/originjs/vite-plugin-federation/issues/366)) ([7956508](https://github.com/originjs/vite-plugin-federation/commit/7956508b5921877b4e956d5feb4adc4eda48a7e2))
+* wrong shared url is generated when server.origin is configured and  dev mode. ([#383](https://github.com/originjs/vite-plugin-federation/issues/383)) ([f67f003](https://github.com/originjs/vite-plugin-federation/commit/f67f003076acaf7837979415f29f1e2c25fd2630))
+
+
+
 ## [1.2.1](https://github.com/originjs/vite-plugin-federation/compare/v1.2.0...v1.2.1) (2023-02-18)
 
 
