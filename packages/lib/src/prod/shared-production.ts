@@ -14,7 +14,7 @@
 // *****************************************************************************
 
 import type { PluginHooks } from '../../types/pluginHooks'
-import { parseSharedOptions } from '../utils'
+import { NAME_CHAR_REG, parseSharedOptions, removeNonRegLetter } from '../utils'
 import { builderInfo, parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { basename, join, resolve } from 'path'
@@ -28,7 +28,7 @@ export function prodSharedPlugin(
   parsedOptions.prodShared = parseSharedOptions(options)
   const shareName2Prop = new Map<string, any>()
   parsedOptions.prodShared.forEach((value) =>
-    shareName2Prop.set(value[0], value[1])
+    shareName2Prop.set(removeNonRegLetter(value[0], NAME_CHAR_REG), value[1])
   )
   let isHost
   let isRemote
@@ -48,7 +48,7 @@ export function prodSharedPlugin(
         // remove item which is both in external and shared
         inputOptions.external = (inputOptions.external as [])?.filter(
           (item) => {
-            return !shareName2Prop.has(item)
+            return !shareName2Prop.has(removeNonRegLetter(item, NAME_CHAR_REG))
           }
         )
       }
@@ -189,13 +189,11 @@ export function prodSharedPlugin(
       for (const key in bundle) {
         const chunk = bundle[key]
         if (chunk.type === 'chunk') {
-          const removeSharedChunk =
-            !isHost &&
-            sharedFilePathReg.test(chunk.fileName) &&
-            shareName2Prop.has(chunk.name) &&
-            !shareName2Prop.get(chunk.name).generate
-          if (removeSharedChunk) {
-            needRemoveShared.add(key)
+          if (!isHost) {
+            const regRst = sharedFilePathReg.exec(chunk.fileName)
+            if (regRst && shareName2Prop.get(regRst[1])?.generate === false) {
+              needRemoveShared.add(key)
+            }
           }
         }
       }
