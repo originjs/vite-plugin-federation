@@ -105,7 +105,7 @@ export default function federation(
       return _options
     },
     config(config: UserConfig, env: ConfigEnv) {
-      options.mode = env.mode
+      options.mode = options.mode ?? env.mode
       registerPlugins(options.mode, env.command)
       registerCount++
       for (const pluginHook of pluginList) {
