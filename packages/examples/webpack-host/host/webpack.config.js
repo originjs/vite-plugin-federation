@@ -1,9 +1,5 @@
-const path = require('path');
-
 const { ModuleFederationPlugin } = require('webpack').container;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-const pkg = require('./package.json');
 
 /** @type {import('webpack').Configuration} */
 module.exports = {
@@ -63,9 +59,6 @@ module.exports = {
     }),
   ],
   devServer: {
-    static: {
-      directory: path.join(__dirname),
-    },
     port: 8080,
     headers: {
       'Access-Control-Allow-Origin': '*',
