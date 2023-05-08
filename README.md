@@ -350,6 +350,82 @@ shared: {
 }
 ```
 
+
+
+## Add other example projects?
+
+First of all, you need to determine whether the test is suitable for `dev` mode or `build&serve` mode, or both.
+
+In addition, the current test will directly access `localhost:5000` for testing, which means that the startup port of `host` must be `5000`, otherwise it will directly lead to test failure.
+
+### How to set the test of `dev` mode or `build&serve` mode?
+
+According to the file name of the test file.
+
+For example, `vue3-demo-esm.dev&serve.spec.ts` means that tests will be built in `dev` mode and `build&serve` mode.
+
+The `vue3-demo-esm.dev.spec.ts` will only build tests in `dev` mode, as summarized as follows
+
+| Mode | File Name |
+| ------------------------ | ------------------- |
+| Only for `dev` mode | *.dev.spec.ts |
+| Only for `build&serve` mode | *.serve.spec.ts |
+| `dev` and `build&serve` mode | *.dev&serve.spec.ts |
+
+### Testing in `Dev` mode
+
+Since the current plug-in only supports the `dev` mode of `vite` on the `host` end, the `dev` mode test will execute the following code on the root path of the test project in turn.
+
+1. `pnpm run dev:host`
+2. `pnpm run build:remotes`
+3. `pnpm run serve:remotes`
+4. Execute test cases
+5. `pnpm run stop`
+
+This also means that there are at least four instructions in the `package.json` file of the project in `dev` mode.
+
+``` json
+  "scripts": {
+    "build:remotes": "pnpm --filter \"./remote\"  build",
+    "serve:remotes": "pnpm --filter \"./remote\"  serve",
+    "dev:hosts": "pnpm --filter \"./host\" dev",
+    "stop": "kill-port --port 5000,5001"
+  },
+  "workspaces": [
+    "host",
+    "remote"
+  ]
+
+```
+
+
+
+### Testing in `Build&Serve` mode
+
+The `build&serve` mode will execute the following instructions in turn
+
+1. `pnpm run build`
+2. `pnpm run serve`
+3. Execute test cases
+4. `pnpm run stop`
+
+This also means that there are at least three instructions in the `package.json` file of the project in `build&serve` mode.
+
+``` json
+  "scripts": {
+    "build": "pnpm --parallel --filter \"./**\" build",
+    "serve": "pnpm --parallel --filter \"./**\" serve ",
+    "stop": "kill-port --port 5000,5001"
+  },
+  "workspaces": [
+    "host",
+    "remote"
+  ]
+
+```
+
+
+
 ## FAQ
 
 ### ERROR: `Top-level` await is not available in the configured target environment

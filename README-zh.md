@@ -228,7 +228,7 @@ import myButton from 'remote/myButton'
 
 ### `filename：string`
 * 作为远程模块的入口文件，非必填，默认为`remoteEntry.js`
- 
+
 ### `transformFileTypes:string[]`
 * 插件所需要处理的文件类型，绝大多数情况下无需配置，因为默认设置了这些类型`['.js','.ts','.jsx','.tsx','.mjs','.cjs','.vue','.svelte']`，当你自定义了一些文件类型时并且需要`vite-plugin-federation`插件处理时，请把它添加到数组配置中。
 
@@ -359,6 +359,82 @@ shared: {
   }
 }
 ```
+
+## 添加其他的Example工程？
+
+首先需要判断测试适用于`dev`模式还是`build&serve`模式，或者两者都需要。
+
+另外当前的测试会直接访问`localhost:5000`来进行测试，这意味着`host`端的启动端口必须是`5000`，否则会直接导致测试失败。
+
+### 如何设置`dev`模式或者`build&serve`模式的测试？
+
+根据测试文件的文件名称区分
+
+ 例如 `vue3-demo-esm.dev&serve.spec.ts`表示会在`dev`模式和`build&serve`模式下构建测试，
+ 而`vue3-demo-esm.dev.spec.ts`则只会在`dev`模式下构建测试，总结如下
+
+| 模式                     | 文件名称            |
+| ------------------------ | ------------------- |
+| 仅用于`dev`模式          | *.dev.spec.ts       |
+| 仅用于`build&serve`模式  | *.serve.spec.ts     |
+| `dev`和`build&serve`模式 | *.dev&serve.spec.ts |
+
+
+
+
+### `Dev`模式下的测试
+
+由于当前插件只有`host`端支持`vite`的`dev`模式，所以`dev`模式测试时，会依次在测试项目的根路径执行以下代码
+
+1. `pnpm run dev:host`
+2. `pnpm run build:remotes`
+3. `pnpm run serve:remotes`
+4. 执行测试用例
+5. `pnpm run stop`
+
+这也表示在`dev`模式下项目的`package.json`文件中至少包含四条指令
+
+``` json
+  "scripts": {
+    "build:remotes": "pnpm --filter \"./remote\"  build",
+    "serve:remotes": "pnpm --filter \"./remote\"  serve",
+    "dev:hosts": "pnpm --filter \"./host\" dev",
+    "stop": "kill-port --port 5000,5001"
+  },
+  "workspaces": [
+    "host",
+    "remote"
+  ]
+
+```
+
+
+
+### `Build&Serve`模式下的测试
+
+`build&serve`模式将会依次执行以下指令
+
+1. `pnpm run build`
+2. `pnpm run serve`
+3. 执行测试用例
+4. `pnpm run stop`
+
+这也表示在`build&serve`模式下项目的`package.json`文件中至少包含三条指令
+
+``` json
+  "scripts": {
+    "build": "pnpm --parallel --filter \"./**\" build",
+    "serve": "pnpm --parallel --filter \"./**\" serve ",
+    "stop": "kill-port --port 5000,5001"
+  },
+  "workspaces": [
+    "host",
+    "remote"
+  ]
+
+```
+
+
 
 ## FAQ
 
