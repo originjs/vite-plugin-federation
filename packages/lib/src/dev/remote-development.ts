@@ -366,15 +366,6 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     const serverConfiguration = viteDevServer.config.server
     const protocol = serverConfiguration.https ? 'https' : 'http'
     const port = serverConfiguration.port ?? 5173
-    const regExp = new RegExp(
-      `${normalizePath(viteDevServer.config.root)}[/\\\\]`
-    )
-    let cacheDir = viteDevServer.config.cacheDir
-    cacheDir = `${
-      cacheDir === null || cacheDir === void 0
-        ? 'node_modules/.vite'
-        : normalizePath(cacheDir).split(regExp)[1]
-    }`
     const res: string[] = []
     if (shared.length) {
       const cwdPath = normalizePath(process.cwd())
@@ -401,7 +392,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             `${protocol}://${resolveHost(serverConfiguration)}:${port}`
           const url = relativePath
             ? `'${address}${relativePath}'`
-            : `'${address}/${cacheDir}/${sharedName}.js?'`
+            : `'${address}/@fs/${moduleInfo.id}'`
           str += `get:()=> get(${url}, ${REMOTE_FROM_PARAMETER})`
           res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
