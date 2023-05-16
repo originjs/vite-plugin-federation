@@ -1,3 +1,14 @@
+## [1.2.3](https://github.com/originjs/vite-plugin-federation/compare/v1.2.2...v1.2.3) (2023-05-16)
+
+
+### Bug Fixes
+
+* **dev:** vite --mode always overrides configured mode ([#405](https://github.com/originjs/vite-plugin-federation/issues/405)) ([5f899df](https://github.com/originjs/vite-plugin-federation/commit/5f899dfb960c309b508149cc9b80cf3b50c5cff7)), closes [#404](https://github.com/originjs/vite-plugin-federation/issues/404)
+* monorepo source dependency not found ([#419](https://github.com/originjs/vite-plugin-federation/issues/419)) ([0d91439](https://github.com/originjs/vite-plugin-federation/commit/0d9143944642e1a68405b5258bec1e68de076edf))
+* remote shared generate: false not work V3 ([#399](https://github.com/originjs/vite-plugin-federation/issues/399)) ([880f027](https://github.com/originjs/vite-plugin-federation/commit/880f027c578f2f13b577536536104a1a747a15b0))
+
+
+
 ## [1.2.2](https://github.com/originjs/vite-plugin-federation/compare/v1.2.1...v1.2.2) (2023-04-08)
 
 
