@@ -1,5 +1,5 @@
 {
-  "name": "webpack-host-host",
+  "name": "@webpack-host/host",
   "version": "0.0.0",
   "private": true,
   "scripts": {
