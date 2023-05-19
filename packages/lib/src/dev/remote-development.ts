@@ -13,7 +13,7 @@
 // SPDX-License-Identifier: MulanPSL-2.0
 // *****************************************************************************
 
-import type { UserConfig } from 'vite'
+import type { ServerOptions, UserConfig } from 'vite'
 import type {
   ConfigTypeSet,
   RemotesConfig,
@@ -364,8 +364,6 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     shared: (string | ConfigTypeSet)[]
   ): Promise<string[]> {
     const serverConfiguration = viteDevServer.config.server
-    const protocol = serverConfiguration.https ? 'https' : 'http'
-    const port = serverConfiguration.port ?? 5173
     const res: string[] = []
     if (shared.length) {
       const cwdPath = normalizePath(process.cwd())
@@ -388,8 +386,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         let str = ''
         if (typeof obj === 'object') {
           const address =
-            serverConfiguration.origin ??
-            `${protocol}://${resolveHost(serverConfiguration)}:${port}`
+            serverConfiguration.origin ?? resolveAddress(serverConfiguration)
           const url = relativePath
             ? `'${address}${relativePath}'`
             : `'${address}/@fs/${moduleInfo.id}'`
@@ -401,18 +398,20 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     return res
   }
 
-  function resolveHost(serverOptions): string {
+  function resolveAddress(serverOptions: ServerOptions): string {
     const hostConfiguration = serverOptions.host
-    let host: string
+    let address: string
     //
     if (
       hostConfiguration === undefined ||
       typeof hostConfiguration === 'boolean'
     ) {
-      host = 'localhost'
+      address = ''
     } else {
-      host = hostConfiguration
+      const protocol = serverOptions.https ? 'https' : 'http'
+      const port = serverOptions.port ?? 5173
+      address = `${protocol}://${hostConfiguration}:${port}`
     }
-    return host
+    return address
   }
 }
