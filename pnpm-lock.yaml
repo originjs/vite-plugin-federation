@@ -65,14 +65,7 @@ importers:
         specifier: ^0.26.2
         version: 0.26.3
 
-  packages/examples:
-    devDependencies:
-      '@originjs/vite-plugin-federation':
-        specifier: workspace:*
-        version: link:../lib
-      kill-port:
-        specifier: ^2.0.1
-        version: 2.0.1
+  packages/examples: {}
 
   packages/examples/basic-host-remote:
     devDependencies:
@@ -1056,7 +1049,7 @@ importers:
   packages/examples/webpack-host:
     devDependencies:
       '@originjs/vite-plugin-federation':
-        specifier: ^1.1.10
+        specifier: workspace:*
         version: link:../../lib
       kill-port:
         specifier: ^2.0.1
