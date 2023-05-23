@@ -364,8 +364,6 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     shared: (string | ConfigTypeSet)[]
   ): Promise<string[]> {
     const serverConfiguration = viteDevServer.config.server
-    const protocol = serverConfiguration.https ? 'https' : 'http'
-    const port = serverConfiguration.port ?? 5173
     const res: string[] = []
     if (shared.length) {
       const cwdPath = normalizePath(process.cwd())
@@ -387,32 +385,16 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         const obj = item[1]
         let str = ''
         if (typeof obj === 'object') {
-          const address =
-            serverConfiguration.origin ??
-            `${protocol}://${resolveHost(serverConfiguration)}:${port}`
-          const url = relativePath
-            ? `'${address}${relativePath}'`
-            : `'${address}/@fs/${moduleInfo.id}'`
+          const origin = serverConfiguration.origin
+          const pathname = relativePath ?? `/@fs/${moduleInfo.id}`
+          const url = origin
+            ? `'${origin}${pathname}'`
+            : `window.location.origin+'${pathname}'`
           str += `get:()=> get(${url}, ${REMOTE_FROM_PARAMETER})`
           res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
       }
     }
     return res
-  }
-
-  function resolveHost(serverOptions): string {
-    const hostConfiguration = serverOptions.host
-    let host: string
-    //
-    if (
-      hostConfiguration === undefined ||
-      typeof hostConfiguration === 'boolean'
-    ) {
-      host = 'localhost'
-    } else {
-      host = hostConfiguration
-    }
-    return host
   }
 }
