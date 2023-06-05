@@ -12,7 +12,7 @@
     },
     "devDependencies": {
       "kill-port": "^2.0.1",
-      "@originjs/vite-plugin-federation": "^1.1.10"
+      "@originjs/vite-plugin-federation": "^1.2.3"
     }
   }
   
