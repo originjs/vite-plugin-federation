@@ -2,10 +2,6 @@
     "name": "react-vite",
     "private": true,
     "version": "1.0.0",
-    "workspaces": [
-      "host",
-      "remote"
-    ],
     "scripts": {
       "build": "pnpm  --parallel --filter \"./**\" build",
       "serve": "pnpm  --parallel --filter \"./**\" preview",
