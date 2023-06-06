@@ -3,8 +3,8 @@
     "private": true,
     "version": "1.0.0",
     "scripts": {
-      "build": "pnpm  --parallel --filter \"./**\" build",
-      "serve": "pnpm  --parallel --filter \"./**\" preview",
+      "build": "pnpm --parallel --filter \"./**\" build",
+      "serve": "pnpm --parallel --filter \"./**\" preview",
       "build:remotes": "pnpm --parallel --filter \"./remote\" build",
       "serve:remotes": "pnpm --parallel --filter \"./remote\" serve",
       "dev:hosts": "pnpm --filter \"./host\" dev",
