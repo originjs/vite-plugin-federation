@@ -28,7 +28,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: 8
 
       - name: Cache pnpm modules
         uses: actions/cache@v2
@@ -70,7 +70,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: 8
 
       - name: Set node version to 18
         uses: actions/setup-node@v2
