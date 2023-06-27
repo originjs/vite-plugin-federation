@@ -21,12 +21,11 @@ import {
   createRemotesMap,
   getModuleMarker,
   parseRemoteOptions,
-  Remote,
   removeNonRegLetter,
   REMOTE_FROM_PARAMETER,
   NAME_CHAR_REG
 } from '../utils'
-import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
+import { builderInfo, EXPOSES_KEY_MAP, parsedOptions, prodRemotes } from '../public'
 import { basename } from 'path'
 import type { PluginHooks } from '../../types/pluginHooks'
 
@@ -39,9 +38,9 @@ export function prodRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.prodRemote = parseRemoteOptions(options)
-  const remotes: Remote[] = []
+  // const remotes: Remote[] = []
   for (const item of parsedOptions.prodRemote) {
-    remotes.push({
+    prodRemotes.push({
       id: item[0],
       regexp: new RegExp(`^${item[0]}/.+?`),
       config: item[1]
@@ -52,8 +51,9 @@ export function prodRemotePlugin(
     name: 'originjs:remote-production',
     virtualFile: {
       // language=JS
-      __federation__: `
-                ${createRemotesMap(remotes)}
+      // __federation__: `
+      [`__federation__${options.filename}`]: `
+                ${createRemotesMap(prodRemotes)}
                 const loadJS = async (url, fn) => {
                     const resolvedUrl = typeof url === 'function' ? await url() : url;
                     const script = document.createElement('script')
@@ -210,7 +210,7 @@ export function prodRemotePlugin(
       }
 
       if (builderInfo.isHost) {
-        if (id === '\0virtual:__federation__') {
+        if (id === `\0virtual:__federation__${options.filename}`) {
           const res: string[] = []
           parsedOptions.prodShared.forEach((arr) => {
             const obj = arr[1]
@@ -310,7 +310,7 @@ export function prodRemotePlugin(
               node.source?.value?.indexOf('/') > -1
             ) {
               const moduleId = node.source.value
-              const remote = remotes.find((r) => r.regexp.test(moduleId))
+              const remote = prodRemotes.find((r) => r.regexp.test(moduleId))
               const needWrap = remote?.config.from === 'vite'
               if (remote) {
                 requiresRuntime = true
@@ -435,7 +435,7 @@ export function prodRemotePlugin(
 
         if (requiresRuntime) {
           magicString.prepend(
-            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__${options.filename}';\n\n`
           )
         }
 

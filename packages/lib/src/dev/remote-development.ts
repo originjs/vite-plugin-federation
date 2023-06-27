@@ -32,16 +32,16 @@ import {
   parseRemoteOptions,
   REMOTE_FROM_PARAMETER
 } from '../utils'
-import { builderInfo, parsedOptions } from '../public'
+import { builderInfo, parsedOptions, devRemotes } from '../public'
 import type { PluginHooks } from '../../types/pluginHooks'
 
 export function devRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.devRemote = parseRemoteOptions(options)
-  const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
+  // const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
   for (const item of parsedOptions.devRemote) {
-    remotes.push({
+    devRemotes.push({
       id: item[0],
       regexp: new RegExp(`^${item[0]}/.+?`),
       config: item[1]
@@ -67,7 +67,7 @@ export function devRemotePlugin(
     name: 'originjs:remote-development',
     virtualFile: {
       __federation__: `
-${createRemotesMap(remotes)}
+${createRemotesMap(devRemotes)}
 const loadJS = async (url, fn) => {
   const resolvedUrl = typeof url === 'function' ? await url() : url;
   const script = document.createElement('script')
@@ -227,7 +227,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
             node.source?.value?.indexOf('/') > -1
           ) {
             const moduleId = node.source.value
-            const remote = remotes.find((r) => r.regexp.test(moduleId))
+            const remote = devRemotes.find((r) => r.regexp.test(moduleId))
             const needWrap = remote?.config.from === 'vite'
             if (remote) {
               requiresRuntime = true
