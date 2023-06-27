@@ -29,7 +29,8 @@ import {
   EXPOSES_KEY_MAP,
   EXTERNALS,
   parsedOptions,
-  SHARED
+  SHARED,
+  viteConfigResolved
 } from '../public'
 import type { AcornNode, OutputAsset, OutputChunk } from 'rollup'
 import type { VitePluginFederationOptions } from 'types'
@@ -43,8 +44,14 @@ export function prodExposePlugin(
 ): PluginHooks {
   let moduleMap = ''
   parsedOptions.prodExpose = parseExposeOptions(options)
+  const hasOptions = parsedOptions.prodExpose.some((expose) => {
+    return expose[0] === parseExposeOptions(options)[0]?.[0]
+  })
+  if (!hasOptions) {
+    parsedOptions.prodExpose = Array.prototype.concat(parsedOptions.prodExpose, parseExposeOptions(options))
+  }
   // exposes module
-  for (const item of parsedOptions.prodExpose) {
+  for (const item of parseExposeOptions(options)) {
     const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
     EXTERNALS.push(moduleName)
     const exposeFilepath = normalizePath(resolve(item[1].import))
@@ -58,7 +65,7 @@ export function prodExposePlugin(
       return __federation_import('\${__federation_expose_${item[0]}}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
   }
 
-  let viteConfigResolved: ResolvedConfig
+  // let viteConfigResolved: ResolvedConfig
 
   return {
     name: 'originjs:expose-production',
@@ -106,7 +113,9 @@ export function prodExposePlugin(
     },
 
     configResolved(config: ResolvedConfig) {
-      viteConfigResolved = config
+      if (config) {
+        viteConfigResolved.config = config
+      }
     },
 
     buildStart() {
@@ -149,7 +158,7 @@ export function prodExposePlugin(
           new RegExp(`(["'])${DYNAMIC_LOADING_CSS_PREFIX}.*?\\1`, 'g'),
           (str) => {
             // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
-            if (viteConfigResolved && !viteConfigResolved.build.cssCodeSplit) {
+            if (viteConfigResolved.config && !viteConfigResolved.config.build.cssCodeSplit) {
               if (cssBundlesMap.size) {
                 return `[${[...cssBundlesMap.values()]
                   .map((cssBundle) =>
@@ -198,7 +207,7 @@ export function prodExposePlugin(
         )
 
         // replace the export file placeholder path to final chunk path
-        for (const expose of parsedOptions.prodExpose) {
+        for (const expose of parseExposeOptions(options)) {
           const module = Object.keys(bundle).find((module) => {
             const chunk = bundle[module]
             return chunk.name === EXPOSES_KEY_MAP.get(expose[0])
