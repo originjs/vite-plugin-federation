@@ -2,8 +2,25 @@ import {lazy, Suspense} from "react";
 import {ErrorBoundary} from "react-error-boundary";
 
 const remotesMap = {};
+// const __vite__import = name => import(/* @vite-ignore */name);
+
+const shareScope = {
+    // 'react': {
+    //     'default': {
+    //         get: () => __vite__import('http://localhost:5001/assets/__federation_shared_react.js'),
+    //         loaded: 1
+    //     }
+    // },
+    // 'react-dom': {
+    //     'default': {
+    //         get: () => __vite__import('http://localhost:5001/assets/__federation_shared_react-dom.js'),
+    //         loaded: 1
+    //     }
+    // },
+};
+
 if (!globalThis.__federation_shared__){
-    globalThis.__federation_shared__={default: {}}
+    globalThis.__federation_shared__=shareScope
 }
 var __federation__ = {
     ensure: async (remoteId) => {
@@ -17,7 +34,7 @@ var __federation__ = {
                 debugger;
                 console.log('lib', lib);
                 if (!remote.inited) {
-                    lib.init(globalThis.__federation_shared__.default);
+                    lib.init(globalThis.__federation_shared__);
                     remote.lib = lib;
                     remote.inited = true;
                 }
