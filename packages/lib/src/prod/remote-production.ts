@@ -23,8 +23,7 @@ import {
   parseRemoteOptions,
   removeNonRegLetter,
   REMOTE_FROM_PARAMETER,
-  NAME_CHAR_REG,
-  createContentHash
+  NAME_CHAR_REG
 } from '../utils'
 import {
   builderInfo,
@@ -34,6 +33,7 @@ import {
 } from '../public'
 import { basename } from 'path'
 import type { PluginHooks } from '../../types/pluginHooks'
+import { createHash } from 'crypto'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
@@ -55,10 +55,10 @@ export function prodRemotePlugin(
 
   return {
     name: 'originjs:remote-production',
-    virtualFile: {
-      // language=JS
-      // __federation__: `
-      [`__federation__${options.filename}`]: `
+    virtualFile: options.remotes
+      ? {
+          // language=JS
+          __federation__: `
                 ${createRemotesMap(prodRemotes)}
                 const loadJS = async (url, fn) => {
                     const resolvedUrl = typeof url === 'function' ? await url() : url;
@@ -154,7 +154,8 @@ export function prodRemotePlugin(
                     __federation_method_wrapDefault
                 }
             `
-    },
+        }
+      : { __federation__: '' },
 
     async transform(this: TransformPluginContext, code: string, id: string) {
       if (builderInfo.isShared) {
@@ -163,7 +164,11 @@ export function prodRemotePlugin(
             const basename = `__federation_shared_${removeNonRegLetter(
               sharedInfo[0],
               NAME_CHAR_REG
-            )}-${createContentHash(sharedInfo[1].packagePath)}.js`
+            )}-${createHash('md5')
+              .update(sharedInfo[1].packagePath)
+              .digest('hex')
+              .toString()
+              .slice(0, 8)}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
               id: sharedInfo[1].id ?? sharedInfo[1].packagePath,
@@ -216,7 +221,7 @@ export function prodRemotePlugin(
       }
 
       if (builderInfo.isHost) {
-        if (id === `\0virtual:__federation__${options.filename}`) {
+        if (id === '\0virtual:__federation__') {
           const res: string[] = []
           parsedOptions.prodShared.forEach((arr) => {
             const obj = arr[1]
@@ -441,7 +446,7 @@ export function prodRemotePlugin(
 
         if (requiresRuntime) {
           magicString.prepend(
-            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__${options.filename}';\n\n`
+            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
           )
         }
 

@@ -61,8 +61,9 @@ export function devRemotePlugin(
   let viteDevServer: ViteDevServer
   return {
     name: 'originjs:remote-development',
-    virtualFile: {
-      [`__federation__${options.filename}`]: `
+    virtualFile: options.remotes
+      ? {
+          __federation__: `
 ${createRemotesMap(devRemotes)}
 const loadJS = async (url, fn) => {
   const resolvedUrl = typeof url === 'function' ? await url() : url;
@@ -144,7 +145,8 @@ function __federation_method_getRemote(remoteName,  componentName){
 }
 export {__federation_method_ensure, __federation_method_getRemote , __federation_method_unwrapDefault , __federation_method_wrapDefault}
 ;`
-    },
+        }
+      : { __federation__: '' },
     config(config: UserConfig) {
       // need to include remotes in the optimizeDeps.exclude
       if (parsedOptions.devRemote.length) {
@@ -186,7 +188,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         }
       }
 
-      if (id === `\0virtual:__federation__${options.filename}`) {
+      if (id === '\0virtual:__federation__') {
         const scopeCode = await devSharedScopeCode.call(
           this,
           parsedOptions.devShared
@@ -348,7 +350,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
       if (requiresRuntime) {
         magicString.prepend(
-          `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__${options.filename}';\n\n`
+          `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
         )
       }
       return magicString.toString()
