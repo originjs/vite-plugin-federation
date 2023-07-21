@@ -23,9 +23,15 @@ import {
   parseRemoteOptions,
   removeNonRegLetter,
   REMOTE_FROM_PARAMETER,
-  NAME_CHAR_REG
+  NAME_CHAR_REG,
+  createContentHash
 } from '../utils'
-import { builderInfo, EXPOSES_KEY_MAP, parsedOptions, prodRemotes } from '../public'
+import {
+  builderInfo,
+  EXPOSES_KEY_MAP,
+  parsedOptions,
+  prodRemotes
+} from '../public'
 import { basename } from 'path'
 import type { PluginHooks } from '../../types/pluginHooks'
 
@@ -157,7 +163,7 @@ export function prodRemotePlugin(
             const basename = `__federation_shared_${removeNonRegLetter(
               sharedInfo[0],
               NAME_CHAR_REG
-            )}.js`
+            )}-${createContentHash(sharedInfo[1].packagePath)}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
               id: sharedInfo[1].id ?? sharedInfo[1].packagePath,

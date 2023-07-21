@@ -14,11 +14,7 @@
 // *****************************************************************************
 
 import type { UserConfig } from 'vite'
-import type {
-  ConfigTypeSet,
-  RemotesConfig,
-  VitePluginFederationOptions
-} from 'types'
+import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { readFileSync } from 'fs'
@@ -66,7 +62,7 @@ export function devRemotePlugin(
   return {
     name: 'originjs:remote-development',
     virtualFile: {
-      __federation__: `
+      [`__federation__${options.filename}`]: `
 ${createRemotesMap(devRemotes)}
 const loadJS = async (url, fn) => {
   const resolvedUrl = typeof url === 'function' ? await url() : url;
@@ -190,7 +186,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         }
       }
 
-      if (id === '\0virtual:__federation__') {
+      if (id === `\0virtual:__federation__${options.filename}`) {
         const scopeCode = await devSharedScopeCode.call(
           this,
           parsedOptions.devShared
@@ -352,7 +348,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
       if (requiresRuntime) {
         magicString.prepend(
-          `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+          `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__${options.filename}';\n\n`
         )
       }
       return magicString.toString()

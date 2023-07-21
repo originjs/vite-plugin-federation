@@ -43,12 +43,14 @@ export function prodExposePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   let moduleMap = ''
-  parsedOptions.prodExpose = parseExposeOptions(options)
   const hasOptions = parsedOptions.prodExpose.some((expose) => {
     return expose[0] === parseExposeOptions(options)[0]?.[0]
   })
   if (!hasOptions) {
-    parsedOptions.prodExpose = Array.prototype.concat(parsedOptions.prodExpose, parseExposeOptions(options))
+    parsedOptions.prodExpose = Array.prototype.concat(
+      parsedOptions.prodExpose,
+      parseExposeOptions(options)
+    )
   }
   // exposes module
   for (const item of parseExposeOptions(options)) {
@@ -72,7 +74,7 @@ export function prodExposePlugin(
     virtualFile: {
       // code generated for remote
       // language=JS
-      __remoteEntryHelper__: `
+      [`__remoteEntryHelper__${options.filename}`]: `
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {${moduleMap}}
     const seen = {}
@@ -126,7 +128,7 @@ export function prodExposePlugin(
             builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
           }${options.filename}`,
           type: 'chunk',
-          id: '__remoteEntryHelper__',
+          id: `__remoteEntryHelper__${options.filename}`,
           preserveSignature: 'strict'
         })
       }
@@ -137,7 +139,10 @@ export function prodExposePlugin(
       let remoteEntryChunk
       for (const file in bundle) {
         const chunk = bundle[file] as OutputChunk
-        if (chunk?.facadeModuleId === '\0virtual:__remoteEntryHelper__') {
+        if (
+          chunk?.facadeModuleId ===
+          `\0virtual:__remoteEntryHelper__${options.filename}`
+        ) {
           remoteEntryChunk = chunk
           break
         }
@@ -158,7 +163,10 @@ export function prodExposePlugin(
           new RegExp(`(["'])${DYNAMIC_LOADING_CSS_PREFIX}.*?\\1`, 'g'),
           (str) => {
             // when build.cssCodeSplit: false, all files are aggregated into style.xxxxxxxx.css
-            if (viteConfigResolved.config && !viteConfigResolved.config.build.cssCodeSplit) {
+            if (
+              viteConfigResolved.config &&
+              !viteConfigResolved.config.build.cssCodeSplit
+            ) {
               if (cssBundlesMap.size) {
                 return `[${[...cssBundlesMap.values()]
                   .map((cssBundle) =>
