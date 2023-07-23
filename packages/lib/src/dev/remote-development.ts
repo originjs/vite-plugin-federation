@@ -90,8 +90,10 @@ const wrapShareScope = ${REMOTE_FROM_PARAMETER} => {
   }
 }
 const initMap = Object.create(null);
-async function __federation_method_ensure(remoteId) {
-  const remote = remotesMap[remoteId];
+async function __federation_method_ensure(remoteName) {
+  const remote = remotesMap[remoteName];
+  const remoteId = remote?.id
+  
   if (!remote.inited) {
     if ('var' === remote.format) {
       // loading js with script tag
