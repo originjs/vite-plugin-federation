@@ -363,9 +363,9 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     this: TransformPluginContext,
     shared: (string | ConfigTypeSet)[]
   ): Promise<string[]> {
-    const serverConfiguration = viteDevServer.config.server
     const res: string[] = []
     if (shared.length) {
+      const serverConfiguration = viteDevServer.config.server
       const cwdPath = normalizePath(process.cwd())
 
       for (const item of shared) {
