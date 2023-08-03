@@ -63,8 +63,8 @@ importers:
         specifier: ^4.9.4
         version: 4.9.4
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vitest:
         specifier: ^0.26.2
         version: 0.26.3
@@ -117,8 +117,8 @@ importers:
         specifier: ^1.3.6
         version: 1.3.6
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/react-in-vue/layout:
     dependencies:
@@ -134,10 +134,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/react-vite:
     devDependencies:
@@ -165,10 +165,10 @@ importers:
         version: 18.0.6
       '@vitejs/plugin-react':
         specifier: ^3.0.0
-        version: 3.0.0(vite@4.3.2)
+        version: 3.0.0(vite@4.0.5)
       vite:
-        specifier: ^4.3.2
-        version: 4.3.2(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/react-vite/remote:
     dependencies:
@@ -187,10 +187,10 @@ importers:
         version: 18.0.6
       '@vitejs/plugin-react':
         specifier: ^3.0.0
-        version: 3.0.0(vite@4.3.2)
+        version: 3.0.0(vite@4.0.5)
       vite:
-        specifier: ^4.3.2
-        version: 4.3.2(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/simple-react-esm:
     devDependencies:
@@ -464,10 +464,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue2':
         specifier: ^2.2.0
-        version: 2.2.0(vite@4.0.3)(vue@2.7.14)
+        version: 2.2.0(vite@4.0.5)(vue@2.7.14)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue2-demo/remote-simple:
     dependencies:
@@ -477,10 +477,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue2':
         specifier: ^2.2.0
-        version: 2.2.0(vite@4.0.3)(vue@2.7.14)
+        version: 2.2.0(vite@4.0.5)(vue@2.7.14)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-advanced-demo:
     devDependencies:
@@ -511,16 +511,16 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       typescript:
         specifier: ^4.9.4
         version: 4.9.4
       unplugin-element-plus:
         specifier: 0.4.1
-        version: 0.4.1(vite@4.0.3)
+        version: 0.4.1(vite@4.0.5)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vue-tsc:
         specifier: ^0.39.5
         version: 0.39.5(typescript@4.9.4)
@@ -536,13 +536,13 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       typescript:
         specifier: ^4.9.4
         version: 4.9.4
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vue-tsc:
         specifier: ^0.39.5
         version: 0.39.5(typescript@4.9.4)
@@ -564,16 +564,16 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       typescript:
         specifier: ^4.9.4
         version: 4.9.4
       unplugin-element-plus:
         specifier: 0.4.1
-        version: 0.4.1(vite@4.0.3)
+        version: 0.4.1(vite@4.0.5)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vue-tsc:
         specifier: ^0.39.5
         version: 0.39.5(typescript@4.9.4)
@@ -607,10 +607,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-expose-store/remote:
     dependencies:
@@ -619,17 +619,17 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-shared-store:
     devDependencies:
@@ -651,10 +651,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-shared-store/remote-A:
     dependencies:
@@ -663,17 +663,17 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-shared-store/remote-B:
     dependencies:
@@ -682,46 +682,46 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/common-lib:
     dependencies:
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/css-modules:
     dependencies:
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       autoprefixer:
         specifier: ^10.3.2
         version: 10.4.7(postcss@8.4.14)
@@ -729,8 +729,8 @@ importers:
         specifier: ^8.3.0
         version: 8.4.14
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/home:
     dependencies:
@@ -739,17 +739,17 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/layout:
     dependencies:
@@ -762,10 +762,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs:
     devDependencies:
@@ -784,10 +784,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs/css-modules:
     dependencies:
@@ -797,7 +797,7 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       autoprefixer:
         specifier: ^10.3.2
         version: 10.4.7(postcss@8.4.14)
@@ -805,8 +805,8 @@ importers:
         specifier: ^8.3.0
         version: 8.4.14
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs/home:
     dependencies:
@@ -819,10 +819,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs/layout:
     dependencies:
@@ -835,10 +835,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-webpack-esm-esm:
     devDependencies:
@@ -903,10 +903,10 @@ importers:
         version: link:../../../lib
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-webpack-esm-var:
     devDependencies:
@@ -974,10 +974,10 @@ importers:
         version: link:../../../lib
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-webpack-systemjs:
     devDependencies:
@@ -1045,10 +1045,10 @@ importers:
         version: link:../../../lib
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/webpack-host:
     devDependencies:
@@ -1116,10 +1116,10 @@ importers:
         version: 18.0.6
       '@vitejs/plugin-react':
         specifier: ^3.0.0
-        version: 3.0.0(vite@4.0.3)
+        version: 3.0.0(vite@4.0.5)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/lib:
     dependencies:
@@ -1143,8 +1143,8 @@ importers:
         specifier: ^4.9.4
         version: 4.9.4
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
 packages:
 
@@ -3559,7 +3559,7 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-react@3.0.0(vite@4.0.3):
+  /@vitejs/plugin-react@3.0.0(vite@4.0.5):
     resolution: {integrity: sha512-1mvyPc0xYW5G8CHQvJIJXLoMjl5Ct3q2g5Y2s6Ccfgwm45y48LBvsla7az+GkkAtYikWQ4Lxqcsq5RHLcZgtNQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -3570,46 +3570,30 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.19.6(@babel/core@7.20.7)
       magic-string: 0.27.0
       react-refresh: 0.14.0
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-react@3.0.0(vite@4.3.2):
-    resolution: {integrity: sha512-1mvyPc0xYW5G8CHQvJIJXLoMjl5Ct3q2g5Y2s6Ccfgwm45y48LBvsla7az+GkkAtYikWQ4Lxqcsq5RHLcZgtNQ==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      vite: ^4.0.0
-    dependencies:
-      '@babel/core': 7.20.7
-      '@babel/plugin-transform-react-jsx-self': 7.18.6(@babel/core@7.20.7)
-      '@babel/plugin-transform-react-jsx-source': 7.19.6(@babel/core@7.20.7)
-      magic-string: 0.27.0
-      react-refresh: 0.14.0
-      vite: 4.3.2(@types/node@18.6.4)
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /@vitejs/plugin-vue2@2.2.0(vite@4.0.3)(vue@2.7.14):
+  /@vitejs/plugin-vue2@2.2.0(vite@4.0.5)(vue@2.7.14):
     resolution: {integrity: sha512-1km7zEuZ/9QRPvzXSjikbTYGQPG86Mq1baktpC4sXqsXlb02HQKfi+fl8qVS703JM7cgm24Ga9j+RwKmvFn90A==}
     engines: {node: ^14.18.0 || >= 16.0.0}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0
       vue: ^2.7.0-0
     dependencies:
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
       vue: 2.7.14
     dev: true
 
-  /@vitejs/plugin-vue@4.0.0(vite@4.0.3)(vue@3.2.45):
+  /@vitejs/plugin-vue@4.0.0(vite@4.0.5)(vue@3.2.45):
     resolution: {integrity: sha512-e0X4jErIxAB5oLtDqbHvHpJe/uWNkdpYV83AOG2xo2tEVSzCzewgJMtREZM30wXnM5ls90hxiOtAuVU6H5JgbA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
       vue: 3.2.45
     dev: true
 
@@ -7466,6 +7450,7 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
 
   /postcss@8.4.24:
     resolution: {integrity: sha512-M0RzbcI0sO/XJNucsGjvWU9ERWxb/ytp1w6dKtxTKgixdtQDq4rmx/g8W1hnaheq9jgwL/oyEdH5Bc4WwJKMqg==}
@@ -7913,7 +7898,6 @@ packages:
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
 
   /rollup@3.9.1:
     resolution: {integrity: sha512-GswCYHXftN8ZKGVgQhTFUJB/NBXxrRGgO2NCy6E8s1rwEJ4Q9/VttNqcYfEvx4dTo4j58YqdC3OVztPzlKSX8w==}
@@ -7921,6 +7905,7 @@ packages:
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
+    dev: true
 
   /run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
@@ -8665,14 +8650,14 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  /unplugin-element-plus@0.4.1(vite@4.0.3):
+  /unplugin-element-plus@0.4.1(vite@4.0.5):
     resolution: {integrity: sha512-x8L35sppkbtnAf+aSPXNsLPjCUrM0mWKgujqMIgrHiDQaGbpMlNnbN2kjP5CMclykNOw8fUCreEhtxPyzg8tmw==}
     engines: {node: '>=14.19.0'}
     dependencies:
       '@rollup/pluginutils': 4.2.1
       es-module-lexer: 0.10.5
       magic-string: 0.26.2
-      unplugin: 0.7.2(vite@4.0.3)
+      unplugin: 0.7.2(vite@4.0.5)
     transitivePeerDependencies:
       - esbuild
       - rollup
@@ -8680,7 +8665,7 @@ packages:
       - webpack
     dev: true
 
-  /unplugin@0.7.2(vite@4.0.3):
+  /unplugin@0.7.2(vite@4.0.5):
     resolution: {integrity: sha512-m7thX4jP8l5sETpLdUASoDOGOcHaOVtgNyrYlToyQUvILUtEzEnngRBrHnAX3IKqooJVmXpoa/CwQ/QqzvGaHQ==}
     peerDependencies:
       esbuild: '>=0.13'
@@ -8699,7 +8684,7 @@ packages:
     dependencies:
       acorn: 8.8.1
       chokidar: 3.5.3
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.4.4
     dev: true
@@ -8831,17 +8816,17 @@ packages:
       vite: 4.3.2(@types/node@18.6.4)
     dev: true
 
-  /vite-plugin-top-level-await@1.1.1(vite@4.0.3):
+  /vite-plugin-top-level-await@1.1.1(vite@4.0.5):
     resolution: {integrity: sha512-il7YijMxjvQxx33I/mf5n+xUJscxcTqRSwPGck/jw92hUyGwjsJnIBYBcKRS+vhOtsJ5g+8xANoBEKx9G1NSEQ==}
     peerDependencies:
       vite: '>=2.8'
     dependencies:
       '@swc/core': 1.2.224
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
     dev: false
 
-  /vite@4.0.3(@types/node@18.6.4):
-    resolution: {integrity: sha512-HvuNv1RdE7deIfQb8mPk51UKjqptO/4RXZ5yXSAvurd5xOckwS/gg8h9Tky3uSbnjYTgUm0hVCet1cyhKd73ZA==}
+  /vite@4.0.5(@types/node@18.6.4):
+    resolution: {integrity: sha512-7m87RC+caiAxG+8j3jObveRLqaWA/neAdCat6JAZwMkSWqFHOvg8MYe5fAQxVBRAuKAQ1S6XDh3CBQuLNbY33w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -8867,9 +8852,9 @@ packages:
     dependencies:
       '@types/node': 18.6.4
       esbuild: 0.16.13
-      postcss: 8.4.20
+      postcss: 8.4.24
       resolve: 1.22.1
-      rollup: 3.9.1
+      rollup: 3.23.1
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -8941,7 +8926,7 @@ packages:
       tinybench: 2.3.1
       tinypool: 0.3.0
       tinyspy: 1.0.2
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.3.2(@types/node@18.6.4)
       vite-node: 0.26.3(@types/node@18.6.4)
     transitivePeerDependencies:
       - less
