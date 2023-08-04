@@ -146,7 +146,11 @@ function __federation_method_wrapDefault(module ,need){
 function __federation_method_getRemote(remoteName,  componentName){
   return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
 }
-export {__federation_method_ensure, __federation_method_getRemote , __federation_method_unwrapDefault , __federation_method_wrapDefault}
+
+function __federation_method_setRemote(remoteName, remoteConfig) {
+  remotesMap[remoteName] = remoteConfig;
+}
+export {__federation_method_ensure, __federation_method_getRemote , __federation_method_setRemote , __federation_method_unwrapDefault , __federation_method_wrapDefault}
 ;`
     },
     config(config: UserConfig) {
