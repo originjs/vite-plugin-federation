@@ -24,7 +24,8 @@ import {
   Remote,
   removeNonRegLetter,
   REMOTE_FROM_PARAMETER,
-  NAME_CHAR_REG
+  NAME_CHAR_REG,
+  createHashFromContent
 } from '../utils'
 import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
 import { basename } from 'path'
@@ -157,7 +158,7 @@ export function prodRemotePlugin(
             const basename = `__federation_shared_${removeNonRegLetter(
               sharedInfo[0],
               NAME_CHAR_REG
-            )}.js`
+            )}-${createHashFromContent(code)}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
               id: sharedInfo[1].id ?? sharedInfo[1].packagePath,
