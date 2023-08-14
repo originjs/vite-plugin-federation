@@ -1,5 +1,5 @@
 {
-  "name": "simple-react-webpack",
+  "name": "react-webpack-vite",
   "private": true,
   "version": "1.0.0",
   "workspaces": [
@@ -9,12 +9,16 @@
   "license": "MulanPSL-2.0",
   "scripts": {
     "build": "pnpm --parallel --filter \"./**\" build",
-    "serve": "pnpm --parallel --filter \"./**\" serve",
+    "serve": "pnpm --parallel --filter \"./**\"  serve",
+    "build:remotes": "pnpm --parallel --filter \"./remote\" build",
+    "serve:remotes": "pnpm --parallel --filter \"./remote\" serve",
+    "dev:hosts": "pnpm --filter \"./host\" dev",
     "stop": "kill-port --port 5000,5001"
   },
   "devDependencies": {
     "@originjs/vite-plugin-federation": "^1.2.3",
-    "http-server": "^13.0.1",
     "kill-port": "^2.0.1"
   }
 }
+
+

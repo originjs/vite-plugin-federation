@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -191,6 +187,71 @@ importers:
       vite:
         specifier: ^4.3.2
         version: 4.3.2(@types/node@18.6.4)
+
+  packages/examples/react-webpack-vite:
+    devDependencies:
+      '@originjs/vite-plugin-federation':
+        specifier: ^1.2.3
+        version: link:../../lib
+      kill-port:
+        specifier: ^2.0.1
+        version: 2.0.1
+
+  packages/examples/react-webpack-vite/host:
+    dependencies:
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.17
+        version: 18.0.21
+      '@types/react-dom':
+        specifier: ^18.0.6
+        version: 18.0.6
+      '@vitejs/plugin-react':
+        specifier: ^3.0.0
+        version: 3.0.0(vite@4.3.2)
+      vite:
+        specifier: ^4.3.2
+        version: 4.3.2(@types/node@18.6.4)
+
+  packages/examples/react-webpack-vite/remote:
+    dependencies:
+      react:
+        specifier: ^16.13.1
+        version: 16.13.1
+      react-dom:
+        specifier: ^16.13.1
+        version: 16.13.1(react@16.13.1)
+    devDependencies:
+      '@babel/core':
+        specifier: ^7.20.7
+        version: 7.20.7
+      '@babel/preset-react':
+        specifier: ^7.18.6
+        version: 7.18.6(@babel/core@7.20.7)
+      babel-loader:
+        specifier: ^9.1.0
+        version: 9.1.0(@babel/core@7.20.7)(webpack@5.75.0)
+      npm-run-all:
+        specifier: 4.1.5
+        version: 4.1.5
+      serve:
+        specifier: ^14.0.0
+        version: 14.0.1
+      webpack:
+        specifier: ^5.75.0
+        version: 5.75.0(webpack-cli@5.0.1)
+      webpack-cli:
+        specifier: ^5.0.1
+        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+      webpack-dev-server:
+        specifier: ^4.11.1
+        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
 
   packages/examples/simple-react-esm:
     devDependencies:
@@ -887,7 +948,7 @@ importers:
         version: 5.75.0(webpack-cli@5.0.1)
       webpack-cli:
         specifier: ^5.0.1
-        version: 5.0.1(webpack@5.75.0)
+        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
 
   packages/examples/vue3-demo-webpack-esm-esm/layout:
     dependencies:
@@ -1244,7 +1305,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0
     dependencies:
-      '@babel/compat-data': 7.18.6
+      '@babel/compat-data': 7.20.10
       '@babel/core': 7.20.7
       '@babel/helper-validator-option': 7.18.6
       browserslist: 4.21.4
@@ -1325,11 +1386,6 @@ packages:
       - supports-color
     dev: true
 
-  /@babel/helper-environment-visitor@7.18.6:
-    resolution: {integrity: sha512-8n6gSfn2baOY+qlp+VSzsosjCVGFqWKmDF0cCWOybh52Dw3SEyoWR1KrhMJASjLwIEkkAufZ0xvr+SxLHSpy2Q==}
-    engines: {node: '>=6.9.0'}
-    dev: true
-
   /@babel/helper-environment-visitor@7.18.9:
     resolution: {integrity: sha512-3r/aACDJ3fhQ/EVgFy0hpj8oHyHpQc+LPtJoY9SzTThAsStm4Ptegq92vqKoE3vD706ZVFWITnMnxucw+S9Ipg==}
     engines: {node: '>=6.9.0'}
@@ -1338,14 +1394,6 @@ packages:
     resolution: {integrity: sha512-eyAYAsQmB80jNfg4baAtLeWAQHfHFiR483rzFK+BhETlGZaQC9bsfrugfXDCbRHLQbIA7U5NxhhOxN7p/dWIcg==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.20.7
-    dev: true
-
-  /@babel/helper-function-name@7.18.6:
-    resolution: {integrity: sha512-0mWMxV1aC97dhjCah5U5Ua7668r5ZmSC2DLfH2EZnf9c3/dHZKiFa5pRLMH5tjSl471tY6496ZWk/kjNONBxhw==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/template': 7.20.7
       '@babel/types': 7.20.7
     dev: true
 
@@ -1435,13 +1483,6 @@ packages:
       - supports-color
     dev: true
 
-  /@babel/helper-simple-access@7.18.6:
-    resolution: {integrity: sha512-iNpIgTgyAvDQpDj76POqg+YEt8fPxx3yaNBg3S30dxNKm2SWfYhD0TGrK/Eu9wHpUW63VQU894TsTg+GLbUa1g==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/types': 7.20.7
-    dev: true
-
   /@babel/helper-simple-access@7.20.2:
     resolution: {integrity: sha512-+0woI/WPq59IrqDYbVGfshjT5Dmk/nnbdpcF8SnMhhXObpTq2KNBdLFRFrkVdbDOyUmHBCxzm5FHV1rACIkIbA==}
     engines: {node: '>=6.9.0'}
@@ -1464,11 +1505,6 @@ packages:
   /@babel/helper-string-parser@7.19.4:
     resolution: {integrity: sha512-nHtDoQcuqFmwYNYPz3Rah5ph2p8PFeFCsZk9A/48dPc/rGocJ5J3hAAZ7pb76VWX3fZKu+uEr/FhH5jLx7umrw==}
     engines: {node: '>=6.9.0'}
-
-  /@babel/helper-validator-identifier@7.18.6:
-    resolution: {integrity: sha512-MmetCkz9ej86nJQV+sFCxoGGrUbU3q02kgLciwkrt9QqEB7cP39oKEY0PakknEO0Gu20SskMRi+AYZ3b1TpN9g==}
-    engines: {node: '>=6.9.0'}
-    dev: true
 
   /@babel/helper-validator-identifier@7.19.1:
     resolution: {integrity: sha512-awrNfaMtnHUr653GgGEs++LlAvW6w+DcPrOliSMXWCKo597CwL5Acf/wWdNkf/tfEQE3mjkeD1YOVZOUV/od1w==}
@@ -1534,7 +1570,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.20.7
-      '@babel/helper-environment-visitor': 7.18.6
+      '@babel/helper-environment-visitor': 7.18.9
       '@babel/helper-plugin-utils': 7.19.0
       '@babel/helper-remap-async-to-generator': 7.18.6(@babel/core@7.20.7)
       '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.20.7)
@@ -1641,7 +1677,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
-      '@babel/compat-data': 7.18.6
+      '@babel/compat-data': 7.20.10
       '@babel/core': 7.20.7
       '@babel/helper-compilation-targets': 7.20.7(@babel/core@7.20.7)
       '@babel/helper-plugin-utils': 7.19.0
@@ -1902,8 +1938,8 @@ packages:
     dependencies:
       '@babel/core': 7.20.7
       '@babel/helper-annotate-as-pure': 7.18.6
-      '@babel/helper-environment-visitor': 7.18.6
-      '@babel/helper-function-name': 7.18.6
+      '@babel/helper-environment-visitor': 7.18.9
+      '@babel/helper-function-name': 7.19.0
       '@babel/helper-optimise-call-expression': 7.18.6
       '@babel/helper-plugin-utils': 7.19.0
       '@babel/helper-replace-supers': 7.18.6
@@ -1983,7 +2019,7 @@ packages:
     dependencies:
       '@babel/core': 7.20.7
       '@babel/helper-compilation-targets': 7.20.7(@babel/core@7.20.7)
-      '@babel/helper-function-name': 7.18.6
+      '@babel/helper-function-name': 7.19.0
       '@babel/helper-plugin-utils': 7.19.0
     dev: true
 
@@ -2030,7 +2066,7 @@ packages:
       '@babel/core': 7.20.7
       '@babel/helper-module-transforms': 7.20.11
       '@babel/helper-plugin-utils': 7.19.0
-      '@babel/helper-simple-access': 7.18.6
+      '@babel/helper-simple-access': 7.20.2
       babel-plugin-dynamic-import-node: 2.3.3
     transitivePeerDependencies:
       - supports-color
@@ -2046,7 +2082,7 @@ packages:
       '@babel/helper-hoist-variables': 7.18.6
       '@babel/helper-module-transforms': 7.20.11
       '@babel/helper-plugin-utils': 7.19.0
-      '@babel/helper-validator-identifier': 7.18.6
+      '@babel/helper-validator-identifier': 7.19.1
       babel-plugin-dynamic-import-node: 2.3.3
     transitivePeerDependencies:
       - supports-color
@@ -2445,7 +2481,7 @@ packages:
     resolution: {integrity: sha512-QG3yxTcTIBoAcQmkCs+wAPYZhu7Dk9rXKacINfNbdJDNERTbLQbHGyVG8q/YGMPeCJRIhSY0+fTc5+xuh6WPSQ==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/helper-validator-identifier': 7.18.6
+      '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
     dev: true
 
@@ -3930,21 +3966,6 @@ packages:
       webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
       webpack-dev-server: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
 
-  /@webpack-cli/serve@2.0.1(webpack-cli@5.0.1)(webpack@5.75.0):
-    resolution: {integrity: sha512-0G7tNyS+yW8TdgHwZKlDWYXFA6OJQnoLCQvYKkQP0Q2X205PSQ6RNUj0M+1OB/9gRQaUZ/ccYfaxd0nhaWKfjw==}
-    engines: {node: '>=14.15.0'}
-    peerDependencies:
-      webpack: 5.x.x
-      webpack-cli: 5.x.x
-      webpack-dev-server: '*'
-    peerDependenciesMeta:
-      webpack-dev-server:
-        optional: true
-    dependencies:
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-cli: 5.0.1(webpack@5.75.0)
-    dev: true
-
   /@xtuc/ieee754@1.2.0:
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
 
@@ -3976,23 +3997,17 @@ packages:
     dependencies:
       acorn: 8.8.1
 
-  /acorn-jsx@5.3.2(acorn@8.8.0):
+  /acorn-jsx@5.3.2(acorn@8.8.1):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
     dependencies:
-      acorn: 8.8.0
+      acorn: 8.8.1
     dev: true
 
   /acorn-walk@8.2.0:
     resolution: {integrity: sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==}
     engines: {node: '>=0.4.0'}
-    dev: true
-
-  /acorn@8.8.0:
-    resolution: {integrity: sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
     dev: true
 
   /acorn@8.8.1:
@@ -4194,7 +4209,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
-      '@babel/compat-data': 7.18.6
+      '@babel/compat-data': 7.20.10
       '@babel/core': 7.20.7
       '@babel/helper-define-polyfill-provider': 0.2.4(@babel/core@7.20.7)
       semver: 6.3.0
@@ -5419,8 +5434,8 @@ packages:
     resolution: {integrity: sha512-ORs1Rt/uQTqUKjDdGCyrtYxbazf5umATSf/K4qxjmZHORR6HJk+2s/2Pqe+Kk49HHINC/xNIrGfgh8sZcll0ng==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
-      acorn: 8.8.0
-      acorn-jsx: 5.3.2(acorn@8.8.0)
+      acorn: 8.8.1
+      acorn-jsx: 5.3.2(acorn@8.8.1)
       eslint-visitor-keys: 3.3.0
     dev: true
 
@@ -9058,39 +9073,6 @@ packages:
       webpack-dev-server: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
       webpack-merge: 5.8.0
 
-  /webpack-cli@5.0.1(webpack@5.75.0):
-    resolution: {integrity: sha512-S3KVAyfwUqr0Mo/ur3NzIp6jnerNpo7GUO6so51mxLi1spqsA17YcMXy0WOIJtBSnj748lthxC6XLbNKh/ZC+A==}
-    engines: {node: '>=14.15.0'}
-    hasBin: true
-    peerDependencies:
-      '@webpack-cli/generators': '*'
-      webpack: 5.x.x
-      webpack-bundle-analyzer: '*'
-      webpack-dev-server: '*'
-    peerDependenciesMeta:
-      '@webpack-cli/generators':
-        optional: true
-      webpack-bundle-analyzer:
-        optional: true
-      webpack-dev-server:
-        optional: true
-    dependencies:
-      '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
-      '@webpack-cli/info': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
-      '@webpack-cli/serve': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
-      colorette: 2.0.19
-      commander: 9.4.1
-      cross-spawn: 7.0.3
-      envinfo: 7.8.1
-      fastest-levenshtein: 1.0.12
-      import-local: 3.1.0
-      interpret: 3.1.1
-      rechoir: 0.8.0
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-merge: 5.8.0
-    dev: true
-
   /webpack-dev-middleware@5.3.3(webpack@5.75.0):
     resolution: {integrity: sha512-hj5CYrY0bZLB+eTO+x/j67Pkrquiy7kWepMHmUMoPsmcUaeEnQJqFzHJOyxgWlq746/wUuA64p9ta34Kyb01pA==}
     engines: {node: '>= 12.13.0'}
@@ -9346,3 +9328,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

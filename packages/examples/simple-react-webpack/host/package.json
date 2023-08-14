@@ -5,7 +5,7 @@
   "license": "MulanPSL-2.0",
   "scripts": {
     "build": "rollup -c",
-    "serve": "http-server . -p 5000 --cors='*'"
+    "serve": "http-server . -p 5500 --cors='*'"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
@@ -13,6 +13,8 @@
     "react-dom": "16.13.1"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-federation": "^1.2.3",
+    "http-server": "^13.0.1",
     "@babel/core": "^7.20.7",
     "@babel/preset-env": "7.14.8",
     "@babel/preset-react": "^7.18.6",

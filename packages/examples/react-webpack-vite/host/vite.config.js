@@ -7,18 +7,26 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: 'app',
       remotes: {
-        remoteApp: 'http://localhost:5001/assets/remoteEntry.js',
-        format: 'var'
+        remoteApp: {
+          external: 'http://localhost:5001/remoteEntry.js',
+          format: 'esm',
+          from: 'webpack'
+        }
       },
       shared: ['react', 'react-dom']
     })
   ],
   build: {
-    modulePreload: false,
     target: 'esnext',
     minify: false,
-    cssCodeSplit: false
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        format: 'esm',
+        entryFileNames: 'assets/[name].js',
+        minifyInternalExports: false
+      }
+    }
   }
 })
