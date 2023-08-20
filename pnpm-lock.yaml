@@ -191,7 +191,7 @@ importers:
   packages/examples/react-webpack-vite:
     devDependencies:
       '@originjs/vite-plugin-federation':
-        specifier: ^1.2.3
+        specifier: workspace:*
         version: link:../../lib
       kill-port:
         specifier: ^2.0.1
@@ -206,6 +206,9 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
     devDependencies:
+      '@originjs/vite-plugin-federation':
+        specifier: ^1.2.3
+        version: link:../../../lib
       '@types/react':
         specifier: ^18.0.17
         version: 18.0.21
@@ -237,6 +240,12 @@ importers:
       babel-loader:
         specifier: ^9.1.0
         version: 9.1.0(@babel/core@7.20.7)(webpack@5.75.0)
+      html-webpack-plugin:
+        specifier: ^5.3.2
+        version: 5.5.0(webpack@5.75.0)
+      http-server:
+        specifier: ^13.0.1
+        version: 13.1.0
       npm-run-all:
         specifier: 4.1.5
         version: 4.1.5
