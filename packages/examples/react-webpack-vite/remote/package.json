@@ -1,0 +1,27 @@
+{
+  "name": "@simple-react-webpack/remote",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "webpack-cli serve",
+    "serve": "serve dist -p 5001 --cors='*'",
+    "build": "webpack --mode production",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "serve": "^14.0.0",
+    "@babel/core": "^7.20.7",
+    "@babel/preset-react": "^7.18.6",
+    "babel-loader": "^9.1.0",
+    "npm-run-all": "4.1.5",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1",
+    "html-webpack-plugin": "^5.3.2",
+    "http-server": "^13.0.1"
+  }
+}
