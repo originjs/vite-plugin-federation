@@ -222,8 +222,16 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       const hasStaticImported = new Map<string, string>()
 
       let requiresRuntime = false
+      let manualRequired: any = null // set static import if exists
       walk(ast, {
         enter(node: any) {
+          if (
+            node.type === 'ImportDeclaration' &&
+            node.source?.value === 'virtual:__federation__'
+          ) {
+            manualRequired = node
+          }
+
           if (
             (node.type === 'ImportExpression' ||
               node.type === 'ImportDeclaration' ||
@@ -355,9 +363,13 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       })
 
       if (requiresRuntime) {
-        magicString.prepend(
-          `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
-        )
+        let requiresCode = `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+        // clear static required
+        if (manualRequired) {
+          requiresCode = `import {__federation_method_setRemote, __federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+          magicString.overwrite(manualRequired.start, manualRequired.end, ``)
+        }
+        magicString.prepend(requiresCode)
       }
       return magicString.toString()
     }

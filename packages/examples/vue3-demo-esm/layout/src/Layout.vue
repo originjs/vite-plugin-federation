@@ -13,6 +13,10 @@
   <common-lib-counter />
   <hr />
   <div ref="container"></div>
+  <hr />
+  <dynamic-images />
+  <dynamic-content />
+  <!-- <dynamic-button /> -->
 </template>
 
 <script>
