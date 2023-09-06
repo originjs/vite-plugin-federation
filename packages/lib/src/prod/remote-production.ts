@@ -21,14 +21,19 @@ import {
   createRemotesMap,
   getModuleMarker,
   parseRemoteOptions,
-  Remote,
   removeNonRegLetter,
   REMOTE_FROM_PARAMETER,
   NAME_CHAR_REG
 } from '../utils'
-import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
+import {
+  builderInfo,
+  EXPOSES_KEY_MAP,
+  parsedOptions,
+  prodRemotes
+} from '../public'
 import { basename } from 'path'
 import type { PluginHooks } from '../../types/pluginHooks'
+import { createHash } from 'crypto'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
@@ -39,9 +44,9 @@ export function prodRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.prodRemote = parseRemoteOptions(options)
-  const remotes: Remote[] = []
+  // const remotes: Remote[] = []
   for (const item of parsedOptions.prodRemote) {
-    remotes.push({
+    prodRemotes.push({
       id: item[0],
       regexp: new RegExp(`^${item[0]}/.+?`),
       config: item[1]
@@ -50,10 +55,11 @@ export function prodRemotePlugin(
 
   return {
     name: 'originjs:remote-production',
-    virtualFile: {
-      // language=JS
-      __federation__: `
-                ${createRemotesMap(remotes)}
+    virtualFile: options.remotes
+      ? {
+          // language=JS
+          __federation__: `
+                ${createRemotesMap(prodRemotes)}
                 const loadJS = async (url, fn) => {
                     const resolvedUrl = typeof url === 'function' ? await url() : url;
                     const script = document.createElement('script')
@@ -153,7 +159,8 @@ export function prodRemotePlugin(
                     __federation_method_wrapDefault
                 }
             `
-    },
+        }
+      : { __federation__: '' },
 
     async transform(this: TransformPluginContext, code: string, id: string) {
       if (builderInfo.isShared) {
@@ -162,7 +169,11 @@ export function prodRemotePlugin(
             const basename = `__federation_shared_${removeNonRegLetter(
               sharedInfo[0],
               NAME_CHAR_REG
-            )}.js`
+            )}-${createHash('md5')
+              .update(sharedInfo[1].packagePath)
+              .digest('hex')
+              .toString()
+              .slice(0, 8)}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
               id: sharedInfo[1].id ?? sharedInfo[1].packagePath,
@@ -323,7 +334,7 @@ export function prodRemotePlugin(
               node.source?.value?.indexOf('/') > -1
             ) {
               const moduleId = node.source.value
-              const remote = remotes.find((r) => r.regexp.test(moduleId))
+              const remote = prodRemotes.find((r) => r.regexp.test(moduleId))
               const needWrap = remote?.config.from === 'vite'
               if (remote) {
                 requiresRuntime = true
