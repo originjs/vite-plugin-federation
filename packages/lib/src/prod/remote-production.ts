@@ -18,24 +18,18 @@ import MagicString from 'magic-string'
 import type { AcornNode, TransformPluginContext } from 'rollup'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import type { PluginHooks } from '../../types/pluginHooks'
-import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
-import {
-  createRemotesMap,
-  getModuleMarker,
-  parseRemoteOptions,
-  removeNonRegLetter,
-  REMOTE_FROM_PARAMETER,
-  NAME_CHAR_REG
-} from '../utils'
 import {
   builderInfo,
   EXPOSES_KEY_MAP,
   parsedOptions,
   prodRemotes
 } from '../public'
-import { basename } from 'path'
-import type { PluginHooks } from '../../types/pluginHooks'
-import { createHash } from 'crypto'
+import {
+  createRemotesMap,
+  getModuleMarker,
+  parseRemoteOptions,
+  REMOTE_FROM_PARAMETER
+} from '../utils'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
