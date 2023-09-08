@@ -94,13 +94,9 @@ export function parseExposeOptions(
   )
 }
 
-export function createHashFromContent(content: string): string {
-  return createHash('md5').update(content).digest('hex').toString().slice(0, 8)
-}
-
 export function createContentHash(path: string): string {
   const content = readFileSync(path, { encoding: 'utf-8' })
-  return createHashFromContent(content)
+  return createHash('md5').update(content).digest('hex').toString().slice(0, 8)
 }
 
 export function parseRemoteOptions(

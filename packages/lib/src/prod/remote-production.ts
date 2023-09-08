@@ -13,23 +13,19 @@
 // SPDX-License-Identifier: MulanPSL-2.0
 // *****************************************************************************
 
-import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import type { AcornNode, TransformPluginContext } from 'rollup'
+import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
+import type { PluginHooks } from '../../types/pluginHooks'
+import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
 import {
   createRemotesMap,
   getModuleMarker,
   parseRemoteOptions,
   Remote,
-  removeNonRegLetter,
-  REMOTE_FROM_PARAMETER,
-  NAME_CHAR_REG,
-  createHashFromContent
+  REMOTE_FROM_PARAMETER
 } from '../utils'
-import { builderInfo, EXPOSES_KEY_MAP, parsedOptions } from '../public'
-import { basename } from 'path'
-import type { PluginHooks } from '../../types/pluginHooks'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
@@ -155,22 +151,12 @@ export function prodRemotePlugin(
       if (builderInfo.isShared) {
         for (const sharedInfo of parsedOptions.prodShared) {
           if (!sharedInfo[1].emitFile) {
-            const basename = `__federation_shared_${removeNonRegLetter(
-              sharedInfo[0],
-              NAME_CHAR_REG
-            )}-${createHashFromContent(code)}.js`
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
               id: sharedInfo[1].id ?? sharedInfo[1].packagePath,
-              fileName: `${
-                builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-              }${
-                sharedInfo[1].root ? sharedInfo[1].root[0] + '/' : ''
-              }${basename}`,
               preserveSignature: 'allow-extension',
-              name: sharedInfo[0]
+              name: `__federation_shared_${sharedInfo[0]}`
             })
-            sharedFileName2Prop.set(basename, sharedInfo as ConfigTypeSet)
           }
         }
 
@@ -179,11 +165,11 @@ export function prodRemotePlugin(
             .filter((shareInfo) => shareInfo[1].generate)
             .map(
               (sharedInfo) =>
-                `'${sharedInfo[0]}':{get:()=>()=>__federation_import('./${
-                  sharedInfo[1].root ? `${sharedInfo[1].root[0]}/` : ''
-                }${basename(
-                  this.getFileName(sharedInfo[1].emitFile)
-                )}'),import:${sharedInfo[1].import}${
+                `'${
+                  sharedInfo[0]
+                }':{get:()=>()=>__federation_import(import.meta.ROLLUP_FILE_URL_${
+                  sharedInfo[1].emitFile
+                }),import:${sharedInfo[1].import}${
                   sharedInfo[1].requiredVersion
                     ? `,requiredVersion:'${sharedInfo[1].requiredVersion}'`
                     : ''
@@ -217,8 +203,8 @@ export function prodRemotePlugin(
             const obj = arr[1]
             let str = ''
             if (typeof obj === 'object') {
-              const fileName = `./${basename(this.getFileName(obj.emitFile))}`
-              str += `get:()=>get('${fileName}', ${REMOTE_FROM_PARAMETER}), loaded:1`
+              const fileUrl = `import.meta.ROLLUP_FILE_URL_${obj.emitFile}`
+              str += `get:()=>get(${fileUrl}, ${REMOTE_FROM_PARAMETER}), loaded:1`
               res.push(`'${arr[0]}':{'${obj.version}':{${str}}}`)
             }
           })
