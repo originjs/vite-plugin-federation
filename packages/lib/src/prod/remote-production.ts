@@ -23,9 +23,19 @@ import {
   createRemotesMap,
   getModuleMarker,
   parseRemoteOptions,
-  Remote,
-  REMOTE_FROM_PARAMETER
+  removeNonRegLetter,
+  REMOTE_FROM_PARAMETER,
+  NAME_CHAR_REG
 } from '../utils'
+import {
+  builderInfo,
+  EXPOSES_KEY_MAP,
+  parsedOptions,
+  prodRemotes
+} from '../public'
+import { basename } from 'path'
+import type { PluginHooks } from '../../types/pluginHooks'
+import { createHash } from 'crypto'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
@@ -36,9 +46,9 @@ export function prodRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.prodRemote = parseRemoteOptions(options)
-  const remotes: Remote[] = []
+  // const remotes: Remote[] = []
   for (const item of parsedOptions.prodRemote) {
-    remotes.push({
+    prodRemotes.push({
       id: item[0],
       regexp: new RegExp(`^${item[0]}/.+?`),
       config: item[1]
@@ -47,10 +57,11 @@ export function prodRemotePlugin(
 
   return {
     name: 'originjs:remote-production',
-    virtualFile: {
-      // language=JS
-      __federation__: `
-                ${createRemotesMap(remotes)}
+    virtualFile: options.remotes
+      ? {
+          // language=JS
+          __federation__: `
+                ${createRemotesMap(prodRemotes)}
                 const loadJS = async (url, fn) => {
                     const resolvedUrl = typeof url === 'function' ? await url() : url;
                     const script = document.createElement('script')
@@ -138,14 +149,20 @@ export function prodRemotePlugin(
                     return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
                 }
 
+                function __federation_method_setRemote(remoteName, remoteConfig) {
+                  remotesMap[remoteName] = remoteConfig;
+                }
+
                 export {
                     __federation_method_ensure,
                     __federation_method_getRemote,
+                    __federation_method_setRemote,
                     __federation_method_unwrapDefault,
                     __federation_method_wrapDefault
                 }
             `
-    },
+        }
+      : { __federation__: '' },
 
     async transform(this: TransformPluginContext, code: string, id: string) {
       if (builderInfo.isShared) {
@@ -228,6 +245,7 @@ export function prodRemotePlugin(
         let requiresRuntime = false
         let hasImportShared = false
         let modify = false
+        let manualRequired: any = null // set static import if exists
 
         walk(ast, {
           enter(node: any) {
@@ -289,6 +307,13 @@ export function prodRemotePlugin(
               }
             }
 
+            if (
+              node.type === 'ImportDeclaration' &&
+              node.source?.value === 'virtual:__federation__'
+            ) {
+              manualRequired = node
+            }
+
             // handle remote import , eg replace import {a} from 'remote/b' to dynamic import
             if (
               (node.type === 'ImportExpression' ||
@@ -297,7 +322,7 @@ export function prodRemotePlugin(
               node.source?.value?.indexOf('/') > -1
             ) {
               const moduleId = node.source.value
-              const remote = remotes.find((r) => r.regexp.test(moduleId))
+              const remote = prodRemotes.find((r) => r.regexp.test(moduleId))
               const needWrap = remote?.config.from === 'vite'
               if (remote) {
                 requiresRuntime = true
@@ -421,9 +446,13 @@ export function prodRemotePlugin(
         })
 
         if (requiresRuntime) {
-          magicString.prepend(
-            `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
-          )
+          let requiresCode = `import {__federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+          // clear static required
+          if (manualRequired) {
+            requiresCode = `import {__federation_method_setRemote, __federation_method_ensure, __federation_method_getRemote , __federation_method_wrapDefault , __federation_method_unwrapDefault} from '__federation__';\n\n`
+            magicString.overwrite(manualRequired.start, manualRequired.end, ``)
+          }
+          magicString.prepend(requiresCode)
         }
 
         if (hasImportShared) {

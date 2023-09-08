@@ -63,8 +63,8 @@ importers:
         specifier: ^4.9.4
         version: 4.9.4
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vitest:
         specifier: ^0.26.2
         version: 0.26.3
@@ -117,8 +117,8 @@ importers:
         specifier: ^1.3.6
         version: 1.3.6
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/react-in-vue/layout:
     dependencies:
@@ -134,10 +134,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/react-vite:
     devDependencies:
@@ -165,10 +165,10 @@ importers:
         version: 18.0.6
       '@vitejs/plugin-react':
         specifier: ^3.0.0
-        version: 3.0.0(vite@4.3.2)
+        version: 3.0.0(vite@4.0.5)
       vite:
-        specifier: ^4.3.2
-        version: 4.3.2(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/react-vite/remote:
     dependencies:
@@ -187,10 +187,10 @@ importers:
         version: 18.0.6
       '@vitejs/plugin-react':
         specifier: ^3.0.0
-        version: 3.0.0(vite@4.3.2)
+        version: 3.0.0(vite@4.0.5)
       vite:
-        specifier: ^4.3.2
-        version: 4.3.2(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/simple-react-esm:
     devDependencies:
@@ -430,7 +430,7 @@ importers:
         version: 7.18.6(@babel/core@7.20.7)
       babel-loader:
         specifier: ^9.1.0
-        version: 9.1.0(@babel/core@7.20.7)(webpack@5.75.0)
+        version: 9.1.0(@babel/core@7.20.7)(webpack@5.76.0)
       npm-run-all:
         specifier: 4.1.5
         version: 4.1.5
@@ -438,14 +438,14 @@ importers:
         specifier: ^14.0.0
         version: 14.0.1
       webpack:
-        specifier: ^5.75.0
-        version: 5.75.0(webpack-cli@5.0.1)
+        specifier: ^5.76.0
+        version: 5.76.0(webpack-cli@5.0.1)
       webpack-cli:
         specifier: ^5.0.1
-        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
       webpack-dev-server:
         specifier: ^4.11.1
-        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
+        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.76.0)
 
   packages/examples/vue2-demo:
     devDependencies:
@@ -464,10 +464,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue2':
         specifier: ^2.2.0
-        version: 2.2.0(vite@4.0.3)(vue@2.7.14)
+        version: 2.2.0(vite@4.0.5)(vue@2.7.14)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue2-demo/remote-simple:
     dependencies:
@@ -477,10 +477,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue2':
         specifier: ^2.2.0
-        version: 2.2.0(vite@4.0.3)(vue@2.7.14)
+        version: 2.2.0(vite@4.0.5)(vue@2.7.14)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-advanced-demo:
     devDependencies:
@@ -511,16 +511,16 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       typescript:
         specifier: ^4.9.4
         version: 4.9.4
       unplugin-element-plus:
         specifier: 0.4.1
-        version: 0.4.1(vite@4.0.3)
+        version: 0.4.1(vite@4.0.5)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vue-tsc:
         specifier: ^0.39.5
         version: 0.39.5(typescript@4.9.4)
@@ -536,13 +536,13 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       typescript:
         specifier: ^4.9.4
         version: 4.9.4
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vue-tsc:
         specifier: ^0.39.5
         version: 0.39.5(typescript@4.9.4)
@@ -564,16 +564,16 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       typescript:
         specifier: ^4.9.4
         version: 4.9.4
       unplugin-element-plus:
         specifier: 0.4.1
-        version: 0.4.1(vite@4.0.3)
+        version: 0.4.1(vite@4.0.5)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
       vue-tsc:
         specifier: ^0.39.5
         version: 0.39.5(typescript@4.9.4)
@@ -607,10 +607,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-expose-store/remote:
     dependencies:
@@ -619,17 +619,17 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-shared-store:
     devDependencies:
@@ -651,10 +651,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-shared-store/remote-A:
     dependencies:
@@ -663,17 +663,17 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm-shared-store/remote-B:
     dependencies:
@@ -682,46 +682,46 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/common-lib:
     dependencies:
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/css-modules:
     dependencies:
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       autoprefixer:
         specifier: ^10.3.2
         version: 10.4.7(postcss@8.4.14)
@@ -729,8 +729,27 @@ importers:
         specifier: ^8.3.0
         version: 8.4.14
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
+
+  packages/examples/vue3-demo-esm/dynamic-remote:
+    dependencies:
+      pinia:
+        specifier: ^2.0.21
+        version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
+      vite-plugin-top-level-await:
+        specifier: ^1.1.1
+        version: 1.1.1(vite@4.0.5)
+      vue:
+        specifier: ^3.2.45
+        version: 3.2.45
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^4.0.0
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
+      vite:
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/home:
     dependencies:
@@ -739,17 +758,17 @@ importers:
         version: 2.0.21(typescript@4.9.4)(vue@3.2.45)
       vite-plugin-top-level-await:
         specifier: ^1.1.1
-        version: 1.1.1(vite@4.0.3)
+        version: 1.1.1(vite@4.0.5)
       vue:
         specifier: ^3.2.45
         version: 3.2.45
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-esm/layout:
     dependencies:
@@ -762,10 +781,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs:
     devDependencies:
@@ -784,10 +803,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs/css-modules:
     dependencies:
@@ -797,7 +816,7 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       autoprefixer:
         specifier: ^10.3.2
         version: 10.4.7(postcss@8.4.14)
@@ -805,8 +824,8 @@ importers:
         specifier: ^8.3.0
         version: 8.4.14
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs/home:
     dependencies:
@@ -819,10 +838,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-systemjs/layout:
     dependencies:
@@ -835,10 +854,10 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-webpack-esm-esm:
     devDependencies:
@@ -856,7 +875,7 @@ importers:
         version: 7.20.7
       babel-loader:
         specifier: ^9.1.0
-        version: 9.1.0(@babel/core@7.20.7)(webpack@5.75.0)
+        version: 9.1.0(@babel/core@7.20.7)(webpack@5.76.0)
       serve:
         specifier: ^14.0.0
         version: 14.0.1
@@ -866,28 +885,28 @@ importers:
     devDependencies:
       css-loader:
         specifier: ^6.7.1
-        version: 6.7.1(webpack@5.75.0)
+        version: 6.7.1(webpack@5.76.0)
       file-loader:
         specifier: ^6.2.0
-        version: 6.2.0(webpack@5.75.0)
+        version: 6.2.0(webpack@5.76.0)
       html-webpack-plugin:
         specifier: ^5.3.2
-        version: 5.3.2(webpack@5.75.0)
+        version: 5.3.2(webpack@5.76.0)
       mini-css-extract-plugin:
         specifier: ^2.6.1
-        version: 2.6.1(webpack@5.75.0)
+        version: 2.6.1(webpack@5.76.0)
       url-loader:
         specifier: ^4.1.1
-        version: 4.1.1(file-loader@6.2.0)(webpack@5.75.0)
+        version: 4.1.1(file-loader@6.2.0)(webpack@5.76.0)
       vue-loader:
         specifier: ^17.0.0
-        version: 17.0.0(webpack@5.75.0)
+        version: 17.0.0(webpack@5.76.0)
       webpack:
-        specifier: ^5.75.0
-        version: 5.75.0(webpack-cli@5.0.1)
+        specifier: ^5.76.0
+        version: 5.76.0(webpack-cli@5.0.1)
       webpack-cli:
         specifier: ^5.0.1
-        version: 5.0.1(webpack@5.75.0)
+        version: 5.0.1(webpack@5.76.0)
 
   packages/examples/vue3-demo-webpack-esm-esm/layout:
     dependencies:
@@ -903,10 +922,10 @@ importers:
         version: link:../../../lib
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-webpack-esm-var:
     devDependencies:
@@ -924,7 +943,7 @@ importers:
         version: 7.20.7
       babel-loader:
         specifier: ^9.1.0
-        version: 9.1.0(@babel/core@7.20.7)(webpack@5.75.0)
+        version: 9.1.0(@babel/core@7.20.7)(webpack@5.76.0)
       serve:
         specifier: ^14.0.0
         version: 14.0.1
@@ -934,31 +953,31 @@ importers:
     devDependencies:
       css-loader:
         specifier: 6.3.0
-        version: 6.3.0(webpack@5.75.0)
+        version: 6.3.0(webpack@5.76.0)
       file-loader:
         specifier: 6.2.0
-        version: 6.2.0(webpack@5.75.0)
+        version: 6.2.0(webpack@5.76.0)
       html-webpack-plugin:
         specifier: 5.3.2
-        version: 5.3.2(webpack@5.75.0)
+        version: 5.3.2(webpack@5.76.0)
       mini-css-extract-plugin:
         specifier: 2.6.1
-        version: 2.6.1(webpack@5.75.0)
+        version: 2.6.1(webpack@5.76.0)
       url-loader:
         specifier: 4.1.1
-        version: 4.1.1(file-loader@6.2.0)(webpack@5.75.0)
+        version: 4.1.1(file-loader@6.2.0)(webpack@5.76.0)
       vue-loader:
         specifier: 17.0.0
-        version: 17.0.0(webpack@5.75.0)
+        version: 17.0.0(webpack@5.76.0)
       webpack:
-        specifier: ^5.75.0
-        version: 5.75.0(webpack-cli@5.0.1)
+        specifier: ^5.76.0
+        version: 5.76.0(webpack-cli@5.0.1)
       webpack-cli:
         specifier: ^5.0.1
-        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
       webpack-dev-server:
         specifier: ^4.11.1
-        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
+        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.76.0)
 
   packages/examples/vue3-demo-webpack-esm-var/layout:
     dependencies:
@@ -974,10 +993,10 @@ importers:
         version: link:../../../lib
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/vue3-demo-webpack-systemjs:
     devDependencies:
@@ -995,7 +1014,7 @@ importers:
         version: 7.20.7
       babel-loader:
         specifier: ^9.1.0
-        version: 9.1.0(@babel/core@7.20.7)(webpack@5.75.0)
+        version: 9.1.0(@babel/core@7.20.7)(webpack@5.76.0)
       serve:
         specifier: ^14.0.0
         version: 14.0.1
@@ -1005,31 +1024,31 @@ importers:
     devDependencies:
       css-loader:
         specifier: 6.3.0
-        version: 6.3.0(webpack@5.75.0)
+        version: 6.3.0(webpack@5.76.0)
       file-loader:
         specifier: 6.2.0
-        version: 6.2.0(webpack@5.75.0)
+        version: 6.2.0(webpack@5.76.0)
       html-webpack-plugin:
         specifier: 5.3.2
-        version: 5.3.2(webpack@5.75.0)
+        version: 5.3.2(webpack@5.76.0)
       mini-css-extract-plugin:
         specifier: 2.6.1
-        version: 2.6.1(webpack@5.75.0)
+        version: 2.6.1(webpack@5.76.0)
       url-loader:
         specifier: 4.1.1
-        version: 4.1.1(file-loader@6.2.0)(webpack@5.75.0)
+        version: 4.1.1(file-loader@6.2.0)(webpack@5.76.0)
       vue-loader:
         specifier: 17.0.0
-        version: 17.0.0(webpack@5.75.0)
+        version: 17.0.0(webpack@5.76.0)
       webpack:
-        specifier: ^5.75.0
-        version: 5.75.0(webpack-cli@5.0.1)
+        specifier: ^5.76.0
+        version: 5.76.0(webpack-cli@5.0.1)
       webpack-cli:
         specifier: ^5.0.1
-        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
       webpack-dev-server:
         specifier: ^4.11.1
-        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
+        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.76.0)
 
   packages/examples/vue3-demo-webpack-systemjs/layout:
     dependencies:
@@ -1045,10 +1064,10 @@ importers:
         version: link:../../../lib
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.0.3)(vue@3.2.45)
+        version: 4.0.0(vite@4.0.5)(vue@3.2.45)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/examples/webpack-host:
     devDependencies:
@@ -1076,13 +1095,13 @@ importers:
         version: 7.18.6(@babel/core@7.20.7)
       babel-loader:
         specifier: ^9.1.0
-        version: 9.1.0(@babel/core@7.20.7)(webpack@5.75.0)
+        version: 9.1.0(@babel/core@7.20.7)(webpack@5.76.0)
       css-loader:
         specifier: ^6.7.3
-        version: 6.7.3(webpack@5.75.0)
+        version: 6.7.3(webpack@5.76.0)
       html-webpack-plugin:
         specifier: ^5.5.0
-        version: 5.5.0(webpack@5.75.0)
+        version: 5.5.0(webpack@5.76.0)
       npm-run-all:
         specifier: 4.1.5
         version: 4.1.5
@@ -1090,14 +1109,14 @@ importers:
         specifier: ^14.0.0
         version: 14.0.1
       webpack:
-        specifier: ^5.75.0
-        version: 5.75.0(webpack-cli@5.0.1)
+        specifier: ^5.76.0
+        version: 5.76.0(webpack-cli@5.0.1)
       webpack-cli:
         specifier: ^5.0.1
-        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+        version: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
       webpack-dev-server:
         specifier: ^4.11.1
-        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
+        version: 4.11.1(webpack-cli@5.0.1)(webpack@5.76.0)
 
   packages/examples/webpack-host/remote:
     dependencies:
@@ -1116,10 +1135,10 @@ importers:
         version: 18.0.6
       '@vitejs/plugin-react':
         specifier: ^3.0.0
-        version: 3.0.0(vite@4.0.3)
+        version: 3.0.0(vite@4.0.5)
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
   packages/lib:
     dependencies:
@@ -1143,8 +1162,8 @@ importers:
         specifier: ^4.9.4
         version: 4.9.4
       vite:
-        specifier: ^4.0.3
-        version: 4.0.3(@types/node@18.6.4)
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.6.4)
 
 packages:
 
@@ -3559,7 +3578,7 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-react@3.0.0(vite@4.0.3):
+  /@vitejs/plugin-react@3.0.0(vite@4.0.5):
     resolution: {integrity: sha512-1mvyPc0xYW5G8CHQvJIJXLoMjl5Ct3q2g5Y2s6Ccfgwm45y48LBvsla7az+GkkAtYikWQ4Lxqcsq5RHLcZgtNQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -3570,46 +3589,30 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.19.6(@babel/core@7.20.7)
       magic-string: 0.27.0
       react-refresh: 0.14.0
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-react@3.0.0(vite@4.3.2):
-    resolution: {integrity: sha512-1mvyPc0xYW5G8CHQvJIJXLoMjl5Ct3q2g5Y2s6Ccfgwm45y48LBvsla7az+GkkAtYikWQ4Lxqcsq5RHLcZgtNQ==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      vite: ^4.0.0
-    dependencies:
-      '@babel/core': 7.20.7
-      '@babel/plugin-transform-react-jsx-self': 7.18.6(@babel/core@7.20.7)
-      '@babel/plugin-transform-react-jsx-source': 7.19.6(@babel/core@7.20.7)
-      magic-string: 0.27.0
-      react-refresh: 0.14.0
-      vite: 4.3.2(@types/node@18.6.4)
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /@vitejs/plugin-vue2@2.2.0(vite@4.0.3)(vue@2.7.14):
+  /@vitejs/plugin-vue2@2.2.0(vite@4.0.5)(vue@2.7.14):
     resolution: {integrity: sha512-1km7zEuZ/9QRPvzXSjikbTYGQPG86Mq1baktpC4sXqsXlb02HQKfi+fl8qVS703JM7cgm24Ga9j+RwKmvFn90A==}
     engines: {node: ^14.18.0 || >= 16.0.0}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0
       vue: ^2.7.0-0
     dependencies:
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
       vue: 2.7.14
     dev: true
 
-  /@vitejs/plugin-vue@4.0.0(vite@4.0.3)(vue@3.2.45):
+  /@vitejs/plugin-vue@4.0.0(vite@4.0.5)(vue@3.2.45):
     resolution: {integrity: sha512-e0X4jErIxAB5oLtDqbHvHpJe/uWNkdpYV83AOG2xo2tEVSzCzewgJMtREZM30wXnM5ls90hxiOtAuVU6H5JgbA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
       vue: 3.2.45
     dev: true
 
@@ -3895,27 +3898,27 @@ packages:
       '@webassemblyjs/ast': 1.11.1
       '@xtuc/long': 4.2.2
 
-  /@webpack-cli/configtest@2.0.1(webpack-cli@5.0.1)(webpack@5.75.0):
+  /@webpack-cli/configtest@2.0.1(webpack-cli@5.0.1)(webpack@5.76.0):
     resolution: {integrity: sha512-njsdJXJSiS2iNbQVS0eT8A/KPnmyH4pv1APj2K0d1wrZcBLw+yppxOy4CGqa0OxDJkzfL/XELDhD8rocnIwB5A==}
     engines: {node: '>=14.15.0'}
     peerDependencies:
       webpack: 5.x.x
       webpack-cli: 5.x.x
     dependencies:
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+      webpack: 5.76.0(webpack-cli@5.0.1)
+      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
 
-  /@webpack-cli/info@2.0.1(webpack-cli@5.0.1)(webpack@5.75.0):
+  /@webpack-cli/info@2.0.1(webpack-cli@5.0.1)(webpack@5.76.0):
     resolution: {integrity: sha512-fE1UEWTwsAxRhrJNikE7v4EotYflkEhBL7EbajfkPlf6E37/2QshOy/D48Mw8G5XMFlQtS6YV42vtbG9zBpIQA==}
     engines: {node: '>=14.15.0'}
     peerDependencies:
       webpack: 5.x.x
       webpack-cli: 5.x.x
     dependencies:
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+      webpack: 5.76.0(webpack-cli@5.0.1)
+      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
 
-  /@webpack-cli/serve@2.0.1(webpack-cli@5.0.1)(webpack-dev-server@4.11.1)(webpack@5.75.0):
+  /@webpack-cli/serve@2.0.1(webpack-cli@5.0.1)(webpack-dev-server@4.11.1)(webpack@5.76.0):
     resolution: {integrity: sha512-0G7tNyS+yW8TdgHwZKlDWYXFA6OJQnoLCQvYKkQP0Q2X205PSQ6RNUj0M+1OB/9gRQaUZ/ccYfaxd0nhaWKfjw==}
     engines: {node: '>=14.15.0'}
     peerDependencies:
@@ -3926,11 +3929,11 @@ packages:
       webpack-dev-server:
         optional: true
     dependencies:
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
-      webpack-dev-server: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
+      webpack: 5.76.0(webpack-cli@5.0.1)
+      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
+      webpack-dev-server: 4.11.1(webpack-cli@5.0.1)(webpack@5.76.0)
 
-  /@webpack-cli/serve@2.0.1(webpack-cli@5.0.1)(webpack@5.75.0):
+  /@webpack-cli/serve@2.0.1(webpack-cli@5.0.1)(webpack@5.76.0):
     resolution: {integrity: sha512-0G7tNyS+yW8TdgHwZKlDWYXFA6OJQnoLCQvYKkQP0Q2X205PSQ6RNUj0M+1OB/9gRQaUZ/ccYfaxd0nhaWKfjw==}
     engines: {node: '>=14.15.0'}
     peerDependencies:
@@ -3941,8 +3944,8 @@ packages:
       webpack-dev-server:
         optional: true
     dependencies:
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-cli: 5.0.1(webpack@5.75.0)
+      webpack: 5.76.0(webpack-cli@5.0.1)
+      webpack-cli: 5.0.1(webpack@5.76.0)
     dev: true
 
   /@xtuc/ieee754@1.2.0:
@@ -3976,23 +3979,17 @@ packages:
     dependencies:
       acorn: 8.8.1
 
-  /acorn-jsx@5.3.2(acorn@8.8.0):
+  /acorn-jsx@5.3.2(acorn@8.8.1):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
     dependencies:
-      acorn: 8.8.0
+      acorn: 8.8.1
     dev: true
 
   /acorn-walk@8.2.0:
     resolution: {integrity: sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==}
     engines: {node: '>=0.4.0'}
-    dev: true
-
-  /acorn@8.8.0:
-    resolution: {integrity: sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
     dev: true
 
   /acorn@8.8.1:
@@ -4171,7 +4168,7 @@ packages:
       postcss-value-parser: 4.2.0
     dev: true
 
-  /babel-loader@9.1.0(@babel/core@7.20.7)(webpack@5.75.0):
+  /babel-loader@9.1.0(@babel/core@7.20.7)(webpack@5.76.0):
     resolution: {integrity: sha512-Antt61KJPinUMwHwIIz9T5zfMgevnfZkEVWYDWlG888fgdvRRGD0JTuf/fFozQnfT+uq64sk1bmdHDy/mOEWnA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -4181,7 +4178,7 @@ packages:
       '@babel/core': 7.20.7
       find-cache-dir: 3.3.2
       schema-utils: 4.0.0
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
 
   /babel-plugin-dynamic-import-node@2.3.3:
     resolution: {integrity: sha512-jZVI+s9Zg3IqA/kdi0i6UDCybUI3aSBLnglhYbSSjKlV7yF1F/5LWv8MakQmvYpnbJDS6fcBL2KzHSxNCMtWSQ==}
@@ -4311,10 +4308,10 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001363
-      electron-to-chromium: 1.4.177
-      node-releases: 2.0.5
-      update-browserslist-db: 1.0.4(browserslist@4.21.1)
+      caniuse-lite: 1.0.30001422
+      electron-to-chromium: 1.4.284
+      node-releases: 2.0.6
+      update-browserslist-db: 1.0.10(browserslist@4.21.1)
     dev: true
 
   /browserslist@4.21.4:
@@ -4827,7 +4824,7 @@ packages:
     dependencies:
       nice-try: 1.0.5
       path-key: 2.0.1
-      semver: 5.7.1
+      semver: 5.7.2
       shebang-command: 1.2.0
       which: 1.3.1
     dev: true
@@ -4840,7 +4837,7 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  /css-loader@6.3.0(webpack@5.75.0):
+  /css-loader@6.3.0(webpack@5.76.0):
     resolution: {integrity: sha512-9NGvHOR+L6ps13Ilw/b216++Q8q+5RpJcVufCdW9S/9iCzs4KBDNa8qnA/n3FK/sSfWmH35PAIK/cfPi7LOSUg==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
@@ -4854,10 +4851,10 @@ packages:
       postcss-modules-values: 4.0.0(postcss@8.4.20)
       postcss-value-parser: 4.2.0
       semver: 7.3.8
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
-  /css-loader@6.7.1(webpack@5.75.0):
+  /css-loader@6.7.1(webpack@5.76.0):
     resolution: {integrity: sha512-yB5CNFa14MbPJcomwNh3wLThtkZgcNyI2bNMRt8iE5Z8Vwl7f8vQXFAzn2HDOJvtDq2NTZBUGMSUNNyrv3/+cw==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
@@ -4871,10 +4868,10 @@ packages:
       postcss-modules-values: 4.0.0(postcss@8.4.16)
       postcss-value-parser: 4.2.0
       semver: 7.3.8
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
-  /css-loader@6.7.3(webpack@5.75.0):
+  /css-loader@6.7.3(webpack@5.76.0):
     resolution: {integrity: sha512-qhOH1KlBMnZP8FzRO6YCH9UHXQhVMcEGLyNdb7Hv2cpcmJbW0YrddO+tG1ab5nT41KpHIYGsbeHqxB9xPu1pKQ==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
@@ -4888,7 +4885,7 @@ packages:
       postcss-modules-values: 4.0.0(postcss@8.4.20)
       postcss-value-parser: 4.2.0
       semver: 7.3.8
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
   /css-select@4.3.0:
@@ -5104,10 +5101,6 @@ packages:
 
   /ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
-
-  /electron-to-chromium@1.4.177:
-    resolution: {integrity: sha512-FYPir3NSBEGexSZUEeht81oVhHfLFl6mhUKSkjHN/iB/TwEIt/WHQrqVGfTLN5gQxwJCQkIJBe05eOXjI7omgg==}
-    dev: true
 
   /electron-to-chromium@1.4.284:
     resolution: {integrity: sha512-M8WEXFuKXMYMVr45fo8mq0wUrrJHheiKZf6BArTKk9ZBYCKJEOU5H8cdWgDT+qCVZf7Na4lVUaZsA+h6uA9+PA==}
@@ -5419,8 +5412,8 @@ packages:
     resolution: {integrity: sha512-ORs1Rt/uQTqUKjDdGCyrtYxbazf5umATSf/K4qxjmZHORR6HJk+2s/2Pqe+Kk49HHINC/xNIrGfgh8sZcll0ng==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
-      acorn: 8.8.0
-      acorn-jsx: 5.3.2(acorn@8.8.0)
+      acorn: 8.8.1
+      acorn-jsx: 5.3.2(acorn@8.8.1)
       eslint-visitor-keys: 3.3.0
     dev: true
 
@@ -5583,7 +5576,7 @@ packages:
       flat-cache: 3.0.4
     dev: true
 
-  /file-loader@6.2.0(webpack@5.75.0):
+  /file-loader@6.2.0(webpack@5.76.0):
     resolution: {integrity: sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -5591,7 +5584,7 @@ packages:
     dependencies:
       loader-utils: 2.0.2
       schema-utils: 3.1.1
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
   /fill-range@7.0.1:
@@ -5996,7 +5989,7 @@ packages:
       terser: 5.14.1
     dev: true
 
-  /html-webpack-plugin@5.3.2(webpack@5.75.0):
+  /html-webpack-plugin@5.3.2(webpack@5.76.0):
     resolution: {integrity: sha512-HvB33boVNCz2lTyBsSiMffsJ+m0YLIQ+pskblXgN9fnjS1BgEcuAfdInfXfGrkdXV406k9FiDi86eVCDBgJOyQ==}
     engines: {node: '>=10.13.0'}
     peerDependencies:
@@ -6007,10 +6000,10 @@ packages:
       lodash: 4.17.21
       pretty-error: 3.0.4
       tapable: 2.2.1
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
-  /html-webpack-plugin@5.5.0(webpack@5.75.0):
+  /html-webpack-plugin@5.5.0(webpack@5.76.0):
     resolution: {integrity: sha512-sy88PC2cRTVxvETRgUHFrL4No3UxvcH8G1NepGhqaTT+GXN2kTamqasot0inS5hXeg1cMbFDt27zzo9p35lZVw==}
     engines: {node: '>=10.13.0'}
     peerDependencies:
@@ -6021,7 +6014,7 @@ packages:
       lodash: 4.17.21
       pretty-error: 4.0.0
       tapable: 2.2.1
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
   /htmlparser2@6.1.0:
@@ -6818,14 +6811,14 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /mini-css-extract-plugin@2.6.1(webpack@5.75.0):
+  /mini-css-extract-plugin@2.6.1(webpack@5.76.0):
     resolution: {integrity: sha512-wd+SD57/K6DiV7jIR34P+s3uckTRuQvx0tKPcvjFlrEylk6P4mQ2KSWk1hblj1Kxaqok7LogKOieygXqBczNlg==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
       webpack: ^5.0.0
     dependencies:
       schema-utils: 4.0.0
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
   /minimalistic-assert@1.0.1:
@@ -6938,10 +6931,6 @@ packages:
     resolution: {integrity: sha512-dPEtOeMvF9VMcYV/1Wb8CPoVAXtp6MKMlcbAt4ddqmGqUJ6fQZFXkNZNkNlfevtNkGtaSoXf/vNNNSvgrdXwtA==}
     engines: {node: '>= 6.13.0'}
 
-  /node-releases@2.0.5:
-    resolution: {integrity: sha512-U9h1NLROZTq9uE1SNffn6WuPDg8icmi3ns4rEl/oTfIle4iLjTliCzgTsbaIFMq/Xn078/lfY/BL0GWZ+psK4Q==}
-    dev: true
-
   /node-releases@2.0.6:
     resolution: {integrity: sha512-PiVXnNuFm5+iYkLBNeq5211hvO38y63T0i2KKh2KnUs3RpzJ+JtODFjkD8yjLwnDkTYF1eKXheUwdssR+NRZdg==}
 
@@ -6950,7 +6939,7 @@ packages:
     dependencies:
       hosted-git-info: 2.8.9
       resolve: 1.22.1
-      semver: 5.7.1
+      semver: 5.7.2
       validate-npm-package-license: 3.0.4
     dev: true
 
@@ -7466,6 +7455,7 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
 
   /postcss@8.4.24:
     resolution: {integrity: sha512-M0RzbcI0sO/XJNucsGjvWU9ERWxb/ytp1w6dKtxTKgixdtQDq4rmx/g8W1hnaheq9jgwL/oyEdH5Bc4WwJKMqg==}
@@ -7913,7 +7903,6 @@ packages:
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
 
   /rollup@3.9.1:
     resolution: {integrity: sha512-GswCYHXftN8ZKGVgQhTFUJB/NBXxrRGgO2NCy6E8s1rwEJ4Q9/VttNqcYfEvx4dTo4j58YqdC3OVztPzlKSX8w==}
@@ -7921,6 +7910,7 @@ packages:
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
+    dev: true
 
   /run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
@@ -7993,8 +7983,8 @@ packages:
     dependencies:
       node-forge: 1.3.1
 
-  /semver@5.7.1:
-    resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
+  /semver@5.7.2:
+    resolution: {integrity: sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==}
     hasBin: true
     dev: true
 
@@ -8419,7 +8409,7 @@ packages:
       uuid: 3.4.0
     dev: true
 
-  /terser-webpack-plugin@5.3.3(webpack@5.75.0):
+  /terser-webpack-plugin@5.3.3(webpack@5.76.0):
     resolution: {integrity: sha512-Fx60G5HNYknNTNQnzQ1VePRuu89ZVYWfjRAeT5rITuCY/1b08s49e5kSQwHDirKZWuoKOBRFS98EUUoZ9kLEwQ==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -8440,7 +8430,7 @@ packages:
       schema-utils: 3.1.1
       serialize-javascript: 6.0.0
       terser: 5.14.1
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
 
   /terser@4.8.0:
     resolution: {integrity: sha512-EAPipTNeWsb/3wLPeup1tVPaXfIaU68xMnVdPafIL1TV05OhASArYyIfFvnvJCNrR2NIOvDVNNTFRa+Re2MWyw==}
@@ -8665,14 +8655,14 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  /unplugin-element-plus@0.4.1(vite@4.0.3):
+  /unplugin-element-plus@0.4.1(vite@4.0.5):
     resolution: {integrity: sha512-x8L35sppkbtnAf+aSPXNsLPjCUrM0mWKgujqMIgrHiDQaGbpMlNnbN2kjP5CMclykNOw8fUCreEhtxPyzg8tmw==}
     engines: {node: '>=14.19.0'}
     dependencies:
       '@rollup/pluginutils': 4.2.1
       es-module-lexer: 0.10.5
       magic-string: 0.26.2
-      unplugin: 0.7.2(vite@4.0.3)
+      unplugin: 0.7.2(vite@4.0.5)
     transitivePeerDependencies:
       - esbuild
       - rollup
@@ -8680,7 +8670,7 @@ packages:
       - webpack
     dev: true
 
-  /unplugin@0.7.2(vite@4.0.3):
+  /unplugin@0.7.2(vite@4.0.5):
     resolution: {integrity: sha512-m7thX4jP8l5sETpLdUASoDOGOcHaOVtgNyrYlToyQUvILUtEzEnngRBrHnAX3IKqooJVmXpoa/CwQ/QqzvGaHQ==}
     peerDependencies:
       esbuild: '>=0.13'
@@ -8699,9 +8689,20 @@ packages:
     dependencies:
       acorn: 8.8.1
       chokidar: 3.5.3
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.4.4
+    dev: true
+
+  /update-browserslist-db@1.0.10(browserslist@4.21.1):
+    resolution: {integrity: sha512-OztqDenkfFkbSG+tRxBeAnCVPckDBcvibKd35yDONx6OU8N7sqgwc7rCbkJ/WcYtVRZ4ba68d6byhC21GFh7sQ==}
+    hasBin: true
+    peerDependencies:
+      browserslist: '>= 4.21.0'
+    dependencies:
+      browserslist: 4.21.1
+      escalade: 3.1.1
+      picocolors: 1.0.0
     dev: true
 
   /update-browserslist-db@1.0.10(browserslist@4.21.4):
@@ -8713,17 +8714,6 @@ packages:
       browserslist: 4.21.4
       escalade: 3.1.1
       picocolors: 1.0.0
-
-  /update-browserslist-db@1.0.4(browserslist@4.21.1):
-    resolution: {integrity: sha512-jnmO2BEGUjsMOe/Fg9u0oczOe/ppIDZPebzccl1yDWGLFP16Pa1/RM5wEoKYPG2zstNcDuAStejyxsOuKINdGA==}
-    hasBin: true
-    peerDependencies:
-      browserslist: '>= 4.21.0'
-    dependencies:
-      browserslist: 4.21.1
-      escalade: 3.1.1
-      picocolors: 1.0.0
-    dev: true
 
   /update-check@1.5.4:
     resolution: {integrity: sha512-5YHsflzHP4t1G+8WGPlvKbJEbAJGCgw+Em+dGR1KmBUbr1J36SJBqlHLjR7oob7sco5hWHGQVcr9B2poIVDDTQ==}
@@ -8740,7 +8730,7 @@ packages:
     resolution: {integrity: sha512-c2H1fIgpUdwFRIru9HFno5DT73Ok8hg5oOb5AT3ayIgvCRfxgs2jyt5Slw8kEB7j3QUr6yJmMPDT/odjk7jXow==}
     dev: true
 
-  /url-loader@4.1.1(file-loader@6.2.0)(webpack@5.75.0):
+  /url-loader@4.1.1(file-loader@6.2.0)(webpack@5.76.0):
     resolution: {integrity: sha512-3BTV812+AVHHOJQO8O5MkWgZ5aosP7GnROJwvzLS9hWDj00lZ6Z0wNak423Lp9PBZN05N+Jk/N5Si8jRAlGyWA==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -8750,11 +8740,11 @@ packages:
       file-loader:
         optional: true
     dependencies:
-      file-loader: 6.2.0(webpack@5.75.0)
+      file-loader: 6.2.0(webpack@5.76.0)
       loader-utils: 2.0.2
       mime-types: 2.1.35
       schema-utils: 3.1.1
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
   /util-deprecate@1.0.2:
@@ -8831,17 +8821,17 @@ packages:
       vite: 4.3.2(@types/node@18.6.4)
     dev: true
 
-  /vite-plugin-top-level-await@1.1.1(vite@4.0.3):
+  /vite-plugin-top-level-await@1.1.1(vite@4.0.5):
     resolution: {integrity: sha512-il7YijMxjvQxx33I/mf5n+xUJscxcTqRSwPGck/jw92hUyGwjsJnIBYBcKRS+vhOtsJ5g+8xANoBEKx9G1NSEQ==}
     peerDependencies:
       vite: '>=2.8'
     dependencies:
       '@swc/core': 1.2.224
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.0.5(@types/node@18.6.4)
     dev: false
 
-  /vite@4.0.3(@types/node@18.6.4):
-    resolution: {integrity: sha512-HvuNv1RdE7deIfQb8mPk51UKjqptO/4RXZ5yXSAvurd5xOckwS/gg8h9Tky3uSbnjYTgUm0hVCet1cyhKd73ZA==}
+  /vite@4.0.5(@types/node@18.6.4):
+    resolution: {integrity: sha512-7m87RC+caiAxG+8j3jObveRLqaWA/neAdCat6JAZwMkSWqFHOvg8MYe5fAQxVBRAuKAQ1S6XDh3CBQuLNbY33w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -8867,9 +8857,9 @@ packages:
     dependencies:
       '@types/node': 18.6.4
       esbuild: 0.16.13
-      postcss: 8.4.20
+      postcss: 8.4.24
       resolve: 1.22.1
-      rollup: 3.9.1
+      rollup: 3.23.1
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -8941,7 +8931,7 @@ packages:
       tinybench: 2.3.1
       tinypool: 0.3.0
       tinyspy: 1.0.2
-      vite: 4.0.3(@types/node@18.6.4)
+      vite: 4.3.2(@types/node@18.6.4)
       vite-node: 0.26.3(@types/node@18.6.4)
     transitivePeerDependencies:
       - less
@@ -8967,7 +8957,7 @@ packages:
       vue: 3.2.45
     dev: false
 
-  /vue-loader@17.0.0(webpack@5.75.0):
+  /vue-loader@17.0.0(webpack@5.76.0):
     resolution: {integrity: sha512-OWSXjrzIvbF2LtOUmxT3HYgwwubbfFelN8PAP9R9dwpIkj48TVioHhWWSx7W7fk+iF5cgg3CBJRxwTdtLU4Ecg==}
     peerDependencies:
       webpack: ^4.1.0 || ^5.0.0-0
@@ -8975,7 +8965,7 @@ packages:
       chalk: 4.1.2
       hash-sum: 2.0.0
       loader-utils: 2.0.2
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
     dev: true
 
   /vue-router@4.1.5(vue@3.2.45):
@@ -9025,7 +9015,7 @@ packages:
     dependencies:
       minimalistic-assert: 1.0.1
 
-  /webpack-cli@5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0):
+  /webpack-cli@5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0):
     resolution: {integrity: sha512-S3KVAyfwUqr0Mo/ur3NzIp6jnerNpo7GUO6so51mxLi1spqsA17YcMXy0WOIJtBSnj748lthxC6XLbNKh/ZC+A==}
     engines: {node: '>=14.15.0'}
     hasBin: true
@@ -9043,9 +9033,9 @@ packages:
         optional: true
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
-      '@webpack-cli/info': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
-      '@webpack-cli/serve': 2.0.1(webpack-cli@5.0.1)(webpack-dev-server@4.11.1)(webpack@5.75.0)
+      '@webpack-cli/configtest': 2.0.1(webpack-cli@5.0.1)(webpack@5.76.0)
+      '@webpack-cli/info': 2.0.1(webpack-cli@5.0.1)(webpack@5.76.0)
+      '@webpack-cli/serve': 2.0.1(webpack-cli@5.0.1)(webpack-dev-server@4.11.1)(webpack@5.76.0)
       colorette: 2.0.19
       commander: 9.4.1
       cross-spawn: 7.0.3
@@ -9054,11 +9044,11 @@ packages:
       import-local: 3.1.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-dev-server: 4.11.1(webpack-cli@5.0.1)(webpack@5.75.0)
+      webpack: 5.76.0(webpack-cli@5.0.1)
+      webpack-dev-server: 4.11.1(webpack-cli@5.0.1)(webpack@5.76.0)
       webpack-merge: 5.8.0
 
-  /webpack-cli@5.0.1(webpack@5.75.0):
+  /webpack-cli@5.0.1(webpack@5.76.0):
     resolution: {integrity: sha512-S3KVAyfwUqr0Mo/ur3NzIp6jnerNpo7GUO6so51mxLi1spqsA17YcMXy0WOIJtBSnj748lthxC6XLbNKh/ZC+A==}
     engines: {node: '>=14.15.0'}
     hasBin: true
@@ -9076,9 +9066,9 @@ packages:
         optional: true
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
-      '@webpack-cli/info': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
-      '@webpack-cli/serve': 2.0.1(webpack-cli@5.0.1)(webpack@5.75.0)
+      '@webpack-cli/configtest': 2.0.1(webpack-cli@5.0.1)(webpack@5.76.0)
+      '@webpack-cli/info': 2.0.1(webpack-cli@5.0.1)(webpack@5.76.0)
+      '@webpack-cli/serve': 2.0.1(webpack-cli@5.0.1)(webpack@5.76.0)
       colorette: 2.0.19
       commander: 9.4.1
       cross-spawn: 7.0.3
@@ -9087,11 +9077,11 @@ packages:
       import-local: 3.1.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
       webpack-merge: 5.8.0
     dev: true
 
-  /webpack-dev-middleware@5.3.3(webpack@5.75.0):
+  /webpack-dev-middleware@5.3.3(webpack@5.76.0):
     resolution: {integrity: sha512-hj5CYrY0bZLB+eTO+x/j67Pkrquiy7kWepMHmUMoPsmcUaeEnQJqFzHJOyxgWlq746/wUuA64p9ta34Kyb01pA==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
@@ -9102,9 +9092,9 @@ packages:
       mime-types: 2.1.35
       range-parser: 1.2.1
       schema-utils: 4.0.0
-      webpack: 5.75.0(webpack-cli@5.0.1)
+      webpack: 5.76.0(webpack-cli@5.0.1)
 
-  /webpack-dev-server@4.11.1(webpack-cli@5.0.1)(webpack@5.75.0):
+  /webpack-dev-server@4.11.1(webpack-cli@5.0.1)(webpack@5.76.0):
     resolution: {integrity: sha512-lILVz9tAUy1zGFwieuaQtYiadImb5M3d+H+L1zDYalYoDl0cksAB1UNyuE5MMWJrG6zR1tXkCP2fitl7yoUJiw==}
     engines: {node: '>= 12.13.0'}
     hasBin: true
@@ -9142,9 +9132,9 @@ packages:
       serve-index: 1.9.1
       sockjs: 0.3.24
       spdy: 4.0.2
-      webpack: 5.75.0(webpack-cli@5.0.1)
-      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
-      webpack-dev-middleware: 5.3.3(webpack@5.75.0)
+      webpack: 5.76.0(webpack-cli@5.0.1)
+      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
+      webpack-dev-middleware: 5.3.3(webpack@5.76.0)
       ws: 8.8.0
     transitivePeerDependencies:
       - bufferutil
@@ -9167,8 +9157,8 @@ packages:
     resolution: {integrity: sha512-h9atBP/bsZohWpHnr+2sic8Iecb60GxftXsWNLLLSqewgIsGzByd2gcIID4nXcG+3tNe4GQG3dLcff3kXupdRA==}
     dev: true
 
-  /webpack@5.75.0(webpack-cli@5.0.1):
-    resolution: {integrity: sha512-piaIaoVJlqMsPtX/+3KTTO6jfvrSYgauFVdt8cr9LTHKmcq/AMd4mhzsiP7ZF/PGRNPGA8336jldh9l2Kt2ogQ==}
+  /webpack@5.76.0(webpack-cli@5.0.1):
+    resolution: {integrity: sha512-l5sOdYBDunyf72HW8dF23rFtWq/7Zgvt/9ftMof71E/yUb1YLOBmTgA2K4vQthB3kotMrSj609txVE0dnr2fjA==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     peerDependencies:
@@ -9198,9 +9188,9 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.1.1
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.3(webpack@5.75.0)
+      terser-webpack-plugin: 5.3.3(webpack@5.76.0)
       watchpack: 2.4.0
-      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.75.0)
+      webpack-cli: 5.0.1(webpack-dev-server@4.11.1)(webpack@5.76.0)
       webpack-sources: 3.2.3
     transitivePeerDependencies:
       - '@swc/core'

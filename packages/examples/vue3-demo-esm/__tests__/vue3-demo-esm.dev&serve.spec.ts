@@ -13,6 +13,12 @@ test('remote button', async () => {
   ).toBe('Hello Layout Button')
 })
 
+test('dynamic remote button', async () => {
+  expect(
+    await page.textContent('#btn-dynamic')
+  ).toBe('Hello Dynamic Remote Button')
+})
+
 test('check pinia data', async () => {
   expect(
     await page.textContent('#cart-item')

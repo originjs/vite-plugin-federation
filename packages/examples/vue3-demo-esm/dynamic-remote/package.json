@@ -1,15 +1,17 @@
 {
-  "name": "@vue3-demo-systemjs/common-lib-systemjs",
+  "name": "@vue3-demo-esm/home",
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite --port 5002 --strictPort",
-    "serve": "vite preview --port 5002 --strictPort",
+    "dev": "vite --port 5004 --strictPort",
+    "serve": "vite preview --port 5004 --strictPort",
     "build": "vite build",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "vue": "^3.2.45"
+    "vite-plugin-top-level-await": "^1.1.1",
+    "vue": "^3.2.45",
+    "pinia": "^2.0.21"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
