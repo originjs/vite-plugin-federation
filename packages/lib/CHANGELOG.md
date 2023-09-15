@@ -1,3 +1,19 @@
+## [1.3.1](https://github.com/originjs/vite-plugin-federation/compare/v1.2.3...v1.3.1) (2023-09-11)
+
+
+### Bug Fixes
+
+* improve getSharedFromXXX detect need unwrap module V2 ([#447](https://github.com/originjs/vite-plugin-federation/issues/447)) ([72d9b5a](https://github.com/originjs/vite-plugin-federation/commit/72d9b5ad9bc71f3906ec18f11f45944b14bdfafc))
+* stop reading server configuration when no shared ([#470](https://github.com/originjs/vite-plugin-federation/issues/470)) ([38af31f](https://github.com/originjs/vite-plugin-federation/commit/38af31f6095363f62f4d780bdefd698d8ac60f59))
+
+
+### Features
+
+* dynamic loading of remote support & test demo ([#481](https://github.com/originjs/vite-plugin-federation/issues/481)) ([72a1223](https://github.com/originjs/vite-plugin-federation/commit/72a1223c55ff786d3c21f0af6146c450cd42e708))
+* support multi-config for plugin ([#469](https://github.com/originjs/vite-plugin-federation/issues/469)) ([d1b9fd4](https://github.com/originjs/vite-plugin-federation/commit/d1b9fd4962d35c0cc1c5d451114b38f21bba4c40))
+
+
+
 ## [1.2.3](https://github.com/originjs/vite-plugin-federation/compare/v1.2.2...v1.2.3) (2023-05-16)
 
 
