@@ -42,6 +42,12 @@ export const parsedOptions = {
   devExpose: [] as (string | ConfigTypeSet)[],
   devRemote: [] as (string | ConfigTypeSet)[]
 }
-export const devRemotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
+export const devRemotes: {
+  id: string
+  regexp: RegExp
+  config: RemotesConfig
+}[] = []
 export const prodRemotes: Remote[] = []
-export const viteConfigResolved: { config: ResolvedConfig | undefined } = { config: undefined };
+export const viteConfigResolved: { config: ResolvedConfig | undefined } = {
+  config: undefined
+}
