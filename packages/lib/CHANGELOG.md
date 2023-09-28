@@ -1,3 +1,17 @@
+## [1.3.2](https://github.com/originjs/vite-plugin-federation/compare/v1.3.1...v1.3.2) (2023-09-28)
+
+
+### Bug Fixes
+
+* Flatten module with default exports when available ([#505](https://github.com/originjs/vite-plugin-federation/issues/505)) ([0bc4f8e](https://github.com/originjs/vite-plugin-federation/commit/0bc4f8ec9eb7105121da823d406cfd071f7f4b65))
+
+
+### Features
+
+* add content hash for shared libraries ([#487](https://github.com/originjs/vite-plugin-federation/issues/487)) ([055c759](https://github.com/originjs/vite-plugin-federation/commit/055c7591a83a1bec6aba82da2b19729c45d7f731))
+
+
+
 ## [1.3.1](https://github.com/originjs/vite-plugin-federation/compare/v1.2.3...v1.3.1) (2023-09-11)
 
 
