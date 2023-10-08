@@ -479,6 +479,13 @@ export default defineConfig({
 }
 ```
 
+
+### error TS2307: Cannot find module
+Add declarations in the d.ts file, like this
+```ts
+declare module "router-remote/*"{}
+```
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=originjs/vite-plugin-federation&type=Date)](https://star-history.com/#originjs/vite-plugin-federation&Date)
