@@ -99,7 +99,8 @@ export function prodExposePlugin(
         return import(name);
     };
     export const get =(module) => {
-        return moduleMap[module]();
+      if(!moduleMap[module]) throw new Error('Can not find remote module ' + module)
+      return moduleMap[module]();
     };
     export const init =(shareScope) => {
       globalThis.__federation_shared__= globalThis.__federation_shared__|| {};
