@@ -15,7 +15,7 @@
 
 import type { PluginHooks } from '../../types/pluginHooks'
 import { NAME_CHAR_REG, parseSharedOptions, removeNonRegLetter } from '../utils'
-import { builderInfo, parsedOptions } from '../public'
+import { parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { basename, join, resolve } from 'path'
 import { readdirSync, readFileSync, statSync } from 'fs'
@@ -59,9 +59,7 @@ export function prodSharedPlugin(
       // Cannot emit chunks after module loading has finished, so emitFile first.
       if (parsedOptions.prodShared.length && isRemote) {
         this.emitFile({
-          fileName: `${
-            builderInfo.assetsDir ? builderInfo.assetsDir + '/' : ''
-          }__federation_fn_import.js`,
+          name: '__federation_fn_import',
           type: 'chunk',
           id: '__federation_fn_import',
           preserveSignature: 'strict'
