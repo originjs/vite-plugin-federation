@@ -1,3 +1,18 @@
+## [1.3.3](https://github.com/originjs/vite-plugin-federation/compare/v1.3.2...v1.3.3) (2023-11-20)
+
+
+### Bug Fixes
+
+* flatten module return function when module default is function ([#538](https://github.com/originjs/vite-plugin-federation/issues/538)) ([d60c019](https://github.com/originjs/vite-plugin-federation/commit/d60c019b288eb00337e38661985850bf8b426d34))
+* throw error when remote module can not find ([#524](https://github.com/originjs/vite-plugin-federation/issues/524)) ([4ccfe4b](https://github.com/originjs/vite-plugin-federation/commit/4ccfe4b1db309ffaa11f2c0d845150b7e14d56c1)), closes [#522](https://github.com/originjs/vite-plugin-federation/issues/522)
+
+
+### Features
+
+* add content hash to federation_fn_import file name ([#520](https://github.com/originjs/vite-plugin-federation/issues/520)) ([7b88529](https://github.com/originjs/vite-plugin-federation/commit/7b88529a80caa396b4e2cab6b8f120093578ac47))
+
+
+
 ## [1.3.2](https://github.com/originjs/vite-plugin-federation/compare/v1.3.1...v1.3.2) (2023-09-28)
 
 
