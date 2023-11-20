@@ -46,6 +46,16 @@ async function getSharedFromLocal(name) {
   }
 }
 function flattenModule(module, name) {
+  // use a shared module which export default a function will getting error 'TypeError: xxx is not a function'
+  if (typeof module.default === 'function') {
+    Object.keys(module).forEach((key) => {
+      if (key !== 'default') {
+        module.default[key] = module[key]
+      }
+    })
+    moduleCache[name] = module.default
+    return module.default
+  }
   if (module.default) module = Object.assign({}, module.default, module)
   moduleCache[name] = module
   return module
