@@ -121,6 +121,13 @@ declare interface ExposesConfig {
    * Custom chunk name for the exposed module.
    */
   name?: string
+
+  /**
+   * If false, the link element with styles is put in <head> element. If true, the href argument of all links objects
+   * are put under global window object and can be retrieved by the component. It's for using with ShadowDOM, when
+   * the component must place the styles inside the ShadowDOM instead of the <head> element.
+   */
+  dontAppendStylesToHead?: boolean
 }
 
 /**
