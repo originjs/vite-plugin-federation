@@ -236,9 +236,34 @@ As the entry file of the remote module, not required, default is `remoteEntry.js
 ```js
 exposes: {
 // 'externally exposed component name': 'externally exposed component address'
-    './remote-simple-button': './src/components/Button.vue',
-        './remote-simple-section': './src/components/Section.vue'
+    './remote-simple-button': './src/components/Button.vue', 
+    './remote-simple-section': './src/components/Section.vue'
 },
+```
+
+* If you need a more complex configuration
+```js
+exposes: {
+    './remote-simple-button': {
+        import: './src/components/Button.vue',
+        name: 'customChunkName',
+        dontAppendStylesToHead: true
+    },
+},
+```
+The `import` property is the address of the module. If you need to specify a custom chunk name for the module use the `name` property.
+
+The `dontAppendStylesToHead` property is used if you don't want the plugin to automatically append all styles of the exposed component to the `<head>` element, which is the default behavior. It's useful if your component uses a ShadowDOM and the global styles wouldn't affect it anyway. The plugin will then expose the addresses of the CSS files in the global `window` object, so that your exposed component can append the styles inside the ShadowDOM itself. The key under the `window` object used for styles will be `css__{name_of_the_app}__{key_of_the_exposed_component}`. In the above example it would be `css__App__./remote-simple-button`, assuming that the global `name` option (not the one under exposed component configuration) is `App`. The value under this key is an array of strings, which contains the addresses of CSS files. In your exposed component you can iterate over this array and manually create `<link>` elements with `href` attribute set to the elements of the array like this:
+```js
+const styleContainer = document.createElement("div");
+const hrefs = window["css__App__./remote-simple-button"];
+
+hrefs.forEach((href: string) => {
+    const link = document.createElement('link')
+    link.href = href
+    link.rel = 'stylesheet'
+    styleContainer.appendChild(link);
+});
 ```
 
 ----
