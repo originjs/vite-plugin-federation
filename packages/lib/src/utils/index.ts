@@ -84,12 +84,14 @@ export function parseExposeOptions(
     (item) => {
       return {
         import: item,
-        name: undefined
+        name: undefined,
+        dontAppendStylesToHead: false
       }
     },
     (item) => ({
       import: item.import,
-      name: item.name || undefined
+      name: item.name || undefined,
+      dontAppendStylesToHead: item.dontAppendStylesToHead || false
     })
   )
 }
