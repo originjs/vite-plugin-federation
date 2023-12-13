@@ -37,38 +37,52 @@ import type { PluginHooks } from '../../types/pluginHooks'
 
 const exposedItems: string[] = []
 
-const importShared = `
-const importShared = async (name, shareScope = 'default') => {
-  return (await getSharedFromRuntime(name, shareScope)) || getSharedFromLocal(name)
-}
-const getSharedFromRuntime = async (name, shareScope) => {
-  let module = null
-  if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
-    const versionObj = globalThis.__federation_shared__[shareScope][name]
-    const versionKey = Object.keys(versionObj)[0]
-    const versionValue = Object.values(versionObj)[0]
-    module = await (await versionValue.get())()
-  }
-  if (module) {
-    return flattenModule(module, name)
-  }
-}
-const getSharedFromLocal = async (name) => {
-    let module = await (await moduleMap[name].get())()
-    return flattenModule(module, name)
-}
-const flattenModule = (module, name) => {
-  if (typeof module.default === 'function') {
-    Object.keys(module).forEach((key) => {
-      if (key !== 'default') {
-        module.default[key] = module[key]
+const importShared = `(function(){
+  if(!globalThis.importShared){
+    const moduleCache = Object.create(null);
+    const getSharedFromRuntime = async (name, shareScope) => {
+      let module = null
+      if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
+        const versionObj = globalThis.__federation_shared__[shareScope][name]
+        const versionKey = Object.keys(versionObj)[0]
+        const versionValue = Object.values(versionObj)[0]
+        module = await (await versionValue.get())()
       }
-    })
-    return module.default
+      if (module) {
+        return flattenModule(module, name)
+      }
+    };
+    
+    const getSharedFromLocal = async (name) => {
+      if (moduleMap[name]?.import) {
+        let module = await (await moduleMap[name].get())()
+        return flattenModule(module, name)
+      }
+    };
+    const flattenModule = (module, name) => {
+      if (typeof module.default === 'function') {
+        Object.keys(module).forEach((key) => {
+          if (key !== 'default') {
+            module.default[key] = module[key]
+          }
+        })
+        return module.default
+      }
+      if (module.default) module = Object.assign({}, module.default, module)
+      return module
+    };
+    globalThis.importShared = async (name, shareScope = 'default') => {
+      try{
+      console.log("import shared", name)
+      return moduleCache[name]
+        ? new Promise((r) => r(moduleCache[name]))
+        : (await getSharedFromRuntime(name, shareScope)) || getSharedFromLocal(name)
+      }catch(ex){
+        console.log(ex);
+      }
+    }
   }
-  if (module.default) module = Object.assign({}, module.default, module)
-  return module
-}`
+})()`
 
 export function devRemotePlugin(
   options: VitePluginFederationOptions
@@ -260,6 +274,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
 
       let requiresRuntime = false
       let manualRequired: any = null // set static import if exists
+      let wasImportSharedAdded = false
       walk(ast, {
         enter(node: any) {
           if (
@@ -302,22 +317,32 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                 if (defaultImportDeclaration && namedImportDeclaration.length) {
                   // import a, {b} from 'c' -> const a = await importShared('c'); const {b} = a;
                   const imports = namedImportDeclaration.join(',')
-                  const line = `${importShared}\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
+                  const line = `${
+                    wasImportSharedAdded ? importShared : ''
+                  }\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
+
                   magicString.overwrite(node.start, node.end, line)
+                  wasImportSharedAdded = true
                 } else if (defaultImportDeclaration) {
                   magicString.overwrite(
                     node.start,
                     node.end,
-                    `${importShared}\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
+                    `${
+                      wasImportSharedAdded ? importShared : ''
+                    }\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
                   )
+                  wasImportSharedAdded = true
                 } else if (namedImportDeclaration.length) {
                   magicString.overwrite(
                     node.start,
                     node.end,
-                    `${importShared}\n const {${namedImportDeclaration.join(
+                    `${
+                      wasImportSharedAdded ? importShared : ''
+                    }\n const {${namedImportDeclaration.join(
                       ','
                     )}} = await importShared('${moduleName}');\n`
                   )
+                  wasImportSharedAdded = true
                 }
               }
             }
