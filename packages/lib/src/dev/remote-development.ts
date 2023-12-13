@@ -14,7 +14,11 @@
 // *****************************************************************************
 
 import type { UserConfig } from 'vite'
-import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
+import type {
+  ConfigTypeSet,
+  ExposesConfig,
+  VitePluginFederationOptions
+} from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { readFileSync } from 'fs'
@@ -30,6 +34,41 @@ import {
 } from '../utils'
 import { builderInfo, parsedOptions, devRemotes } from '../public'
 import type { PluginHooks } from '../../types/pluginHooks'
+
+const exposedItems: string[] = []
+
+const importShared = `
+const importShared = async (name, shareScope = 'default') => {
+  return (await getSharedFromRuntime(name, shareScope)) || getSharedFromLocal(name)
+}
+const getSharedFromRuntime = async (name, shareScope) => {
+  let module = null
+  if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
+    const versionObj = globalThis.__federation_shared__[shareScope][name]
+    const versionKey = Object.keys(versionObj)[0]
+    const versionValue = Object.values(versionObj)[0]
+    module = await (await versionValue.get())()
+  }
+  if (module) {
+    return flattenModule(module, name)
+  }
+}
+const getSharedFromLocal = async (name) => {
+    let module = await (await moduleMap[name].get())()
+    return flattenModule(module, name)
+}
+const flattenModule = (module, name) => {
+  if (typeof module.default === 'function') {
+    Object.keys(module).forEach((key) => {
+      if (key !== 'default') {
+        module.default[key] = module[key]
+      }
+    })
+    return module.default
+  }
+  if (module.default) module = Object.assign({}, module.default, module)
+  return module
+}`
 
 export function devRemotePlugin(
   options: VitePluginFederationOptions
@@ -229,6 +268,60 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
           ) {
             manualRequired = node
           }
+          if (
+            isExposed(id, parsedOptions.devExpose) &&
+            node.type === 'ImportDeclaration' &&
+            node.source?.value
+          ) {
+            const moduleName = node.source.value
+            if (
+              parsedOptions.devShared.some(
+                (sharedInfo) => sharedInfo[0] === moduleName
+              )
+            ) {
+              const namedImportDeclaration: (string | never)[] = []
+              let defaultImportDeclaration: string | null = null
+              if (!node.specifiers?.length) {
+                // invalid import , like import './__federation_shared_lib.js' , and remove it
+                magicString.remove(node.start, node.end)
+              } else {
+                node.specifiers.forEach((specify) => {
+                  if (specify.imported?.name) {
+                    namedImportDeclaration.push(
+                      `${
+                        specify.imported.name === specify.local.name
+                          ? specify.imported.name
+                          : `${specify.imported.name}:${specify.local.name}`
+                      }`
+                    )
+                  } else {
+                    defaultImportDeclaration = specify.local.name
+                  }
+                })
+
+                if (defaultImportDeclaration && namedImportDeclaration.length) {
+                  // import a, {b} from 'c' -> const a = await importShared('c'); const {b} = a;
+                  const imports = namedImportDeclaration.join(',')
+                  const line = `${importShared}\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
+                  magicString.overwrite(node.start, node.end, line)
+                } else if (defaultImportDeclaration) {
+                  magicString.overwrite(
+                    node.start,
+                    node.end,
+                    `${importShared}\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
+                  )
+                } else if (namedImportDeclaration.length) {
+                  magicString.overwrite(
+                    node.start,
+                    node.end,
+                    `${importShared}\n const {${namedImportDeclaration.join(
+                      ','
+                    )}} = await importShared('${moduleName}');\n`
+                  )
+                }
+              }
+            }
+          }
 
           if (
             (node.type === 'ImportExpression' ||
@@ -410,5 +503,28 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       }
     }
     return res
+  }
+  function isExposed(id: string, options: (string | ConfigTypeSet)[]) {
+    if (exposedItems.includes(id)) {
+      return true
+    }
+    if (options.length >= 2 && (options[1] as ExposesConfig).import) {
+      if (normalizePath((options[1] as ExposesConfig).import)) {
+        return true
+      }
+    }
+    for (let i = 0, length = options.length; i < length; i++) {
+      const item = options[i]
+      if (
+        Array.isArray(item) &&
+        item.length >= 2 &&
+        (item[1] as ExposesConfig).import
+      ) {
+        if (normalizePath((item[1] as ExposesConfig).import)) {
+          return true
+        }
+      }
+    }
+    return false
   }
 }
