@@ -1,3 +1,17 @@
+## [1.3.4](https://github.com/originjs/vite-plugin-federation/compare/v1.3.3...v1.3.4) (2024-01-03)
+
+
+### Bug Fixes
+
+* global shared modules into wrapper ([#553](https://github.com/originjs/vite-plugin-federation/issues/553)) ([dade815](https://github.com/originjs/vite-plugin-federation/commit/dade815d752eb863d5c276e4c5c5f6604954648a)), closes [#543](https://github.com/originjs/vite-plugin-federation/issues/543)
+
+
+### Features
+
+* dev: add option for adding styles to global object instead of <head> element (for using in Shadow DOM) ([#548](https://github.com/originjs/vite-plugin-federation/issues/548)) ([76e847a](https://github.com/originjs/vite-plugin-federation/commit/76e847a9af25f98a3c51afd3c8cf039f6ec5ac23))
+
+
+
 ## [1.3.3](https://github.com/originjs/vite-plugin-federation/compare/v1.3.2...v1.3.3) (2023-11-20)
 
 
