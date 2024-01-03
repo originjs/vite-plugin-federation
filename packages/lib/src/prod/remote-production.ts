@@ -49,6 +49,7 @@ export function prodRemotePlugin(
     })
   }
 
+  const shareScope = options.shareScope || 'default'
   return {
     name: 'originjs:remote-production',
     virtualFile: options.remotes
@@ -73,11 +74,21 @@ export function prodRemotePlugin(
                         return module
                     })
                 }
+                
+                function merge(obj1, obj2) {
+                  const mergedObj = Object.assign(obj1, obj2);
+                  for (const key of Object.keys(mergedObj)) {
+                    if (typeof mergedObj[key] === 'object' && typeof obj2[key] === 'object') {
+                      mergedObj[key] = merge(mergedObj[key], obj2[key]);
+                    }
+                  }
+                  return mergedObj;
+                }
 
                 const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
-                    return {
-                        ${getModuleMarker('shareScope')}
-                    }
+                  return merge({
+                    ${getModuleMarker('shareScope')}
+                  }, (globalThis.__federation_shared__ || {})['${shareScope}'] || {});
                 }
 
                 async function __federation_import(name) {
@@ -109,7 +120,7 @@ export function prodRemotePlugin(
                                 getUrl().then(url => {
                                     import(/* @vite-ignore */ url).then(lib => {
                                         if (!remote.inited) {
-                                            const shareScope = wrapShareModule(remote.from)
+                                            const shareScope = wrapShareModule(remote.from);
                                             lib.init(shareScope);
                                             remote.lib = lib;
                                             remote.lib.init(shareScope);
