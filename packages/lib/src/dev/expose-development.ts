@@ -19,6 +19,7 @@ import { EXTERNALS, SHARED, builderInfo, parsedOptions } from '../public'
 import type { VitePluginFederationOptions } from 'types'
 import type { PluginHooks } from '../../types/pluginHooks'
 import { ViteDevServer } from 'vite'
+import { importShared } from './import-shared'
 
 export function devExposePlugin(
   options: VitePluginFederationOptions
@@ -35,7 +36,7 @@ export function devExposePlugin(
     moduleMap += `\n"${item[0]}":() => {
       return __federation_import('/${importPath}', '/@fs/${exposeFilepath}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
   }
-  const remoteFile = `
+  const remoteFile = `(${importShared})();
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
         ${moduleMap}

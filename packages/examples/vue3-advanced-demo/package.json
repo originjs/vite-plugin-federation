@@ -15,6 +15,7 @@
     "build:remotes": "pnpm --parallel --filter \"./team-blue\" --filter \"./team-green\"  build",
     "serve:remotes": "pnpm --parallel --filter \"./team-blue\" --filter \"./team-green\"  serve",
     "dev:hosts": "pnpm --filter \"./team-red\" dev",
+    "dev:remotes": "pnpm --parallel --filter \"./team-blue\" --filter \"./team-green\" dev",
     "stop": "kill-port --port 5000,5001,5002",
     "clean": "pnpm run clean"
   },

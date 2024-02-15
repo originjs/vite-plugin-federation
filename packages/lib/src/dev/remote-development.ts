@@ -34,55 +34,10 @@ import {
 } from '../utils'
 import { builderInfo, parsedOptions, devRemotes } from '../public'
 import type { PluginHooks } from '../../types/pluginHooks'
+import { Literal } from 'estree'
+import { importShared } from './import-shared'
 
 const exposedItems: string[] = []
-
-const importShared = `(function(){
-  if(!globalThis.importShared){
-    const moduleCache = Object.create(null);
-    const getSharedFromRuntime = async (name, shareScope) => {
-      let module = null
-      if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
-        const versionObj = globalThis.__federation_shared__[shareScope][name]
-        const versionKey = Object.keys(versionObj)[0]
-        const versionValue = Object.values(versionObj)[0]
-        module = await (await versionValue.get())()
-      }
-      if (module) {
-        return flattenModule(module, name)
-      }
-    };
-    
-    const getSharedFromLocal = async (name) => {
-      if (moduleMap[name]?.import) {
-        let module = await (await moduleMap[name].get())()
-        return flattenModule(module, name)
-      }
-    };
-    const flattenModule = (module, name) => {
-      if (typeof module.default === 'function') {
-        Object.keys(module).forEach((key) => {
-          if (key !== 'default') {
-            module.default[key] = module[key]
-          }
-        })
-        return module.default
-      }
-      if (module.default) module = Object.assign({}, module.default, module)
-      return module
-    };
-    globalThis.importShared = async (name, shareScope = 'default') => {
-      try{
-      console.log("import shared", name)
-      return moduleCache[name]
-        ? new Promise((r) => r(moduleCache[name]))
-        : (await getSharedFromRuntime(name, shareScope)) || getSharedFromLocal(name)
-      }catch(ex){
-        console.log(ex);
-      }
-    }
-  }
-})()`
 
 export function devRemotePlugin(
   options: VitePluginFederationOptions
@@ -270,13 +225,33 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       }
 
       const magicString = new MagicString(code)
+      magicString.prepend(`(${importShared})();`)
       const hasStaticImported = new Map<string, string>()
 
       let requiresRuntime = false
       let manualRequired: any = null // set static import if exists
-      let wasImportSharedAdded = false
       walk(ast, {
         enter(node: any) {
+          if (
+            node.type === 'MemberExpression' &&
+            node.object.type === 'MemberExpression' &&
+            node.object.object.type === 'MetaProperty' &&
+            node.object.object.meta.name === 'import' &&
+            node.object.property.type === 'Identifier' &&
+            node.object.property.name === 'env' &&
+            node.property.name === 'BASE_URL'
+          ) {
+            const serverPort = viteDevServer.config.inlineConfig.server?.port
+            const baseUrlFromConfig =
+              viteDevServer.config.env.BASE_URL &&
+              viteDevServer.config.env.BASE_URL !== '/'
+                ? viteDevServer.config.env.BASE_URL
+                : ''
+            // This assumes that the dev server will always be running on localhost. That's probably not a good assumption, but I don't know how to work around it right now.
+            const baseUrl = `"//localhost:${serverPort}${baseUrlFromConfig}"`
+            magicString.overwrite(node.start, node.end, baseUrl)
+            node = { type: 'Literal', value: baseUrl } as Literal
+          }
           if (
             node.type === 'ImportDeclaration' &&
             node.source?.value === 'virtual:__federation__'
@@ -317,32 +292,23 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                 if (defaultImportDeclaration && namedImportDeclaration.length) {
                   // import a, {b} from 'c' -> const a = await importShared('c'); const {b} = a;
                   const imports = namedImportDeclaration.join(',')
-                  const line = `${
-                    wasImportSharedAdded ? importShared : ''
-                  }\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
+                  const line = `const ${defaultImportDeclaration} = await importShared('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
 
                   magicString.overwrite(node.start, node.end, line)
-                  wasImportSharedAdded = true
                 } else if (defaultImportDeclaration) {
                   magicString.overwrite(
                     node.start,
                     node.end,
-                    `${
-                      wasImportSharedAdded ? importShared : ''
-                    }\n const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
+                    `const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
                   )
-                  wasImportSharedAdded = true
                 } else if (namedImportDeclaration.length) {
                   magicString.overwrite(
                     node.start,
                     node.end,
-                    `${
-                      wasImportSharedAdded ? importShared : ''
-                    }\n const {${namedImportDeclaration.join(
+                    `const {${namedImportDeclaration.join(
                       ','
                     )}} = await importShared('${moduleName}');\n`
                   )
-                  wasImportSharedAdded = true
                 }
               }
             }
