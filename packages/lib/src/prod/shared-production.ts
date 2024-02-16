@@ -46,11 +46,13 @@ export function prodSharedPlugin(
 
       if (shareName2Prop.size) {
         // remove item which is both in external and shared
-        inputOptions.external = (inputOptions.external as [])?.filter(
-          (item) => {
-            return !shareName2Prop.has(removeNonRegLetter(item, NAME_CHAR_REG))
-          }
-        )
+        inputOptions.external = (
+          inputOptions.external as (string | RegExp)[]
+        )?.filter((item) => {
+          if (item instanceof RegExp)
+            return ![...shareName2Prop.keys()].some((key) => item.test(key))
+          return !shareName2Prop.has(removeNonRegLetter(item, NAME_CHAR_REG))
+        })
       }
       return inputOptions
     },
