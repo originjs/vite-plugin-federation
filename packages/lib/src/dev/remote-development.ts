@@ -225,7 +225,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       }
 
       const magicString = new MagicString(code)
-      magicString.prepend(`(${importShared})();`)
+      magicString.prepend(`(${importShared})();\n`)
       const hasStaticImported = new Map<string, string>()
 
       let requiresRuntime = false
@@ -292,14 +292,14 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                 if (defaultImportDeclaration && namedImportDeclaration.length) {
                   // import a, {b} from 'c' -> const a = await importShared('c'); const {b} = a;
                   const imports = namedImportDeclaration.join(',')
-                  const line = `const ${defaultImportDeclaration} = await importShared('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
+                  const line = `const ${defaultImportDeclaration} = await importShared('${moduleName}') || await import('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
 
                   magicString.overwrite(node.start, node.end, line)
                 } else if (defaultImportDeclaration) {
                   magicString.overwrite(
                     node.start,
                     node.end,
-                    `const ${defaultImportDeclaration} = await importShared('${moduleName}');\n`
+                    `const ${defaultImportDeclaration} = await importShared('${moduleName}')  || await import('${moduleName}');\n`
                   )
                 } else if (namedImportDeclaration.length) {
                   magicString.overwrite(
@@ -307,7 +307,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
                     node.end,
                     `const {${namedImportDeclaration.join(
                       ','
-                    )}} = await importShared('${moduleName}');\n`
+                    )}} = await importShared('${moduleName}') || await import('${moduleName}');\n`
                   )
                 }
               }

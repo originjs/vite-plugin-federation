@@ -12,31 +12,26 @@ export const importShared = function () {
         return flattenModule(module, name)
       }
     }
-
-    const getSharedFromLocal = async (name) => {
-      if (globalThis.moduleMap[name]?.import) {
-        let module = await (await globalThis.moduleMap[name].get())()
-        return flattenModule(module, name)
-      }
-    }
     const flattenModule = (module, name) => {
+      // use a shared module which export default a function will getting error 'TypeError: xxx is not a function'
       if (typeof module.default === 'function') {
         Object.keys(module).forEach((key) => {
           if (key !== 'default') {
             module.default[key] = module[key]
           }
         })
+        moduleCache[name] = module.default
         return module.default
       }
       if (module.default) module = Object.assign({}, module.default, module)
+      moduleCache[name] = module
       return module
     }
     globalThis.importShared = async (name, shareScope = 'default') => {
       try {
         return moduleCache[name]
           ? new Promise((r) => r(moduleCache[name]))
-          : (await getSharedFromRuntime(name, shareScope)) ||
-              getSharedFromLocal(name)
+          : (await getSharedFromRuntime(name, shareScope)) || null
       } catch (ex) {
         console.log(ex)
       }
