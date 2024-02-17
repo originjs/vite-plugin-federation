@@ -19,7 +19,7 @@ import { parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { basename, join, resolve } from 'path'
 import { readdirSync, readFileSync, statSync } from 'fs'
-const sharedFilePathReg = /__federation_shared_(.+)\.js$/
+const sharedFilePathReg = /__federation_shared_(.+)-.{8}\.js$/
 import federation_fn_import from './federation_fn_import.js?raw'
 
 export function prodSharedPlugin(
