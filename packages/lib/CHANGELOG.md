@@ -1,3 +1,13 @@
+## [1.3.5](https://github.com/originjs/vite-plugin-federation/compare/v1.3.4...v1.3.5) (2024-02-18)
+
+
+### Bug Fixes
+
+* check for regex in external ([#573](https://github.com/originjs/vite-plugin-federation/issues/573)) ([7e5be49](https://github.com/originjs/vite-plugin-federation/commit/7e5be49057be534982f1819f80e5ea9c78305498))
+* sharedFilePathReg ([#567](https://github.com/originjs/vite-plugin-federation/issues/567)) ([0a09bf0](https://github.com/originjs/vite-plugin-federation/commit/0a09bf0ead5e763a8c32a63d554c2bdf5f3a322c))
+
+
+
 ## [1.3.4](https://github.com/originjs/vite-plugin-federation/compare/v1.3.3...v1.3.4) (2024-01-03)
 
 
