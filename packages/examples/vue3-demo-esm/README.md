@@ -4,7 +4,10 @@ This example demos consumption of federated modules from a vite bundle. `layout`
 
 ## Running Demo
 
-First, `cd packages\examples\vue3-demo`, then run `pnpm build` and `pnpm serve` . This will build and serve `layout`, `home`, `common-lib` and `css-modules` on ports 5000, 5001, 5002, 5003 respectively.
+1. Clone [originjs/vite-plugin-federation](https://github.com/originjs/vite-plugin-federation) if you haven't already.
+1. At the repository root, install dependencies (`pnpm install`) and build (`pnpm build`).
+1. Go to this example folder: `cd packages\examples\vue3-demo-esm`
+1. Run `pnpm install`, `pnpm build` and `pnpm serve` . This will build and serve `layout`, `home`, `common-lib` and `css-modules` on ports 5000, 5001, 5002, 5003 respectively.
 
 - HOST (layout): [localhost:5000](http://localhost:5000/)
 - REMOTE (home): [localhost:5001](http://localhost:5001/)
