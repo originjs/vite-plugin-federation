@@ -17,10 +17,19 @@ import type { PluginHooks } from '../../types/pluginHooks'
 import { NAME_CHAR_REG, parseSharedOptions, removeNonRegLetter } from '../utils'
 import { parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
+import { walk } from 'estree-walker'
+import MagicString from 'magic-string'
 import { basename, join, resolve } from 'path'
 import { readdirSync, readFileSync, statSync } from 'fs'
-const sharedFilePathReg = /__federation_shared_(.+)-.{8}\.js$/
+import type { OutputChunk, PluginContext } from 'rollup'
+
 import federation_fn_import from './federation_fn_import.js?raw'
+
+const sharedFilePathReg = /__federation_shared_(.+)-.{8}\.js$/
+const getSharedName = (importName: string) => {
+  const regRst = sharedFilePathReg.exec(importName)
+  return regRst?.[1]
+}
 
 export function prodSharedPlugin(
   options: VitePluginFederationOptions
@@ -33,6 +42,86 @@ export function prodSharedPlugin(
   let isHost
   let isRemote
   const id2Prop = new Map<string, any>()
+
+  let federation_fn_import_id = ''
+
+  const transformImportFn = function (
+    this: PluginContext,
+    code,
+    chunk: OutputChunk
+  ) {
+    const ast = this.parse(code)
+    const magicString = new MagicString(code)
+    let importSharedRequired = false
+    let importSharedFound = false
+    let modified = false
+
+    walk(ast, {
+      enter(node: any) {
+        if (node.type === 'ImportDeclaration') {
+          if (
+            node.source.value.includes('__federation_fn_import-') &&
+            node.specifiers.some(
+              (specify) => specify.imported?.name === 'importShared'
+            )
+          ) {
+            importSharedFound = true
+          }
+
+          const sharedName = getSharedName(node.source.value)
+          if (sharedName) {
+            const declaration: (string | never)[] = []
+            if (!node.specifiers?.length) {
+              //  invalid import , like import './__federation_shared_lib.js' , and remove it
+              magicString.remove(node.start, node.end)
+              modified = true
+            } else {
+              node.specifiers.forEach((specify) => {
+                declaration.push(
+                  `${
+                    specify.imported?.name
+                      ? `${
+                          specify.imported.name === specify.local.name
+                            ? specify.local.name
+                            : `${specify.imported.name}:${specify.local.name}`
+                        }`
+                      : `default:${specify.local.name}`
+                  }`
+                )
+              })
+            }
+            if (declaration.length) {
+              magicString.overwrite(
+                node.start,
+                node.end,
+                `const {${declaration.join(
+                  ','
+                )}} = await importShared('${sharedName}');\n`
+              )
+              importSharedRequired = true
+              modified = true
+            }
+          }
+        }
+      }
+    })
+    if (importSharedRequired && !importSharedFound) {
+      magicString.prepend(
+        `import {importShared} from '/${this.getFileName(
+          federation_fn_import_id
+        )}';\n`
+      )
+    }
+    if (modified) {
+      return {
+        code: magicString.toString(),
+        map: magicString.generateMap({
+          source: chunk.map?.file,
+          hires: true
+        })
+      }
+    }
+  }
 
   return {
     name: 'originjs:shared-production',
@@ -60,7 +149,7 @@ export function prodSharedPlugin(
     async buildStart() {
       // Cannot emit chunks after module loading has finished, so emitFile first.
       if (parsedOptions.prodShared.length && isRemote) {
-        this.emitFile({
+        federation_fn_import_id = this.emitFile({
           name: '__federation_fn_import',
           type: 'chunk',
           id: '__federation_fn_import',
@@ -190,9 +279,25 @@ export function prodSharedPlugin(
         const chunk = bundle[key]
         if (chunk.type === 'chunk') {
           if (!isHost) {
-            const regRst = sharedFilePathReg.exec(chunk.fileName)
-            if (regRst && shareName2Prop.get(regRst[1])?.generate === false) {
+            const sharedName = getSharedName(chunk.fileName)
+            if (
+              sharedName &&
+              shareName2Prop.get(sharedName)?.generate === false
+            ) {
               needRemoveShared.add(key)
+              continue
+            }
+            const hasSharedImport = chunk.imports?.some((name) =>
+              sharedFilePathReg.test(name)
+            )
+
+            if (hasSharedImport && options.format === 'es') {
+              const transformedCode = transformImportFn.apply(this, [
+                chunk.code,
+                chunk
+              ])
+              chunk.code = transformedCode?.code ?? chunk.code
+              chunk.map = transformedCode?.map ?? chunk.map
             }
           }
         }

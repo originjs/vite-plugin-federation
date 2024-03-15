@@ -16,7 +16,7 @@
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import type { AcornNode, TransformPluginContext } from 'rollup'
-import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
+import type { VitePluginFederationOptions } from 'types'
 import type { PluginHooks } from '../../types/pluginHooks'
 import {
   builderInfo,
@@ -30,11 +30,6 @@ import {
   parseRemoteOptions,
   REMOTE_FROM_PARAMETER
 } from '../utils'
-
-const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
-  string,
-  ConfigTypeSet
->()
 
 export function prodRemotePlugin(
   options: VitePluginFederationOptions
@@ -476,5 +471,3 @@ export function prodRemotePlugin(
     }
   }
 }
-
-export { sharedFileName2Prop }

@@ -53,10 +53,12 @@ function flattenModule(module, name) {
         module.default[key] = module[key]
       }
     })
-    moduleCache[name] = module.default
-    return module.default
+  } else if (module.default) {
+    module = Object.assign({}, module.default, module)
+  } else {
+    module = Object.assign({ default: module }, module)
   }
-  if (module.default) module = Object.assign({}, module.default, module)
+
   moduleCache[name] = module
   return module
 }

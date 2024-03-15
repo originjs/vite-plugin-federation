@@ -7,10 +7,11 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: "viteRemote",
+      name: "remote_app",
       filename: "remoteEntry.js",
       exposes: {
-        './Button': './src/components/Button'
+        './Button': './src/components/Button',
+        './useBearStore': './src/state/useBearStore'
       },
       shared: ['react','react-dom']
     })
@@ -19,10 +20,6 @@ export default defineConfig({
     modulePreload: false,
     target: 'esnext',
     minify: false,
-    cssCodeSplit: false,
-
-    commonjsOptions: {
-      defaultIsModuleExports: true,
-    }
+    cssCodeSplit: false
   }
 })
