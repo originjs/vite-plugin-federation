@@ -45,19 +45,19 @@ export default function federation(
   let registerCount = 0
 
   function registerPlugins(mode: string, command: string) {
-    if (mode === 'development' || command === 'serve') {
-      pluginList = [
-        devSharedPlugin(options),
-        devExposePlugin(options),
-        devRemotePlugin(options)
-      ]
-    } else if (mode === 'production' || command === 'build') {
+    if (mode === 'production' || command === 'build') {
       pluginList = [
         prodSharedPlugin(options),
         prodExposePlugin(options),
         prodRemotePlugin(options)
       ]
-    } else {
+    } else if (mode === 'development' || command === 'serve') {
+      pluginList = [
+        devSharedPlugin(options),
+        devExposePlugin(options),
+        devRemotePlugin(options)
+      ]
+    }  else {
       pluginList = []
     }
     builderInfo.isHost = !!(
