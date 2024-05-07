@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import federation from "@originjs/vite-plugin-federation"
 import ElementPlus from 'unplugin-element-plus/vite'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(() => ({
   plugins: [
     ElementPlus(),
     vue(),
@@ -17,8 +17,15 @@ export default defineConfig({
       shared: ['vue','pinia']
   })
   ],
+  
   build:{
     minify:false,
-    target: ["chrome89", "edge89", "firefox89", "safari15"]
-  }
-})
+    target: ["chrome89", "edge89", "firefox89", "safari15"],
+  
+  },
+  test: {
+    globals: true,
+    environment: "happy-dom",
+    include: ["./src/**/*.{test,spec}.?(c|m)[jt]s?(x)"], // get tests in src
+  },
+}))
