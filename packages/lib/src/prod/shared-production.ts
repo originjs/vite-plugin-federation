@@ -15,7 +15,7 @@
 
 import type { PluginHooks } from '../../types/pluginHooks'
 import { NAME_CHAR_REG, parseSharedOptions, removeNonRegLetter } from '../utils'
-import { parsedOptions } from '../public'
+import { builderInfo, parsedOptions } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
@@ -69,6 +69,7 @@ export function prodSharedPlugin(
           }
 
           const sharedName = getSharedName(node.source.value)
+
           if (sharedName) {
             const declaration: (string | never)[] = []
             if (!node.specifiers?.length) {
@@ -106,10 +107,12 @@ export function prodSharedPlugin(
       }
     })
     if (importSharedRequired && !importSharedFound) {
+      const federationFnImportPath = this.getFileName(
+        federation_fn_import_id
+      ).replace(builderInfo.assetsDir, '.')
+
       magicString.prepend(
-        `import {importShared} from '/${this.getFileName(
-          federation_fn_import_id
-        )}';\n`
+        `import {importShared} from '${federationFnImportPath}';\n`
       )
     }
     if (modified) {
