@@ -36,7 +36,12 @@ export function devExposePlugin(
     moduleMap += `\n"${item[0]}":() => {
       return __federation_import('/${importPath}', '/@fs/${exposeFilepath}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
   }
-  const remoteFile = `(${importShared})();
+  const remoteFile = `(${importShared})(); 
+    import RefreshRuntime from "/@react-refresh"
+    RefreshRuntime.injectIntoGlobalHook(window)
+    window.$RefreshReg$ = () => {}
+    window.$RefreshSig$ = () => (type) => type
+    window.__vite_plugin_react_preamble_installed__ = true
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
         ${moduleMap}

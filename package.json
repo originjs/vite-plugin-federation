@@ -8,6 +8,16 @@
     "packages/lib/dist/*",
     "packages/types/*"
   ],
+  "main": "./packages/lib/dist/index.js",
+  "module": "./packages/lib/dist/index.mjs",
+  "types": "./packages/lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./packages/lib/types/index.d.ts",
+      "import": "./packages/lib/dist/index.mjs",
+      "require": "./packages/lib/dist/index.js"
+    }
+  },
   "engines": {
     "node": "^14.18.0 || >=16.0.0",
     "pnpm": ">=8.0.1"

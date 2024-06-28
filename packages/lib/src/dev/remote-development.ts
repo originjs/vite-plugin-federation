@@ -214,6 +214,8 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         return
       }
 
+      code += `(${importShared})();\n`
+
       let ast: AcornNode | null = null
       try {
         ast = this.parse(code)
@@ -223,9 +225,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       if (!ast) {
         return null
       }
-
       const magicString = new MagicString(code)
-      magicString.prepend(`(${importShared})();\n`)
       const hasStaticImported = new Map<string, string>()
 
       let requiresRuntime = false
