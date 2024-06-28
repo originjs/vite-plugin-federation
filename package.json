@@ -16,8 +16,7 @@
   "license": "MulanPSL-2.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "prepare": "husky install",
-    "prepublishOnly": "pnpm run build",
+    "prepare": "pnpm run build",
     "postinstall": "npx playwright install",
     "lint-staged": "lint-staged",
     "format": "prettier -w packages/lib/**/*.ts",
