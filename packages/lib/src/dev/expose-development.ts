@@ -18,14 +18,16 @@ import { getModuleMarker, normalizePath, parseExposeOptions } from '../utils'
 import { EXTERNALS, SHARED, builderInfo, parsedOptions } from '../public'
 import type { VitePluginFederationOptions } from 'types'
 import type { PluginHooks } from '../../types/pluginHooks'
-import { ViteDevServer } from 'vite'
+import { UserConfig, ViteDevServer } from 'vite'
 import { importShared } from './import-shared'
+import { config } from 'process'
 
 export function devExposePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.devExpose = parseExposeOptions(options)
   let moduleMap = ''
+  let baseDir = '/'
 
   // exposes module
   for (const item of parsedOptions.devExpose) {
@@ -37,7 +39,7 @@ export function devExposePlugin(
       return __federation_import('/${importPath}', '/@fs/${exposeFilepath}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
   }
   const remoteFile = `(${importShared})(); 
-    import RefreshRuntime from "/@react-refresh"
+    import RefreshRuntime from "${baseDir}@react-refresh"
     RefreshRuntime.injectIntoGlobalHook(window)
     window.$RefreshReg$ = () => {}
     window.$RefreshSig$ = () => (type) => type
@@ -73,6 +75,11 @@ export function devExposePlugin(
 
   return {
     name: 'originjs:expose-development',
+    config: (config: UserConfig) => {
+      if (config.base) {
+        baseDir = config.base
+      }
+    },
     configureServer: (server: ViteDevServer) => {
       const remoteFilePath = `${builderInfo.assetsDir}/${options.filename}`
       server.middlewares.use((req, res, next) => {
