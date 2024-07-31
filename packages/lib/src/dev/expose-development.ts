@@ -36,7 +36,7 @@ export function devExposePlugin(
     const importPath = normalizePath(item[1].import)
     const exposeFilepath = normalizePath(resolve(item[1].import))
     moduleMap += `\n"${item[0]}":() => {
-      return __federation_import('/${importPath}', '/@fs/${exposeFilepath}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
+      return __federation_import('/${importPath}', '${baseDir}@fs/${exposeFilepath}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
   }
   const remoteFile = `(${importShared})(); 
     import RefreshRuntime from "${baseDir}@react-refresh"
