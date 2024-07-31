@@ -20,25 +20,27 @@ import type { VitePluginFederationOptions } from 'types'
 import type { PluginHooks } from '../../types/pluginHooks'
 import { UserConfig, ViteDevServer } from 'vite'
 import { importShared } from './import-shared'
-import { config } from 'process'
 
 export function devExposePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.devExpose = parseExposeOptions(options)
   let moduleMap = ''
-  let baseDir = '/'
+  let remoteFile: string | null = null
 
-  // exposes module
-  for (const item of parsedOptions.devExpose) {
-    const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
-    EXTERNALS.push(moduleName)
-    const importPath = normalizePath(item[1].import)
-    const exposeFilepath = normalizePath(resolve(item[1].import))
-    moduleMap += `\n"${item[0]}":() => {
-      return __federation_import('/${importPath}', '${baseDir}@fs/${exposeFilepath}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
+  const exposeModules = (baseDir) => {
+    for (const item of parsedOptions.devExpose) {
+      const moduleName = getModuleMarker(`\${${item[0]}}`, SHARED)
+      EXTERNALS.push(moduleName)
+      const importPath = normalizePath(item[1].import)
+      const exposeFilepath = normalizePath(resolve(item[1].import))
+      moduleMap += `\n"${item[0]}":() => {
+        return __federation_import('/${importPath}', '${baseDir}@fs/${exposeFilepath}').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},`
+    }
   }
-  const remoteFile = `(${importShared})(); 
+
+  const buildRemoteFile = (baseDir) => {
+    return `(${importShared})(); 
     import RefreshRuntime from "${baseDir}@react-refresh"
     RefreshRuntime.injectIntoGlobalHook(window)
     window.$RefreshReg$ = () => {}
@@ -72,12 +74,14 @@ export function devExposePlugin(
         });
       }
     `
+  }
 
   return {
     name: 'originjs:expose-development',
     config: (config: UserConfig) => {
       if (config.base) {
-        baseDir = config.base
+        exposeModules(config.base)
+        remoteFile = buildRemoteFile(config.base)
       }
     },
     configureServer: (server: ViteDevServer) => {
