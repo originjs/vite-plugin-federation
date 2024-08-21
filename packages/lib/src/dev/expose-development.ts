@@ -53,9 +53,9 @@ export function devExposePlugin(
       const __federation_import = async (urlImportPath, fsImportPath) => {
         let importedModule;
         try {
-          return await import(urlImportPath);
+          return await import(fsImportPath);
         }catch(ex) {
-          return await import(fsImportPath)
+          return await import(urlImportPath);
         }
       };
       export const get =(module) => {
