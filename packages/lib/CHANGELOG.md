@@ -1,3 +1,17 @@
+## [1.3.6](https://github.com/originjs/vite-plugin-federation/compare/v1.3.5...v1.3.6) (2024-09-15)
+
+
+### Bug Fixes
+
+* removeNonRegLetter for chunk filename ([#621](https://github.com/originjs/vite-plugin-federation/issues/621)) ([7e822ff](https://github.com/originjs/vite-plugin-federation/commit/7e822ff7dcee15499a5f065e190fd73f41a9764e))
+
+
+### Features
+
+* adds a workaround for a safari bug when loading modules async ([#617](https://github.com/originjs/vite-plugin-federation/issues/617)) ([bbd1d89](https://github.com/originjs/vite-plugin-federation/commit/bbd1d89de65e36698bc0e1027a76587e4989d6cd))
+
+
+
 ## [1.3.5](https://github.com/originjs/vite-plugin-federation/compare/v1.3.4...v1.3.5) (2024-02-18)
 
 
