@@ -8,19 +8,23 @@
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview --port 5000 --strictPort",
     "clean": "rm -rf dist",
-    "stop": "kill-port --port 5000"
+    "stop": "kill-port --port 5000",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "element-plus": "^2.2.15",
+    "pinia": "^2.0.21",
     "vue": "^3.2.45",
-    "vue-router": "^4.1.5",
-    "pinia": "^2.0.21"
+    "vue-router": "^4.1.5"
   },
   "devDependencies": {
-    "unplugin-element-plus": "0.4.1",
     "@vitejs/plugin-vue": "^4.0.0",
     "typescript": "^4.9.4",
+    "unplugin-element-plus": "0.4.1",
     "vite": "^4.0.5",
+    "vitest": "^0.26.2",
+    "happy-dom": "^14.10.1",
+    "@vue/test-utils": "^2.4.6",
     "vue-tsc": "^0.39.5"
   }
 }
