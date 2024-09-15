@@ -1,4 +1,4 @@
-import { execa } from 'execa';
+import { execa } from 'execa'
 import { dirname, join, resolve } from 'node:path'
 import os from 'node:os'
 import fs from 'fs-extra'
@@ -22,7 +22,7 @@ export const browserErrors: Error[] = []
 
 export let page: Page = undefined!
 export let browser: Browser = undefined!
-export let viteTestUrl: string = ''
+export let viteTestUrl = ''
 
 const DIR = join(os.tmpdir(), 'vitest_playwright_global_setup')
 
@@ -67,7 +67,6 @@ beforeAll(async (s) => {
       /packages\/examples\/([\w-]+)\//
     )?.[1]
     testDir = dirname(testPath)
-
 
     // if this is a test placed under examples/xxx/__tests__
     // start a vite server in that directory.
