@@ -191,7 +191,11 @@ export function prodSharedPlugin(
         if (chunk.type === 'chunk') {
           if (!isHost) {
             const regRst = sharedFilePathReg.exec(chunk.fileName)
-            if (regRst && shareName2Prop.get(regRst[1])?.generate === false) {
+            if (
+              regRst &&
+              shareName2Prop.get(removeNonRegLetter(regRst[1], NAME_CHAR_REG))
+                ?.generate === false
+            ) {
               needRemoveShared.add(key)
             }
           }
