@@ -75,6 +75,7 @@ export function prodExposePlugin(
       // code generated for remote
       // language=JS
       [`__remoteEntryHelper__${options.filename}`]: `
+      const currentImports = {}
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {${moduleMap}}
     const seen = {}
@@ -102,7 +103,8 @@ export function prodExposePlugin(
       })
     };
     async function __federation_import(name) {
-        return import(name);
+        currentImports[name] ??= import(name)
+        return currentImports[name]
     };
     export const get =(module) => {
       if(!moduleMap[module]) throw new Error('Can not find remote module ' + module)

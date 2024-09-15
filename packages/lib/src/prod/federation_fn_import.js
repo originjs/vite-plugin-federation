@@ -1,5 +1,7 @@
 import { satisfy } from '__federation_fn_satisfy'
 
+const currentImports = {}
+
 // eslint-disable-next-line no-undef
 const moduleMap = __rf_var__moduleMap
 const moduleCache = Object.create(null)
@@ -10,7 +12,8 @@ async function importShared(name, shareScope = 'default') {
 }
 // eslint-disable-next-line
 async function __federation_import(name) {
-  return import(name)
+  currentImports[name] ??= import(name)
+  return currentImports[name]
 }
 async function getSharedFromRuntime(name, shareScope) {
   let module = null

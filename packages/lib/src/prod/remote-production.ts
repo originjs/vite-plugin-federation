@@ -57,6 +57,7 @@ export function prodRemotePlugin(
           // language=JS
           __federation__: `
                 ${createRemotesMap(prodRemotes)}
+                const currentImports = {}
                 const loadJS = async (url, fn) => {
                     const resolvedUrl = typeof url === 'function' ? await url() : url;
                     const script = document.createElement('script')
@@ -92,7 +93,8 @@ export function prodRemotePlugin(
                 }
 
                 async function __federation_import(name) {
-                    return import(name);
+                    currentImports[name] ??= import(name)
+                    return currentImports[name]
                 }
 
                 const initMap = Object.create(null);
