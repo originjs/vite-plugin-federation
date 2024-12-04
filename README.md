@@ -13,6 +13,20 @@ English | [简体中文](./README-zh.md)
 A Vite/Rollup plugin which support Module Federation.
 Inspired by Webpack and compatible with [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/).
 
+## Navigation
+
+- [Running results](#running-results)
+- [Install](#install)
+- [Usage](#usage)
+- [Example projects](#example-projects)
+- [Features](#features)
+- [Configuration](#configuration)
+- [Add other example projects?](#add-other-example-projects)
+- [Runtime add remotes with `virtual:__federation__`](#runtime-add-remotes-with-virtual__federation__)
+- [FAQ](#faq)
+- [Star History](#star-history)
+- [Wiki](#wiki)
+
 ## Running results
 
 ![Preview](./README-Preview.gif)
@@ -218,7 +232,7 @@ import myButton from 'remote/myButton'
 
 ⚠️ **Note:**
 * Static imports may rely on the browser `Top-level await` feature, so you will need to set build.target in the configuration file to `next` or use the plugin [`vite-plugin-top-level-await`](https://github.com/Menci/vite-plugin-top-level-await). You can see the [browser compatibility](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#browser_) of top-level await here compatibility)
-* 
+
 ## Configuration
 
 ### `name: string`
@@ -386,6 +400,189 @@ shared: {
 }
 ```
 
+## Runtime add remotes with `virtual:__federation__`
+It is not always possible to define the list of remote applications in advance in `vite.config`. Some applications may load the list of these remotes asynchronously when the user visits the website. In such cases, you can use the `virtual:__federation__` API.
+
+### API `virtual:__federation__`
+
+Using methods from the `virtual:__federation__` module, you can implement dynamic loading of a remote application.
+
+```ts
+import {
+  __federation_method_getRemote as getRemote,
+  __federation_method_setRemote as setRemote,
+  __federation_method_unwrapDefault as unwrapModule,
+  type IRemoteConfig,
+} from "virtual:__federation__";
+
+const renderComponent = () => {
+  throw Error("Not implemented");
+}
+
+const loadCrmPlugins = async () => {
+  try {
+    const pluginsResponse = await fetch("some-backed.com/plugins");
+    const pluginsJson = await pluginsResponse.json();
+    
+    const unresolvedPlugins = pluginsJson.map(async (plugin) => {
+      setRemote(plugin.name, {
+        ...commonRemoteConfig,
+        url: plugin.entry,
+      });
+
+      const remoteModule = await getRemote(plugin.name, plugin.component);
+      const remoteComponent = await unwrapModule(remoteModule);
+      renderComponent(plugin.name, remoteComponent);
+    });
+
+    await Promise.all(unresolvedPlugins);
+  } catch (e) {
+    console.error(e);
+  }
+};
+```
+
+Available methods:
+
+<details>
+<summary><strong>__federation_method_setRemote</strong></summary>
+
+**Syntax**
+
+```ts
+/**
+ * Adds a new remote to the shared map of all remotes on the page.
+ * @param {string} name - The name of the remote.
+ * @param {IRemoteConfig} config - The configuration of the remote.
+ */
+function __federation_method_setRemote(name: string, config: IRemoteConfig): void;
+```
+
+**Types**
+
+```ts
+interface IRemoteConfig {
+    url: (() => Promise<string>) | string; 
+    format: "esm" | "systemjs" | "var";   
+    from: "vite" | "webpack;
+}
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_getRemote</strong></summary>
+
+**Syntax**
+
+```ts
+/**
+ * Returns a component from a remote.
+ * @param {string} remoteName - The name of the remote.
+ * @param {string} componentName - The name of the component to retrieve.
+ * @returns {Promise<unknown>} - The retrieved component.
+ */
+function __federation_method_getRemote(remoteName: string, componentName: string): Promise<unknown>;
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_unwrapDefault</strong></summary>
+
+**Syntax**
+
+```ts
+/**
+ * Unwraps a module and returns its default export or the module itself.
+ * @param {unknown} module - The module to unwrap.
+ * @returns {unknown} - The default export or the module itself.
+ */
+function __federation_method_unwrapDefault(module: unknown): unknown;
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_wrapDefault</strong></summary>
+
+**Syntax**
+
+```ts
+/**
+ * Checks for a default export and creates a wrapper if necessary.
+ * @param {unknown} module - The module to process.
+ * @param {boolean} need - A flag indicating whether to create a wrapper.
+ * @returns {Promise<unknown>} - The wrapped module or the original.
+ */
+function __federation_method_wrapDefault(module: unknown, need: boolean): Promise<unknown>;
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_ensure</strong></summary>
+
+**Syntax**
+
+```ts
+/**
+ * Checks if a module is initialized and initializes it if necessary.
+ * @param {string} remoteName - The name of the remote.
+ * @returns {Promise<unknown>} - The initialized remote.
+ */
+async function __federation_method_ensure(remoteName: string): Promise<unknown>;
+```
+</details>
+
+--- 
+
+### Using `virtual:__federation__` with TypeScript
+
+If you are using TypeScript, define the module types using `declare module`.
+
+<details>
+<summary>declare module example</summary>
+
+To ensure correct functionality in the TypeScript environment, describe the module in a `*.d.ts` file:
+
+```ts
+declare module "virtual:__federation__" {
+  interface IRemoteConfig {
+    url: (() => Promise<string>) | string;
+    format: "esm" | "systemjs" | "var";
+    from: "vite" | "webpack";
+  }
+
+  export function __federation_method_setRemote(
+    name: string,
+    config: IRemoteConfig,
+  ): void;
+
+  export function __federation_method_getRemote(
+    name: string,
+    exposedPath: string,
+  ): Promise<unknown>;
+
+  export function __federation_method_unwrapDefault(
+    unwrappedModule: unknown,
+  ): Promise<unknown>;
+  
+  export function __federation_method_ensure(
+    remoteName: string,
+  ): Promise<unknown>;
+  
+  export function __federation_method_wrapDefault(
+    module: unknown,
+    need: boolean,
+  ): Promise<unknown>;
+}
+```
+</details>
+
+Now you can load remote applications without predefining them in `vite.config`.
+- [Example vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/blob/main/packages/examples/vue3-demo-esm/layout/src/Layout.vue)
+
 
 ## Add other example projects?
 
@@ -458,8 +655,6 @@ This also means that there are at least three instructions in the `package.json`
   ]
 
 ```
-
-
 
 ## FAQ
 
