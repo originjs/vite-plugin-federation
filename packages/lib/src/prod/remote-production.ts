@@ -178,7 +178,7 @@ export function prodRemotePlugin(
             sharedInfo[1].emitFile = this.emitFile({
               type: 'chunk',
               id: sharedInfo[1].id ?? sharedInfo[1].packagePath,
-              preserveSignature: 'allow-extension',
+              preserveSignature: 'strict',
               name: `__federation_shared_${sharedInfo[0]}`
             })
           }
