@@ -18,10 +18,12 @@ export default defineConfig({
       },
       shared: {
         vue:{
-          generate:false
+          generate:false,
+          modulePreload: true,
         },
         pinia:{
-          generate:false
+          generate:false,
+          modulePreload: true,
         },
         // This is to test if the custom library can be SHARED, there is no real point
         // myStore:{

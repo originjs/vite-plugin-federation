@@ -375,6 +375,16 @@ shared: {
 }
 ```
 
+#### `modulePreload : boolean`
+* `default: false`
+* if true, the shared dependency bundle file append to html head as link modulepreload, only work in prod mode.
+```js
+shared: {
+    packageName: {
+        modulePreload: true
+    }
+}
+```
 
 
 ## Add other example projects?

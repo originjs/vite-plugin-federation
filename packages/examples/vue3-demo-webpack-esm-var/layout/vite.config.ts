@@ -15,7 +15,7 @@ export default defineConfig({
                     format: 'var'
                 }
             },
-            shared: ['vue', 'pinia']
+            shared: {'vue': { modulePreload: true }, 'pinia': { modulePreload: true }}
         })
     ],
     build: {
