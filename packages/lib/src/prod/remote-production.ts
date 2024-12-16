@@ -15,7 +15,13 @@
 
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
-import type { AcornNode, TransformPluginContext } from 'rollup'
+import path from 'node:path'
+import type {
+  AcornNode,
+  TransformPluginContext,
+  OutputAsset,
+  OutputChunk
+} from 'rollup'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import type { PluginHooks } from '../../types/pluginHooks'
 import {
@@ -28,13 +34,66 @@ import {
   createRemotesMap,
   getModuleMarker,
   parseRemoteOptions,
-  REMOTE_FROM_PARAMETER
+  REMOTE_FROM_PARAMETER,
+  injectToHead,
+  toPreloadTag
 } from '../utils'
+import { ResolvedConfig } from 'vite'
 
 const sharedFileName2Prop: Map<string, ConfigTypeSet> = new Map<
   string,
   ConfigTypeSet
 >()
+
+function joinUrlSegments(a: string, b: string): string {
+  if (!a || !b) {
+    return a || b || ''
+  }
+  if (a[a.length - 1] === '/') {
+    a = a.substring(0, a.length - 1)
+  }
+  if (b[0] !== '/') {
+    b = '/' + b
+  }
+  return a + b
+}
+
+function toOutputFilePathWithoutRuntime(
+  filename: string,
+  type: 'asset' | 'public',
+  hostId: string,
+  hostType: 'js' | 'css' | 'html',
+  config: ResolvedConfig,
+  toRelative: (filename: string, hostId: string) => string
+): string {
+  const { renderBuiltUrl } = config.experimental
+  let relative = config.base === '' || config.base === './'
+  if (renderBuiltUrl) {
+    const result = renderBuiltUrl(filename, {
+      hostId,
+      hostType,
+      type,
+      ssr: !!config.build.ssr
+    })
+    if (typeof result === 'object') {
+      if (result.runtime) {
+        throw new Error(
+          `{ runtime: "${result.runtime}" } is not supported for assets in ${hostType} files: ${filename}`
+        )
+      }
+      if (typeof result.relative === 'boolean') {
+        relative = result.relative
+      }
+    } else if (result) {
+      return result
+    }
+  }
+  if (relative && !config.build.ssr) {
+    return toRelative(filename, hostId)
+  } else {
+    return joinUrlSegments(config.base, filename)
+  }
+}
 
 export function prodRemotePlugin(
   options: VitePluginFederationOptions
@@ -50,6 +109,7 @@ export function prodRemotePlugin(
   }
 
   const shareScope = options.shareScope || 'default'
+  let resolvedConfig: ResolvedConfig
   return {
     name: 'originjs:remote-production',
     virtualFile: options.remotes
@@ -170,6 +230,9 @@ export function prodRemotePlugin(
             `
         }
       : { __federation__: '' },
+    configResolved(config) {
+      resolvedConfig = config
+    },
 
     async transform(this: TransformPluginContext, code: string, id: string) {
       if (builderInfo.isShared) {
@@ -475,6 +538,98 @@ export function prodRemotePlugin(
           }
         }
       }
+    },
+
+    generateBundle(options, bundle) {
+      const preloadSharedReg = parsedOptions.prodShared
+        .filter((shareInfo) => shareInfo[1].modulePreload)
+        .map(
+          (item) => new RegExp(`__federation_shared_${item[0]}-.{8}.js`, 'g')
+        )
+      const getImportedChunks = (
+        chunk: OutputChunk,
+        satisfy: (chunk: OutputChunk) => boolean,
+        seen: Set<string> = new Set()
+      ): OutputChunk[] => {
+        const chunks: OutputChunk[] = []
+        chunk.imports.forEach((file) => {
+          const importee = bundle[file]
+          if (importee) {
+            if (importee.type === 'chunk' && !seen.has(file)) {
+              if (satisfy(importee)) {
+                seen.add(file)
+                chunks.push(...getImportedChunks(importee, satisfy, seen))
+                chunks.push(importee)
+              }
+            }
+          }
+        })
+        return chunks
+      }
+
+      const sharedFiles: string[] = []
+      const entryChunk: Record<string, OutputAsset> = {}
+      for (const fileName in bundle) {
+        const file = bundle[fileName]
+        if (file.type === 'asset') {
+          if (fileName.endsWith('.html')) {
+            entryChunk[fileName] = file
+          }
+        } else {
+          if (preloadSharedReg.some((item) => item.test(fileName))) {
+            sharedFiles.push(fileName)
+          }
+        }
+      }
+
+      if (!sharedFiles.length) return
+
+      Object.keys(entryChunk).forEach((fileName) => {
+        let html = entryChunk[fileName].source as string
+        const htmlPath = entryChunk[fileName].fileName
+        const basePath =
+          resolvedConfig.base === './' || resolvedConfig.base === ''
+            ? path.posix.join(
+                path.posix
+                  .relative(entryChunk[fileName].fileName, '')
+                  .slice(0, -2),
+                './'
+              )
+            : resolvedConfig.base
+
+        const toOutputFilePath = (filename: string) =>
+          toOutputFilePathWithoutRuntime(
+            filename,
+            'asset',
+            htmlPath,
+            'html',
+            resolvedConfig,
+            (filename) => basePath + filename
+          )
+
+        const importFiles = sharedFiles
+          .filter((item) => {
+            return !html.includes(toOutputFilePath(item))
+          })
+          .flatMap((item) => {
+            const filepath = item
+            const importFiles = getImportedChunks(
+              bundle[item] as OutputChunk,
+              (chunk) => !html.includes(toOutputFilePath(chunk.fileName))
+            ).map((item) => item.fileName)
+
+            return [filepath, ...importFiles].map((item) =>
+              toOutputFilePath(item)
+            )
+          })
+
+        html = injectToHead(
+          html,
+          [...new Set(importFiles)].map((item) => toPreloadTag(item))
+        )
+
+        entryChunk[fileName].source = html
+      })
     }
   }
 }

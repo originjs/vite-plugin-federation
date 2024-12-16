@@ -26,6 +26,8 @@ import { createHash } from 'crypto'
 import path, { parse, posix } from 'path'
 import type { PluginContext } from 'rollup'
 
+export * from './html'
+
 export function findDependencies(
   this: PluginContext,
   id: string,
@@ -63,7 +65,8 @@ export function parseSharedOptions(
       packagePath: key,
       // Whether the path is set manually
       manuallyPackagePathSetting: false,
-      generate: true
+      generate: true,
+      modulePreload: false
     }),
     (value, key) => {
       value.import = value.import ?? true
@@ -71,6 +74,7 @@ export function parseSharedOptions(
       value.packagePath = value.packagePath || key
       value.manuallyPackagePathSetting = value.packagePath !== key
       value.generate = value.generate ?? true
+      value.modulePreload = value.modulePreload ?? false
       return value
     }
   )
