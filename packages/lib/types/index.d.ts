@@ -312,4 +312,9 @@ declare interface SharedConfig {
    * determine whether to include the shared in the chunk, true is included, false will not generate a shared chunk, only the remote side of the parameter is valid, the host side will definitely generate a shared chunk
    */
   generate?: boolean
+
+  /**
+   * if true, the shared dep will be append in the html head, only valid in prod mode
+   */
+  modulePreload?: boolean
 }

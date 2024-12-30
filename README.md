@@ -389,6 +389,17 @@ shared: {
 }
 ```
 
+#### `modulePreload : boolean`
+* `default: false`
+* if true, the shared dependency bundle file append to html head as link modulepreload, only work in prod mode.
+```js
+shared: {
+    packageName: {
+        modulePreload: true
+    }
+}
+```
+
 ## Runtime add remotes with `virtual:__federation__`
 It is not always possible to define the list of remote applications in advance in `vite.config`. Some applications may load the list of these remotes asynchronously when the user visits the website. In such cases, you can use the `virtual:__federation__` API.
 

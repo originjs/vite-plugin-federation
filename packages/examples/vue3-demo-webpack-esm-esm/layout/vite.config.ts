@@ -22,7 +22,7 @@ export default defineConfig({
           name: 'button',
           import: './src/components/UnusedButton.vue'}
       },
-      shared: ['vue', 'pinia']
+      shared: {'vue': { modulePreload: true }, 'pinia': { modulePreload: true }}
     })
   ],
   build: {

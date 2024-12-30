@@ -20,6 +20,7 @@ export default defineConfig({
                     generate:false
                 },
                 pinia:{
+                    modulePreload: true,
                 }
 
             }
