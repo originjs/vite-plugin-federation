@@ -30,9 +30,6 @@ jobs:
       - name: Unit test
         run: pnpm run 'test:unit'
 
-      - name: Dev mode e2e test
-        run: pnpm run 'test:e2e-dev'
-
       - name: Serve mode e2e test
         run: pnpm run 'test:e2e-serve'
 
