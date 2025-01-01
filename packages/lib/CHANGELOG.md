@@ -1,3 +1,19 @@
+## [1.3.7](https://github.com/originjs/vite-plugin-federation/compare/v1.3.6...v1.3.7) (2025-01-01)
+
+
+### Bug Fixes
+
+* The remoteEntryChunk should use the base path from the Vite config. ([352f20e](https://github.com/originjs/vite-plugin-federation/commit/352f20e0d4b6f10ef8a86e173221b030bbd18f99))
+* preserve signature of shared librairies([0258207](https://github.com/originjs/vite-plugin-federation/commit/0258207d814020673af2210bcccf650d18947fe3))
+
+
+
+### Features
+
+* shared deps module preload ([cbbf76e](https://github.com/originjs/vite-plugin-federation/commit/cbbf76e771512120b4512609ce1e7c2faec64fcf))
+
+
+
 ## [1.3.6](https://github.com/originjs/vite-plugin-federation/compare/v1.3.5...v1.3.6) (2024-09-15)
 
 
