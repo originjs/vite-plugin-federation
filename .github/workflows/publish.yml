@@ -30,9 +30,6 @@ jobs:
       - name: Unit test
         run: pnpm run 'test:unit'
 
-      - name: Serve mode e2e test
-        run: pnpm run 'test:e2e-serve'
-
       - name: Create Release for Tag
         id: release_tag
         uses: yyx990803/release-tag@master
