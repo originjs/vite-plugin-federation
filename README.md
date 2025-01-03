@@ -403,6 +403,8 @@ shared: {
 ## Runtime add remotes with `virtual:__federation__`
 It is not always possible to define the list of remote applications in advance in `vite.config`. Some applications may load the list of these remotes asynchronously when the user visits the website. In such cases, you can use the `virtual:__federation__` API.
 
+> Note: This is a virtual module, for a deeper understanding of virtual modules in Vite, see: https://vite.dev/guide/api-plugin#virtual-modules-convention
+
 ### API `virtual:__federation__`
 
 Using methods from the `virtual:__federation__` module, you can implement dynamic loading of a remote application.
