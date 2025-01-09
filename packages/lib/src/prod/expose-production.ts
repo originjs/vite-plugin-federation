@@ -239,11 +239,18 @@ export function prodExposePlugin(
             const slashPath = fileRelativePath.replace(/\\/g, '/')
             remoteEntryChunk.code = remoteEntryChunk.code.replace(
               `\${__federation_expose_${expose[0]}}`,
-              [
-                viteConfigResolved.config?.base?.replace(/\/+$/, '') || '.',
-                viteConfigResolved.config?.build?.assetsDir?.replace(/\/+$/, ''),
-                slashPath
-              ].filter(Boolean).join('/')
+              viteConfigResolved.config?.base?.replace(/\/+$/, '')
+                ? [
+                    viteConfigResolved.config.base.replace(/\/+$/, ''),
+                    viteConfigResolved.config.build?.assetsDir?.replace(
+                      /\/+$/,
+                      ''
+                    ),
+                    slashPath
+                  ]
+                    .filter(Boolean)
+                    .join('/')
+                : `./${slashPath}`
             )
           }
         }
