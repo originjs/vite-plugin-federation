@@ -91,8 +91,14 @@ export function prodExposePlugin(
         const assetsDir = __VITE_ASSETS_DIR_PLACEHOLDER__;
 
         cssFilePaths.forEach(cssPath => {
-          const baseUrl = base || curUrl;
-          const href = [baseUrl, assetsDir, cssPath].filter(Boolean).join('/');
+         let href = ''
+         const baseUrl = base || curUrl
+         console.log(baseUrl)
+         if (baseUrl && baseUrl !== '/') {
+         	href = [baseUrl, assetsDir, cssPath].filter(Boolean).join('/')
+         } else {
+         	href = curUrl + cssPath
+         }
 
           if (href in seen) return;
           seen[href] = true;
