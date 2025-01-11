@@ -1,3 +1,13 @@
+## [1.3.8](https://github.com/originjs/vite-plugin-federation/compare/v1.3.7...v1.3.8) (2025-01-11)
+
+
+### Bug Fixes
+
+* Add base and assetsDir to dynamicLoadingCss to support loading style file addresses using the base configuration. ([766b521](https://github.com/originjs/vite-plugin-federation/commit/766b521ee56fd2ba15f234c5f5c0aa6336fa518f))
+* update remoteEntryChunk code to handle base path correctly when Vite config is present ([538e258](https://github.com/originjs/vite-plugin-federation/commit/538e258a891e8cf640ae503feba9205fab53c1c6))
+
+
+
 ## [1.3.7](https://github.com/originjs/vite-plugin-federation/compare/v1.3.6...v1.3.7) (2025-01-01)
 
 
