@@ -93,7 +93,6 @@ export function prodExposePlugin(
         cssFilePaths.forEach(cssPath => {
          let href = ''
          const baseUrl = base || curUrl
-         console.log(baseUrl)
          if (baseUrl && baseUrl !== '/') {
          	href = [baseUrl, assetsDir, cssPath].filter(Boolean).join('/')
          } else {
