@@ -224,7 +224,9 @@ export function prodRemotePlugin(
                             retryCount++;
                             if (retryCount > remoteConfig.importRetryCount) {
                                 if(remoteConfig.onImportFail){
-                                  return remoteConfig.onImportFail(remoteName, componentName, err);
+                                  const errorConfig = {...remoteConfig};
+                                  delete errorConfig.onImportFail;
+                                  return remoteConfig.onImportFail(remoteName, componentName, errorConfig, err);
                                 } else {
                                   throw err;
                                 }

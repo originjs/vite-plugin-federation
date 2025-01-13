@@ -254,7 +254,7 @@ declare type RemotesConfig = {
   /**
    * Method called when import fails (after `importRetryCount` has been exhausted)
    */
-  onImportFail?: (remoteName: string, componentName: string, error: Error) => void;
+  onImportFail?: (remoteName: string, componentName: string, errorConfig: RemotesConfig, error: Error) => void;
 }
 
 /**
