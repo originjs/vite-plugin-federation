@@ -117,6 +117,7 @@ export function parseRemoteOptions(
       from: 'vite',
       externalType: 'url',
       importRetryCount: 0,
+      onImportFail: undefined
     }),
     (item) => ({
       external: Array.isArray(item.external) ? item.external : [item.external],
@@ -124,7 +125,8 @@ export function parseRemoteOptions(
       format: item.format || 'esm',
       from: item.from ?? 'vite',
       externalType: item.externalType || 'url',
-      importRetryCount: item.format === "var" ? undefined : item.importRetryCount || 0
+      importRetryCount: item.format === "var" ? undefined : item.importRetryCount || 0,
+      onImportFail: item.onImportFail ? item.onImportFail : undefined
     })
   )
 }
@@ -236,7 +238,7 @@ ${remotes
     (remote) =>
       `'${remote.id}':{url:${createUrl(remote)},format:'${
         remote.config.format
-      }',from:'${remote.config.from}'},importRetryCount:${remote.config.importRetryCount ?? 0},onImportFail:${remote.config.onImportFail? remote.config.onImportFail.toString(): "undefined"}`
+      }',from:'${remote.config.from}',importRetryCount: ${remote.config.importRetryCount ?? 0}, onImportFail: ${remote.config.onImportFail? remote.config.onImportFail.toString(): "undefined"}}`
   )
   .join(',\n  ')}
 };`
