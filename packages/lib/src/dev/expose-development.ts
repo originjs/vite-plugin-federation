@@ -39,7 +39,7 @@ export function devExposePlugin(
     }
   }
 
-  const buildRemoteFile = (baseDir) => {
+  const buildRemoteFile = (baseDir:string) => {
     return `(${importShared})(); 
     import RefreshRuntime from "${baseDir}@react-refresh"
     RefreshRuntime.injectIntoGlobalHook(window)
@@ -52,11 +52,11 @@ export function devExposePlugin(
       };
       const __federation_import = async (urlImportPath, fsImportPath) => {
         let importedModule;
-        try {
-          return await import(fsImportPath);
-        }catch(ex) {
-          return await import(urlImportPath);
-        }
+          try {
+            return await import(fsImportPath);
+          } catch(ex) {
+            return await import(urlImportPath);
+          }
       };
       export const get =(module) => {
         if(!moduleMap[module]) throw new Error('Can not find remote module ' + module)

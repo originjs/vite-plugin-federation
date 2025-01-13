@@ -78,12 +78,29 @@ export function prodExposePlugin(
       const currentImports = {}
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {${moduleMap}}
-      const seen = {}
-      export const ${DYNAMIC_LOADING_CSS} = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
-        const metaUrl = import.meta.url;
-        if (typeof metaUrl === 'undefined') {
-          console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".');
-          return;
+    const seen = {}
+    export const ${DYNAMIC_LOADING_CSS} = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
+      const metaUrl = import.meta.url
+      if (typeof metaUrl == 'undefined') {
+        console.warn('The remote style takes effect only when the build.target option in the vite.config.ts file is higher than that of "es2020".')
+        return
+      }
+      const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('${
+        options.filename
+      }'))
+
+      cssFilePaths.forEach(cssFilePath => {
+        const href = curUrl + cssFilePath
+        if (href in seen) return
+        seen[href] = true
+        if (dontAppendStylesToHead) {
+          const key = 'css__${options.name}__' + exposeItemName;
+          if (window[key] == null) window[key] = []
+          window[key].push(href);
+        } else {
+          const element = document.head.appendChild(document.createElement('link'))
+          element.href = href
+          element.rel = 'stylesheet'
         }
 
         const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('${options.filename}'));

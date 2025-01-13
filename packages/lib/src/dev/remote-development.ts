@@ -148,10 +148,31 @@ function __federation_method_wrapDefault(module ,need){
   return module; 
 }
 
-function __federation_method_getRemote(remoteName,  componentName){
-  return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
+async function __federation_method_getRemote(remoteName, componentName) {
+    const remoteConfig = remotesMap[remoteName];
+    let retryCount = 0;
+    const getRemote = async () => {
+        try {
+            const remoteModule = await __federation_method_ensure(remoteName);
+            const factory = await remoteModule.get(componentName);
+            factory();
+        } catch (err) {
+            console.log("get remote retry count", retryCount);
+            retryCount++;
+            if (retryCount > remoteConfig.importRetryCount) {
+              if(remoteConfig.onImportFail){
+                return remoteConfig.onImportFail(remoteName, componentName, err);
+              } else {
+                throw err;
+              }
+            } else {
+                return getRemote();
+            }
+        }
+    };
+    return getRemote();
 }
-
+    
 function __federation_method_setRemote(remoteName, remoteConfig) {
   remotesMap[remoteName] = remoteConfig;
 }

@@ -220,7 +220,7 @@ declare interface RemotesObject {
 /**
  * Advanced configuration for container locations from which modules should be resolved and loaded at runtime.
  */
-declare interface RemotesConfig {
+declare type RemotesConfig = {
   /**
    * Container locations from which modules should be resolved and loaded at runtime.
    */
@@ -245,6 +245,16 @@ declare interface RemotesConfig {
    * from
    */
   from?: 'vite' | 'webpack'
+
+  /**
+   * The number of times to retry imports before failure
+   */
+  importRetryCount?: number
+
+  /**
+   * Method called when import fails (after `importRetryCount` has been exhausted)
+   */
+  onImportFail?: (remoteName: string, componentName: string, error: Error) => void;
 }
 
 /**
