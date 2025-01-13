@@ -159,9 +159,9 @@ export function prodRemotePlugin(
 
                 const initMap = Object.create(null);
 
-                async function __federation_method_ensure(remoteId) {
+                async function __federation_method_ensure(remoteId, reInit) {
                     const remote = remotesMap[remoteId];
-                    if (!remote.inited) {
+                    if (!remote.inited || reInit) {
                         if ('var' === remote.format) {
                             // loading js with script tag
                             return new Promise(resolve => {
@@ -216,7 +216,7 @@ export function prodRemotePlugin(
                     let retryCount = 0;
                     const getRemote = async () => {
                         try {
-                            const remoteModule = await __federation_method_ensure(remoteName);
+                            const remoteModule = await __federation_method_ensure(remoteName, retryCount > 0);
                             const factory = await remoteModule.get(componentName);
                             factory();
                         } catch (err) {
