@@ -94,7 +94,7 @@ export function prodExposePlugin(
          let href = ''
          const baseUrl = base || curUrl
          if (baseUrl && baseUrl !== '/') {
-         	href = [baseUrl, assetsDir, cssPath].filter(Boolean).join('/')
+         	href = [baseUrl, assetsDir, cssPath].filter(Boolean).map(part => part.endsWith('/') ? part.substring(0, part.length - 1) : part).join('/')
          } else {
          	href = curUrl + cssPath
          }
