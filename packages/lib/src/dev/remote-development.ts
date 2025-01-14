@@ -95,42 +95,47 @@ const wrapShareScope = ${REMOTE_FROM_PARAMETER} => {
   }
 }
 const initMap = Object.create(null);
-async function __federation_method_ensure(remoteId, reInit) {
+
+async function __federation_method_ensure(remoteId, retryCount) {
   const remote = remotesMap[remoteId];
-  if (!remote.inited || reInit) {
-    if ('var' === remote.format) {
-      // loading js with script tag
-      return new Promise(resolve => {
-        const callback = () => {
-          if (!remote.inited) {
-            remote.lib = window[remoteId];
-            remote.lib.init(wrapShareScope(remote.from))
-            remote.inited = true;
-          }
-          resolve(remote.lib);
-        }
-        return loadJS(remote.url, callback);
-      });
-    } else if (['esm', 'systemjs'].includes(remote.format)) {
-      // loading js with import(...)
-      return new Promise((resolve, reject) => {
-        const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
-        getUrl().then(url => {
-          import(/* @vite-ignore */ url).then(lib => {
-            if (!remote.inited || reInit) {
-              const shareScope = wrapShareScope(remote.from)
-              lib.init(shareScope);
-              remote.lib = lib;
-              remote.lib.init(shareScope);
-              remote.inited = true;
-            }
-            resolve(remote.lib);
-          }).catch(reject)
-        })
-      })
-    }
+  if (!remote.inited || retryCount > 0) {
+      if ('var' === remote.format) {
+          // loading js with script tag
+          return new Promise(resolve => {
+              const callback = () => {
+                  if (!remote.inited) {
+                      remote.lib = window[remoteId];
+                      remote.lib.init(wrapShareModule(remote.from));
+                      remote.inited = true;
+                  }
+                  resolve(remote.lib);
+              };
+              return loadJS(remote.url, callback);
+          });
+      } else if (['esm', 'systemjs'].includes(remote.format)) {
+          // loading js with import(...)
+          return new Promise((resolve, reject) => {
+              const getUrl = typeof remote.url === 'function' ? remote.url : () =>  {
+                  const url = new URL(remote.url, window.location.origin);
+                  url.searchParams.append("retryCount", retryCount);
+                  return Promise.resolve(url.toString());
+              }
+              getUrl().then(url => {
+                  import(/* @vite-ignore */ url).then(lib => {
+                      if (!remote.inited || retryCount > 0) {
+                          const shareScope = wrapShareModule(remote.from);
+                          lib.init(shareScope);
+                          remote.lib = lib;
+                          remote.lib.init(shareScope);
+                          remote.inited = true;
+                      }
+                      resolve(remote.lib);
+                  }).catch(reject);
+              });
+          })
+      }
   } else {
-    return remote.lib;
+      return remote.lib;
   }
 }
 
@@ -149,17 +154,16 @@ function __federation_method_wrapDefault(module ,need){
 }
 
 async function __federation_method_getRemote(remoteName, componentName) {
-    const remoteConfig = remotesMap[remoteName];
-    let retryCount = 0;
-    const getRemote = async () => {
-        try {
-            const remoteModule = await __federation_method_ensure(remoteName, retryCount > 0);
-            const factory = await remoteModule.get(componentName);
-            factory();
-        } catch (err) {
-            console.log("get remote retry count", retryCount);
-            retryCount++;
-            if (retryCount > remoteConfig.importRetryCount) {
+  const remoteConfig = remotesMap[remoteName];
+  let retryCount = 0;
+  const getRemote = async () => {
+      try {
+          const remoteModule = await __federation_method_ensure(remoteName, retryCount);
+          const factory = await remoteModule.get(componentName);
+          factory();
+      } catch (err) {
+          retryCount++;
+          if (retryCount > remoteConfig.importRetryCount) {
               if(remoteConfig.onImportFail){
                 const errorConfig = {...remoteConfig};
                 delete errorConfig.onImportFail;
@@ -167,12 +171,12 @@ async function __federation_method_getRemote(remoteName, componentName) {
               } else {
                 throw err;
               }
-            } else {
-                return getRemote();
-            }
-        }
-    };
-    return getRemote();
+          } else {
+              return getRemote();
+          }
+      }
+  };
+  return getRemote();
 }
     
 function __federation_method_setRemote(remoteName, remoteConfig) {
