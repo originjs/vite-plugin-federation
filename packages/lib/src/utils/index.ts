@@ -238,9 +238,9 @@ export function createRemotesMap(remotes: Remote[]): string {
 ${remotes
   .map(
     (remote) =>
-      `'${remote.id}':{url:${createUrl(remote)},format:'${
+      `'${remote.id}':{url:${createUrl(remote)} ,format:'${
         remote.config.format
-      }',from:'${remote.config.from}',importRetryCount: ${remote.config.importRetryCount ?? 0}, onImportFail: ${remote.config.onImportFail? remote.config.onImportFail.toString(): "undefined"}}`
+      }', from:'${remote.config.from}', importRetryCount: ${remote.config.importRetryCount ?? 0}, onImportFail: ${remote.config.onImportFail? remote.config.onImportFail.toString(): "undefined"}}`
   )
   .join(',\n  ')}
 };`

@@ -131,7 +131,7 @@ export function prodExposePlugin(
           window[key] = window[key] || [];
           window[key].push(href);
         });
-      };
+      });
       async function __federation_import(name) {
         currentImports[name] ??= import(name)
         return currentImports[name]
