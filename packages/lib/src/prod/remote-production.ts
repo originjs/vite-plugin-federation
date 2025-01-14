@@ -224,7 +224,7 @@ export function prodRemotePlugin(
                       try {
                           const remoteModule = await __federation_method_ensure(remoteName, retryCount);
                           const factory = await remoteModule.get(componentName);
-                          factory();
+                          return factory();
                       } catch (err) {
                           retryCount++;
                           if (retryCount > remoteConfig.importRetryCount) {
