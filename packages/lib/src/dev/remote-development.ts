@@ -117,7 +117,7 @@ async function __federation_method_ensure(remoteId, reInit) {
         const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
         getUrl().then(url => {
           import(/* @vite-ignore */ url).then(lib => {
-            if (!remote.inited) {
+            if (!remote.inited || reInit) {
               const shareScope = wrapShareScope(remote.from)
               lib.init(shareScope);
               remote.lib = lib;
