@@ -165,14 +165,20 @@ async function __federation_method_getRemote(remoteName, componentName) {
           retryCount++;
           if (retryCount > remoteConfig.importRetryCount) {
               if(remoteConfig.onImportFail){
-                const errorConfig = {...remoteConfig};
-                delete errorConfig.onImportFail;
-                return remoteConfig.onImportFail(remoteName, componentName, errorConfig, err);
+                return remoteConfig.onImportFail(remoteName, componentName, err);
               } else {
                 throw err;
               }
           } else {
-              return getRemote();
+              const retry = () => {
+                return new Promise((resolve) => {
+                  setTimeout(() => {
+                    const retryResult = getRemote();
+                    resolve(retryResult);
+                  }, remoteConfig.importRetryBackoff || 500)
+                })
+              }
+              return await retry();
           }
       }
   };
