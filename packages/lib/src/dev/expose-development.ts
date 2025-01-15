@@ -39,7 +39,7 @@ export function devExposePlugin(
     }
   }
 
-  const buildRemoteFile = (baseDir) => {
+  const buildRemoteFile = (baseDir:string) => {
     return `(${importShared})(); 
     import RefreshRuntime from "${baseDir}@react-refresh"
     RefreshRuntime.injectIntoGlobalHook(window)
@@ -54,7 +54,7 @@ export function devExposePlugin(
         let importedModule;
         try {
           return await import(fsImportPath);
-        }catch(ex) {
+        } catch(ex) {
           return await import(urlImportPath);
         }
       };

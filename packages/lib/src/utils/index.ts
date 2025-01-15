@@ -115,14 +115,18 @@ export function parseRemoteOptions(
       shareScope: options.shareScope || 'default',
       format: 'esm',
       from: 'vite',
-      externalType: 'url'
+      externalType: 'url',
+      importRetryCount: 0,
+      onImportFail: undefined
     }),
     (item) => ({
       external: Array.isArray(item.external) ? item.external : [item.external],
       shareScope: item.shareScope || options.shareScope || 'default',
       format: item.format || 'esm',
       from: item.from ?? 'vite',
-      externalType: item.externalType || 'url'
+      externalType: item.externalType || 'url',
+      importRetryCount: item.format === "var" ? undefined : item.importRetryCount || 0,
+      onImportFail: item.onImportFail ? item.onImportFail : undefined
     })
   )
 }
@@ -232,9 +236,9 @@ export function createRemotesMap(remotes: Remote[]): string {
 ${remotes
   .map(
     (remote) =>
-      `'${remote.id}':{url:${createUrl(remote)},format:'${
+      `'${remote.id}':{url:${createUrl(remote)} ,format:'${
         remote.config.format
-      }',from:'${remote.config.from}'}`
+      }', from:'${remote.config.from}', importRetryCount: ${remote.config.importRetryCount ?? 0}, onImportFail: ${remote.config.onImportFail? remote.config.onImportFail.toString(): "undefined"}}`
   )
   .join(',\n  ')}
 };`
