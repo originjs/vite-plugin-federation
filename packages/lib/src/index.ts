@@ -25,19 +25,10 @@ import { dirname } from 'path'
 import { prodRemotePlugin } from './prod/remote-production'
 import type { VitePluginFederationOptions } from '../types'
 import { builderInfo, DEFAULT_ENTRY_FILENAME, parsedOptions } from './public'
-import type { PluginHooks } from '../types/pluginHooks'
+import type { PluginHookBuildStart, PluginHookConfig, PluginHookConfigResolved, PluginHookConfigureServer, PluginHookGenerateBundle, PluginHookModuleParsed, PluginHookOutputOptions, PluginHookRenderChunk, PluginHooks, PluginHookTransform } from '../types/pluginHooks'
 import {
   InputOptions,
-  NormalizedInputOptions,
-  NormalizedOutputOptions,
   NullValue,
-  OutputBundle,
-  OutputOptions,
-  PluginContext,
-  RenderedChunk,
-  SourceDescription,
-  SourceMapInput,
-  TransformPluginContext,
   type MinimalPluginContext,
   type ModuleInfo
 } from 'rollup'
@@ -126,14 +117,8 @@ export default function federation(
       options.mode = options.mode ?? env.mode
       registerPlugins(options.mode, env.command)
       registerCount++
-      for (const pluginHook of pluginList) {(
-            pluginHook.config as ((
-              this: void,
-              config: UserConfig,
-              env: ConfigEnv
-            ) => UserConfig | null | void | Promise<UserConfig | null | void>) | undefined
-          )?.call(this, config, env)
-        
+      for (const pluginHook of pluginList) {
+          (pluginHook.config as PluginHookConfig)?.call(this, config, env);
       }
 
       // only run when builder is vite,rollup doesnt has hook named `config`
@@ -142,32 +127,17 @@ export default function federation(
     },
     configureServer(server: ViteDevServer) {
       for (const pluginHook of pluginList) {
-          (
-            pluginHook.configureServer as ((
-              this: void,
-              server: ViteDevServer
-            ) => (() => void) | void | Promise<(() => void) | void>)|undefined
-          )?.call(this, server)
+          (pluginHook.configureServer as PluginHookConfigureServer)?.call(this, server);
       }
     },
     configResolved(config: ResolvedConfig) {
       for (const pluginHook of pluginList) {
-        (
-          pluginHook.configResolved as ((
-            this: void,
-            config: ResolvedConfig
-          ) => void | Promise<void>)| undefined
-        )?.call(this, config)
+        (pluginHook.configResolved as PluginHookConfigResolved)?.call(this, config);
       }
     },
     buildStart(inputOptions) {
       for (const pluginHook of pluginList) {
-          (
-            pluginHook.buildStart as ((
-              this: PluginContext,
-              options: NormalizedInputOptions
-            ) => void )| undefined
-          )?.call(this, inputOptions)
+          (pluginHook.buildStart as PluginHookBuildStart)?.call(this, inputOptions);
       }
     },
 
@@ -207,46 +177,22 @@ export default function federation(
 
     transform(code: string, id: string) {
       for (const pluginHook of pluginList) {
-        const result = (
-          pluginHook.transform as ((
-            this: TransformPluginContext,
-            code: string,
-            id: string,
-            options?: {
-              ssr?: boolean
-            }
-          ) =>
-            | Promise<string | NullValue | Partial<SourceDescription>>
-            | (string | NullValue | Partial<SourceDescription>))
-            | undefined
-        )?.call(this, code, id)
+        const result = (pluginHook.transform as PluginHookTransform)?.call(this, code, id);
         if (result) {
-          return result
+          return result;
         }
       }
       return code
     },
     moduleParsed(moduleInfo: ModuleInfo): void {
       for (const pluginHook of pluginList) {
-        (
-          pluginHook.moduleParsed as (
-            this: PluginContext,
-            info: ModuleInfo
-          ) => void | undefined
-        )?.call(this, moduleInfo)
+        (pluginHook.moduleParsed as PluginHookModuleParsed)?.call(this, moduleInfo);
       }
     },
 
     outputOptions(outputOptions) {
       for (const pluginHook of pluginList) {
-        (
-          pluginHook.outputOptions as
-            | ((
-                this: PluginContext,
-                options: OutputOptions
-              ) => OutputOptions | NullValue)
-            | undefined
-        )?.call(this, outputOptions)
+        (pluginHook.outputOptions as PluginHookOutputOptions)?.call(this, outputOptions)
       }
       return outputOptions
     },
@@ -254,20 +200,7 @@ export default function federation(
     renderChunk(code, chunkInfo, _options) {
       for (const pluginHook of pluginList) {
         if (pluginHook.renderChunk) {
-          const result = (
-            pluginHook.renderChunk as
-              | ((
-                  this: MinimalPluginContext,
-                  code: string,
-                  chunk: RenderedChunk,
-                  options: NormalizedOutputOptions,
-                  meta: { chunks: Record<string, RenderedChunk> }
-                ) =>
-                  | { code: string; map?: SourceMapInput }
-                  | string
-                  | NullValue)
-              | undefined
-          )?.call(this, code, chunkInfo, _options, { chunks: {} })
+          const result = (pluginHook.renderChunk as PluginHookRenderChunk)?.call(this, code, chunkInfo, _options, { chunks: {} })
           if (result) {
             return result
           }
@@ -278,14 +211,7 @@ export default function federation(
 
     generateBundle: function (_options, bundle, isWrite) {
       for (const pluginHook of pluginList) {
-          (
-            pluginHook.generateBundle as ((
-              this: PluginContext,
-              options: NormalizedOutputOptions,
-              bundle: OutputBundle,
-              isWrite: boolean
-            ) => void) | undefined
-          )?.call(this, _options, bundle, isWrite)
+          (pluginHook.generateBundle as PluginHookGenerateBundle)?.call(this, _options, bundle, isWrite);
       }
     }
   }

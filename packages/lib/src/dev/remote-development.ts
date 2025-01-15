@@ -185,7 +185,7 @@ async function __federation_method_getRemote(remoteName, componentName) {
   };
   return getRemote();
 }
-    
+
 function __federation_method_setRemote(remoteName, remoteConfig) {
   remotesMap[remoteName] = remoteConfig;
 }
