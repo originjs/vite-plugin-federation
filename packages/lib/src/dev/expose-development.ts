@@ -51,12 +51,12 @@ export function devExposePlugin(
         ${moduleMap}
       };
       const __federation_import = async (urlImportPath, fsImportPath) => {
-        let importedModule;
-          try {
-            return await import(fsImportPath);
-          } catch(ex) {
-            return await import(urlImportPath);
-          }
+      let importedModule;
+        try {
+          return await import(fsImportPath);
+        } catch(ex) {
+          return await import(urlImportPath);
+        }
       };
       export const get =(module) => {
         if(!moduleMap[module]) throw new Error('Can not find remote module ' + module)

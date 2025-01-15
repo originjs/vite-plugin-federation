@@ -117,7 +117,7 @@ export default function federation(
             pluginHook.options as ((
               this: MinimalPluginContext,
               options: InputOptions
-            ) => InputOptions | NullValue)|undefined
+            ) => InputOptions | NullValue) | undefined
           )?.call(this, _options)
       }
       return _options

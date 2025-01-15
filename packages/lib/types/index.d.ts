@@ -247,12 +247,9 @@ declare type RemotesConfig = {
   from?: 'vite' | 'webpack'
 
   /**
-   * The number of milliseconds to wait between import retries. Defaults to 500ms
-   */
-  importRetryBackoff?: number
-
-  /**
-   * The number of times to retry imports before failure
+   * The number of times to retry imports before failure.
+   * The first retry will happen after a 10ms delay. Subsequent retries will happen
+   * after a (10 ** n)ms delay.
    */
   importRetryCount?: number
 

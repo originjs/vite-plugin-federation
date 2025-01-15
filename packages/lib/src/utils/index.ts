@@ -116,7 +116,6 @@ export function parseRemoteOptions(
       format: 'esm',
       from: 'vite',
       externalType: 'url',
-      importRetryBackoff: 500,
       importRetryCount: 0,
       onImportFail: undefined
     }),
@@ -126,7 +125,6 @@ export function parseRemoteOptions(
       format: item.format || 'esm',
       from: item.from ?? 'vite',
       externalType: item.externalType || 'url',
-      importRetryBackoff: item.importRetryBackoff ?? 500,
       importRetryCount: item.format === "var" ? undefined : item.importRetryCount || 0,
       onImportFail: item.onImportFail ? item.onImportFail : undefined
     })

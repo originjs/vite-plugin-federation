@@ -10,7 +10,7 @@ export default defineConfig({
     target: 'node14',
     minify: false,
     rollupOptions: {
-      external: ['fs', 'path', 'crypto', 'magic-string', '__federation_fn_satisfy'],
+      external: ['fs', 'path', 'crypto', 'magic-string'],
       output: {
         minifyInternalExports: false
       }

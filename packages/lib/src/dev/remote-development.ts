@@ -170,12 +170,13 @@ async function __federation_method_getRemote(remoteName, componentName) {
                 throw err;
               }
           } else {
+              const retryBackoff = 10 ** retryCount;
               const retry = () => {
                 return new Promise((resolve) => {
                   setTimeout(() => {
                     const retryResult = getRemote();
                     resolve(retryResult);
-                  }, remoteConfig.importRetryBackoff || 500)
+                  }, retryBackoff)
                 })
               }
               return await retry();
