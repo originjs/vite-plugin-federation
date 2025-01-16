@@ -43,6 +43,7 @@ export function devRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.devRemote = parseRemoteOptions(options)
+  const shareScope = options.shareScope || 'default'
   // const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
   for (const item of parsedOptions.devRemote) {
     devRemotes.push({
@@ -89,10 +90,10 @@ function get(name, ${REMOTE_FROM_PARAMETER}){
     return module
   })
 }
-const wrapShareScope = ${REMOTE_FROM_PARAMETER} => {
-  return {
+const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
+  return merge({
     ${getModuleMarker('shareScope')}
-  }
+  }, (globalThis.__federation_shared__ || {})['${shareScope}'] || {});
 }
 const initMap = Object.create(null);
 
