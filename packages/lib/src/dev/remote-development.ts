@@ -90,6 +90,15 @@ function get(name, ${REMOTE_FROM_PARAMETER}){
     return module
   })
 }
+function merge(obj1, obj2) {
+  const mergedObj = Object.assign(obj1, obj2);
+  for (const key of Object.keys(mergedObj)) {
+    if (typeof mergedObj[key] === 'object' && typeof obj2[key] === 'object') {
+      mergedObj[key] = merge(mergedObj[key], obj2[key]);
+    }
+  }
+  return mergedObj;
+}
 const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
   return merge({
     ${getModuleMarker('shareScope')}
