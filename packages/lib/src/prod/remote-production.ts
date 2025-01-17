@@ -180,7 +180,10 @@ export function prodRemotePlugin(
                             return new Promise((resolve, reject) => {
                                 const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
                                 getUrl().then(url => {
-                                    import(/* @vite-ignore */ url).then(lib => {
+                                    const importer = remote.format === 'systemjs'
+                                      ? System.import(/* @vite-ignore */ url)
+                                      : import(/* @vite-ignore */ url)
+                                      importer.then(lib => {
                                         if (!remote.inited) {
                                             const shareScope = wrapShareModule(remote.from);
                                             lib.init(shareScope);
