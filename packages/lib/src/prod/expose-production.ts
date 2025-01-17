@@ -91,12 +91,26 @@ export function prodExposePlugin(
         const assetsDir = __VITE_ASSETS_DIR_PLACEHOLDER__;
 
         cssFilePaths.forEach(cssPath => {
-         let href = ''
-         const baseUrl = base || curUrl
-         if (baseUrl && baseUrl !== '/') {
-         	href = [baseUrl, assetsDir, cssPath].filter(Boolean).map(part => part.endsWith('/') ? part.substring(0, part.length - 1) : part).join('/')
+         let href = '';
+         const baseUrl = base || curUrl;
+         if (baseUrl) {
+           const trimmer = {
+             trailing: (path) => (path.endsWith('/') ? path.slice(0, -1) : path),
+             leading: (path) => (path.startsWith('/') ? path.slice(1) : path)
+           }
+           const isAbsoluteUrl = (url) => url.startsWith('http') || url.startsWith('//');
+           
+           const cleanBaseUrl = trimmer.trailing(baseUrl);
+           const cleanCssPath = trimmer.leading(cssPath);
+           const cleanCurUrl = trimmer.trailing(curUrl);
+           
+           if (isAbsoluteUrl(baseUrl)) {
+             href = [cleanBaseUrl, cleanCssPath].filter(Boolean).join('/');
+           } else {
+             href = [cleanCurUrl + cleanBaseUrl, cleanCssPath].filter(Boolean).join('/');
+           }
          } else {
-         	href = curUrl + cssPath
+           href = cssPath;
          }
 
           if (href in seen) return;
@@ -180,7 +194,7 @@ export function prodExposePlugin(
           .replace(
             '__VITE_ASSETS_DIR_PLACEHOLDER__',
             `'${viteConfigResolved.config?.build?.assetsDir || ''}'`
-          );
+          )
 
         const filepathMap = new Map()
         const getFilename = (name) => parse(parse(name).name).name
