@@ -1,3 +1,15 @@
+## [1.3.9](https://github.com/originjs/vite-plugin-federation/compare/v1.3.8...v1.3.9) (2025-01-18)
+
+
+### Bug Fixes
+
+* CSS path in expose-production produce double slashes ([8df65ef](https://github.com/originjs/vite-plugin-federation/commit/8df65ef4d31dc7f18027ed8d9101f3a7f2bfefb2))
+* **css-file-paths-formatting:** ensure CSS paths include hostname for remote module styles ([#667](https://github.com/originjs/vite-plugin-federation/issues/667)) ([e39a86f](https://github.com/originjs/vite-plugin-federation/commit/e39a86f578c2b71dee051f86f5fd4bd3fb76e960))
+* Remove unnecessary console log in prodExposePlugin ([7baff37](https://github.com/originjs/vite-plugin-federation/commit/7baff37fbb2e8e59be508eb635cc71c8c4181980))
+* Updated the CSS file path generation logic in prodExposePlugin to correctly handle the base URL. ([ccec627](https://github.com/originjs/vite-plugin-federation/commit/ccec627da3cdf408bb031cf00b1ac31bb77671be))
+
+
+
 ## [1.3.8](https://github.com/originjs/vite-plugin-federation/compare/v1.3.7...v1.3.8) (2025-01-11)
 
 
