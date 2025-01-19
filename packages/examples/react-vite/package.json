@@ -8,6 +8,7 @@
       "build:remotes": "pnpm --parallel --filter \"./remote\" build",
       "serve:remotes": "pnpm --parallel --filter \"./remote\" serve",
       "dev:hosts": "pnpm --filter \"./host\" dev",
+      "dev:remotes": "pnpm --filter \"./remote\" dev",
       "stop": "kill-port --port 5000,5001"
     },
     "devDependencies": {
