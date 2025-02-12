@@ -99,15 +99,19 @@ export function prodExposePlugin(
              leading: (path) => (path.startsWith('/') ? path.slice(1) : path)
            }
            const isAbsoluteUrl = (url) => url.startsWith('http') || url.startsWith('//');
-           
+
            const cleanBaseUrl = trimmer.trailing(baseUrl);
            const cleanCssPath = trimmer.leading(cssPath);
            const cleanCurUrl = trimmer.trailing(curUrl);
-           
+
            if (isAbsoluteUrl(baseUrl)) {
              href = [cleanBaseUrl, cleanCssPath].filter(Boolean).join('/');
            } else {
-             href = [cleanCurUrl + cleanBaseUrl, cleanCssPath].filter(Boolean).join('/');
+            if (cleanCurUrl.includes(cleanBaseUrl)) {
+              href = [cleanCurUrl, cleanCssPath].filter(Boolean).join('/');
+            } else {
+              href = [cleanCurUrl + cleanBaseUrl, cleanCssPath].filter(Boolean).join('/');
+            }
            }
          } else {
            href = cssPath;
