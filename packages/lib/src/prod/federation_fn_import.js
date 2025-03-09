@@ -19,11 +19,14 @@ async function getSharedFromRuntime(name, shareScope) {
   let module = null
   if (globalThis?.__federation_shared__?.[shareScope]?.[name]) {
     const versionObj = globalThis.__federation_shared__[shareScope][name]
-    const versionKey = Object.keys(versionObj)[0]
-    const versionValue = Object.values(versionObj)[0]
-    if (moduleMap[name]?.requiredVersion) {
-      // judge version satisfy
-      if (satisfy(versionKey, moduleMap[name].requiredVersion)) {
+    const requiredVersion = moduleMap[name]?.requiredVersion
+    const hasRequiredVersion = !!requiredVersion
+    if (hasRequiredVersion) {
+      const versionKey = Object.keys(versionObj).find((version) =>
+        satisfy(version, requiredVersion)
+      )
+      if (versionKey) {
+        const versionValue = versionObj[versionKey]
         module = await (await versionValue.get())()
       } else {
         console.log(
@@ -31,6 +34,8 @@ async function getSharedFromRuntime(name, shareScope) {
         )
       }
     } else {
+      const versionKey = Object.keys(versionObj)[0]
+      const versionValue = versionObj[versionKey]
       module = await (await versionValue.get())()
     }
   }
