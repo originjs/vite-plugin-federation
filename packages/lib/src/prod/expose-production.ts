@@ -144,12 +144,12 @@ export function prodExposePlugin(
       export const init =(shareScope) => {
         globalThis.__federation_shared__= globalThis.__federation_shared__|| {};
         Object.entries(shareScope).forEach(([key, value]) => {
-          const versionKey = Object.keys(value)[0];
-          const versionValue = Object.values(value)[0];
-          const scope = versionValue.scope || 'default'
-          globalThis.__federation_shared__[scope] = globalThis.__federation_shared__[scope] || {};
-          const shared= globalThis.__federation_shared__[scope];
-          (shared[key] = shared[key]||{})[versionKey] = versionValue;
+          for (const [versionKey, versionValue] of Object.entries(value)) {
+            const scope = versionValue.scope || 'default'
+            globalThis.__federation_shared__[scope] = globalThis.__federation_shared__[scope] || {};
+            const shared= globalThis.__federation_shared__[scope];
+            (shared[key] = shared[key]||{})[versionKey] = versionValue;
+          }
         });
       }`
     },
