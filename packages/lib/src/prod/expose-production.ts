@@ -128,7 +128,7 @@ export function prodExposePlugin(
             return;
           }
 
-          const key = 'css__' + options.name + '__' + exposeItemName;
+          const key = 'css__${options.name}__' + exposeItemName;
           window[key] = window[key] || [];
           window[key].push(href);
         });
