@@ -116,21 +116,21 @@ export function prodExposePlugin(
          } else {
            href = cssPath;
          }
+         
+          if (dontAppendStylesToHead) {
+            const key = 'css__${options.name}__' + exposeItemName;
+            window[key] = window[key] || [];
+            window[key].push(href);
+            return;
+          }
 
           if (href in seen) return;
           seen[href] = true;
 
-          if (!dontAppendStylesToHead) {
-            const element = document.createElement('link');
-            element.rel = 'stylesheet';
-            element.href = href;
-            document.head.appendChild(element);
-            return;
-          }
-
-          const key = 'css__${options.name}__' + exposeItemName;
-          window[key] = window[key] || [];
-          window[key].push(href);
+          const element = document.createElement('link');
+          element.rel = 'stylesheet';
+          element.href = href;
+          document.head.appendChild(element);
         });
       };
       async function __federation_import(name) {
