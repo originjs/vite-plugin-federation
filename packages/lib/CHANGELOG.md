@@ -1,3 +1,14 @@
+# [1.4.0](https://github.com/originjs/vite-plugin-federation/compare/v1.3.9...v1.4.0) (2025-03-15)
+
+
+### Bug Fixes
+
+* bug on expose-production.ts ([#680](https://github.com/originjs/vite-plugin-federation/issues/680)) ([be78ec0](https://github.com/originjs/vite-plugin-federation/commit/be78ec0cda8e9c1d5fdcf3d53561805af4390e42))
+* **dev:** Append styles to head even for duplicates, fix key construction ([#683](https://github.com/originjs/vite-plugin-federation/issues/683)) ([8381233](https://github.com/originjs/vite-plugin-federation/commit/83812338a0de7ae5418b57e897818a64d65b74da))
+* multiple version of a package loaded causes problem ([#684](https://github.com/originjs/vite-plugin-federation/issues/684)) ([ff0527f](https://github.com/originjs/vite-plugin-federation/commit/ff0527fa2e3784d211f9a473c671acbb3017edd3))
+
+
+
 ## [1.3.9](https://github.com/originjs/vite-plugin-federation/compare/v1.3.8...v1.3.9) (2025-01-18)
 
 
