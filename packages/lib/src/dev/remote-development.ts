@@ -18,6 +18,7 @@ import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { readFileSync } from 'fs'
+import { posix } from 'path'
 import type { AcornNode, TransformPluginContext } from 'rollup'
 import type { ViteDevServer } from '../../types/viteDevServer'
 import {
@@ -380,6 +381,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
     const res: string[] = []
     if (shared.length) {
       const serverConfiguration = viteDevServer.config.server
+      const base = viteDevServer.config.base
       const cwdPath = normalizePath(process.cwd())
 
       for (const item of shared) {
@@ -393,7 +395,7 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         const idx = moduleFilePath.indexOf(cwdPath)
 
         const relativePath =
-          idx === 0 ? moduleFilePath.slice(cwdPath.length) : null
+          idx === 0 ? posix.join(base, moduleFilePath.slice(cwdPath.length)) : null
 
         const sharedName = item[0]
         const obj = item[1]
