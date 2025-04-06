@@ -14,7 +14,11 @@
 // *****************************************************************************
 
 import type { UserConfig } from 'vite'
-import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
+import type {
+  ConfigTypeSet,
+  ExposesConfig,
+  VitePluginFederationOptions
+} from 'types'
 import { walk } from 'estree-walker'
 import MagicString from 'magic-string'
 import { readFileSync } from 'fs'
@@ -31,11 +35,16 @@ import {
 } from '../utils'
 import { builderInfo, parsedOptions, devRemotes } from '../public'
 import type { PluginHooks } from '../../types/pluginHooks'
+import { Literal } from 'estree'
+import { importShared } from './import-shared'
+
+const exposedItems: string[] = []
 
 export function devRemotePlugin(
   options: VitePluginFederationOptions
 ): PluginHooks {
   parsedOptions.devRemote = parseRemoteOptions(options)
+  const shareScope = options.shareScope || 'default'
   // const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
   for (const item of parsedOptions.devRemote) {
     devRemotes.push({
@@ -82,48 +91,62 @@ function get(name, ${REMOTE_FROM_PARAMETER}){
     return module
   })
 }
-const wrapShareScope = ${REMOTE_FROM_PARAMETER} => {
-  return {
-    ${getModuleMarker('shareScope')}
+function merge(obj1, obj2) {
+  const mergedObj = Object.assign(obj1, obj2);
+  for (const key of Object.keys(mergedObj)) {
+    if (typeof mergedObj[key] === 'object' && typeof obj2[key] === 'object') {
+      mergedObj[key] = merge(mergedObj[key], obj2[key]);
+    }
   }
+  return mergedObj;
+}
+const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
+  return merge({
+    ${getModuleMarker('shareScope')}
+  }, (globalThis.__federation_shared__ || {})['${shareScope}'] || {});
 }
 const initMap = Object.create(null);
-async function __federation_method_ensure(remoteId) {
+
+async function __federation_method_ensure(remoteId, retryCount) {
   const remote = remotesMap[remoteId];
-  if (!remote.inited) {
-    if ('var' === remote.format) {
-      // loading js with script tag
-      return new Promise(resolve => {
-        const callback = () => {
-          if (!remote.inited) {
-            remote.lib = window[remoteId];
-            remote.lib.init(wrapShareScope(remote.from))
-            remote.inited = true;
-          }
-          resolve(remote.lib);
-        }
-        return loadJS(remote.url, callback);
-      });
-    } else if (['esm', 'systemjs'].includes(remote.format)) {
-      // loading js with import(...)
-      return new Promise((resolve, reject) => {
-        const getUrl = typeof remote.url === 'function' ? remote.url : () => Promise.resolve(remote.url);
-        getUrl().then(url => {
-          import(/* @vite-ignore */ url).then(lib => {
-            if (!remote.inited) {
-              const shareScope = wrapShareScope(remote.from)
-              lib.init(shareScope);
-              remote.lib = lib;
-              remote.lib.init(shareScope);
-              remote.inited = true;
-            }
-            resolve(remote.lib);
-          }).catch(reject)
-        })
-      })
-    }
+  if (!remote.inited || retryCount > 0) {
+      if ('var' === remote.format) {
+          // loading js with script tag
+          return new Promise(resolve => {
+              const callback = () => {
+                  if (!remote.inited) {
+                      remote.lib = window[remoteId];
+                      remote.lib.init(wrapShareModule(remote.from));
+                      remote.inited = true;
+                  }
+                  resolve(remote.lib);
+              };
+              return loadJS(remote.url, callback);
+          });
+      } else if (['esm', 'systemjs'].includes(remote.format)) {
+          // loading js with import(...)
+          return new Promise((resolve, reject) => {
+              const getUrl = typeof remote.url === 'function' ? remote.url : () =>  {
+                  const url = new URL(remote.url, window.location.origin);
+                  url.searchParams.append("retryCount", retryCount);
+                  return Promise.resolve(url.toString());
+              }
+              getUrl().then(url => {
+                  import(/* @vite-ignore */ url).then(lib => {
+                      if (!remote.inited || retryCount > 0) {
+                          const shareScope = wrapShareModule(remote.from);
+                          lib.init(shareScope);
+                          remote.lib = lib;
+                          remote.lib.init(shareScope);
+                          remote.inited = true;
+                      }
+                      resolve(remote.lib);
+                  }).catch(reject);
+              });
+          })
+      }
   } else {
-    return remote.lib;
+      return remote.lib;
   }
 }
 
@@ -141,8 +164,37 @@ function __federation_method_wrapDefault(module ,need){
   return module; 
 }
 
-function __federation_method_getRemote(remoteName,  componentName){
-  return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
+async function __federation_method_getRemote(remoteName, componentName) {
+  const remoteConfig = remotesMap[remoteName];
+  let retryCount = 0;
+  const getRemote = async () => {
+      try {
+          const remoteModule = await __federation_method_ensure(remoteName, retryCount);
+          const factory = await remoteModule.get(componentName);
+          return factory();
+      } catch (err) {
+          retryCount++;
+          if (retryCount > remoteConfig.importRetryCount) {
+              if(remoteConfig.onImportFail){
+                return remoteConfig.onImportFail(remoteName, componentName, err);
+              } else {
+                throw err;
+              }
+          } else {
+              const retryBackoff = 10 ** retryCount;
+              const retry = () => {
+                return new Promise((resolve) => {
+                  setTimeout(() => {
+                    const retryResult = getRemote();
+                    resolve(retryResult);
+                  }, retryBackoff)
+                })
+              }
+              return await retry();
+          }
+      }
+  };
+  return getRemote();
 }
 
 function __federation_method_setRemote(remoteName, remoteConfig) {
@@ -207,6 +259,8 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         return
       }
 
+      code += `(${importShared})();\n`
+
       let ast: AcornNode | null = null
       try {
         ast = this.parse(code)
@@ -216,7 +270,6 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       if (!ast) {
         return null
       }
-
       const magicString = new MagicString(code)
       const hasStaticImported = new Map<string, string>()
 
@@ -225,10 +278,85 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       walk(ast, {
         enter(node: any) {
           if (
+            node.type === 'MemberExpression' &&
+            node.object.type === 'MemberExpression' &&
+            node.object.object.type === 'MetaProperty' &&
+            node.object.object.meta.name === 'import' &&
+            node.object.property.type === 'Identifier' &&
+            node.object.property.name === 'env' &&
+            node.property.name === 'BASE_URL'
+          ) {
+            const serverPort = viteDevServer.config.inlineConfig.server?.port
+            const baseUrlFromConfig =
+              viteDevServer.config.env.BASE_URL &&
+              viteDevServer.config.env.BASE_URL !== '/'
+                ? viteDevServer.config.env.BASE_URL
+                : ''
+            // This assumes that the dev server will always be running on localhost. That's probably not a good assumption, but I don't know how to work around it right now.
+            const baseUrl = `"//localhost:${serverPort}${baseUrlFromConfig}"`
+            magicString.overwrite(node.start, node.end, baseUrl)
+            node = { type: 'Literal', value: baseUrl } as Literal
+          }
+          if (
             node.type === 'ImportDeclaration' &&
             node.source?.value === 'virtual:__federation__'
           ) {
             manualRequired = node
+          }
+          if (
+            isExposed(id, parsedOptions.devExpose) &&
+            node.type === 'ImportDeclaration' &&
+            node.source?.value
+          ) {
+            const moduleName = node.source.value
+            if (
+              parsedOptions.devShared.some(
+                (sharedInfo) => sharedInfo[0] === moduleName
+              )
+            ) {
+              const namedImportDeclaration: (string | never)[] = []
+              let defaultImportDeclaration: string | null = null
+              if (!node.specifiers?.length) {
+                // invalid import , like import './__federation_shared_lib.js' , and remove it
+                magicString.remove(node.start, node.end)
+              } else {
+                node.specifiers.forEach((specify) => {
+                  if (specify.imported?.name) {
+                    namedImportDeclaration.push(
+                      `${
+                        specify.imported.name === specify.local.name
+                          ? specify.imported.name
+                          : `${specify.imported.name}:${specify.local.name}`
+                      }`
+                    )
+                  } else {
+                    defaultImportDeclaration = specify.local.name
+                  }
+                })
+
+                if (defaultImportDeclaration && namedImportDeclaration.length) {
+                  // import a, {b} from 'c' -> const a = await importShared('c'); const {b} = a;
+                  const imports = namedImportDeclaration.join(',')
+                  const line = `const ${defaultImportDeclaration} = await importShared('${moduleName}') || await import('${moduleName}');\nconst {${imports}} = ${defaultImportDeclaration};\n`
+
+                  magicString.overwrite(node.start, node.end, line)
+                } else if (defaultImportDeclaration) {
+                  magicString.overwrite(
+                    node.start,
+                    node.end,
+                    `const ${defaultImportDeclaration} = await importShared('${moduleName}')  || await import('${moduleName}');\n`
+                  )
+                } else if (namedImportDeclaration.length) {
+                  magicString.overwrite(
+                    node.start,
+                    node.end,
+                    `const {${namedImportDeclaration.join(
+                      ','
+                    )}} = await importShared('${moduleName}') || await import('${moduleName}');\n`
+                  )
+                }
+              }
+            }
           }
 
           if (
@@ -412,5 +540,28 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       }
     }
     return res
+  }
+  function isExposed(id: string, options: (string | ConfigTypeSet)[]) {
+    if (exposedItems.includes(id)) {
+      return true
+    }
+    if (options.length >= 2 && (options[1] as ExposesConfig).import) {
+      if (normalizePath((options[1] as ExposesConfig).import)) {
+        return true
+      }
+    }
+    for (let i = 0, length = options.length; i < length; i++) {
+      const item = options[i]
+      if (
+        Array.isArray(item) &&
+        item.length >= 2 &&
+        (item[1] as ExposesConfig).import
+      ) {
+        if (normalizePath((item[1] as ExposesConfig).import)) {
+          return true
+        }
+      }
+    }
+    return false
   }
 }
