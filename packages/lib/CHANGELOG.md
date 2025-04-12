@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/originjs/vite-plugin-federation/compare/v1.4.0...v1.4.1) (2025-04-12)
+
+### Bug Fixes
+* Fixes #687 (#688)([#687](https://github.com/originjs/vite-plugin-federation/issues/687))([6287bae](https://github.com/originjs/vite-plugin-federation/commit/6287bae6f84dba182e024493e00c2491820b1148))
+
+
+
 # [1.4.0](https://github.com/originjs/vite-plugin-federation/compare/v1.3.9...v1.4.0) (2025-03-15)
 
 
