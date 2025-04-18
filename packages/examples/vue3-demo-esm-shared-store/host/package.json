@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "vue": "^3.2.45",
-    "pinia": "^2.0.21"
+    "pinia": "^2.0.21",
+    "shared-styled": "file:./shared-styled"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
