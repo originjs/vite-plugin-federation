@@ -13,11 +13,14 @@
 // SPDX-License-Identifier: MulanPSL-2.0
 // *****************************************************************************
 
+import MagicString from 'magic-string'
 import type { PluginHooks } from '../../types/pluginHooks'
 import { NAME_CHAR_REG, parseSharedOptions, removeNonRegLetter } from '../utils'
-import { parsedOptions } from '../public'
+import { parsedOptions, builderInfo } from '../public'
 import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
-import { basename, join, resolve } from 'path'
+import type { RenderedChunk } from 'rollup'
+import type { ChunkMetadata } from 'vite'
+import { basename, join, resolve, relative, dirname } from 'path'
 import { readdirSync, readFileSync, statSync } from 'fs'
 const sharedFilePathReg = /__federation_shared_(.+)-.{8}\.js$/
 import federation_fn_import from './federation_fn_import.js?raw'
@@ -147,6 +150,38 @@ export function prodSharedPlugin(
       if (parsedOptions.prodShared.length && isRemote) {
         for (const prod of parsedOptions.prodShared) {
           id2Prop.set(prod[1].id, prod[1])
+        }
+      }
+    },
+
+    renderChunk(this, code, _chunk) {
+      if (builderInfo.isShared) {
+        const chunk = _chunk as RenderedChunk & { viteMetadata?: ChunkMetadata }
+        const regRst = sharedFilePathReg.exec(chunk.fileName)
+        if (
+          regRst &&
+          shareName2Prop.get(removeNonRegLetter(regRst[1], NAME_CHAR_REG))
+            ?.generate !== false &&
+          chunk.type === 'chunk' &&
+          chunk.viteMetadata?.importedCss.size
+        ) {
+          /**
+           * Inject the referenced style files at the top of the chunk.
+           */
+          const magicString = new MagicString(code)
+          for (const cssFileName of chunk.viteMetadata.importedCss) {
+            let cssFilePath = relative(dirname(chunk.fileName), cssFileName)
+            cssFilePath = cssFilePath.startsWith('.')
+              ? cssFilePath
+              : `./${cssFilePath}`
+
+            magicString.prepend(`import '${cssFilePath}';`)
+          }
+
+          return {
+            code: magicString.toString(),
+            map: magicString.generateMap({ hires: true })
+          }
         }
       }
     },
