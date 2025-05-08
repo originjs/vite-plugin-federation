@@ -360,6 +360,17 @@ shared: {
 }
 ```
 
+#### `modulePreload : boolean`
+* `默认值: false`
+* 如果为 true，则会将 shared 依赖的 bundle 文件以 link modulepreload 的方式插入到 html head，仅在生产模式下生效。
+```js
+shared: {
+    packageName: {
+        modulePreload: true
+    }
+}
+```
+
 ## 添加其他的Example工程？
 
 首先需要判断测试适用于`dev`模式还是`build&serve`模式，或者两者都需要。
