@@ -34,7 +34,8 @@ export default defineConfig({
                 myStore: {
                     packagePath: './src/store.js',
                     modulePreload: true,
-                }
+                },
+                'shared-styled': {}
             }
         })
     ],
