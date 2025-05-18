@@ -37,13 +37,14 @@
   },
   "homepage": "https://github.com/originjs/vite-plugin-federation#readme",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc",
     "dev": "vite build --watch",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path ."
   },
   "dependencies": {
     "estree-walker": "^3.0.2",
-    "magic-string": "^0.27.0"
+    "magic-string": "^0.27.0",
+    "rollup": "^3.9.1"
   },
   "devDependencies": {
     "@rollup/plugin-virtual": "^3.0.1",

@@ -1,7 +1,9 @@
 {
-  "include": ["src"],
+  "include": ["src", "types/*.d.ts"],
   "exclude": ["dist", "node_modules", "test"],
   "compilerOptions": {
+    "composite": false,
+    "declaration": false,
     "outDir": "dist",
     "target": "es2019",
     "module": "commonjs",
@@ -12,6 +14,7 @@
     "noUnusedLocals": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "skipLibCheck": true
   }
 }
