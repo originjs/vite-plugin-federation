@@ -150,6 +150,7 @@ app.mount("#root");
 | [vue3-demo-webpack-esm-esm](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-esm)   | `vite/webpack`+`esm`                  | `vite/webpack`+`esm`                |
 | [vue3-demo-webpack-esm-var](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-esm-var)   | `vite`+`esm`                          | `webpack`+`var`                     |
 | [vue3-demo-webpack-systemjs](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/vue3-demo-webpack-systemjs) | `vite`+`systemjs`                     | `webpack`+`systemjs`                |
+| [react-vite](https://github.com/originjs/vite-plugin-federation/tree/main/packages/examples/react-vite)                                 | `vite`+`react` | `vite` + `react`
 
 ## 特性
 
@@ -241,6 +242,31 @@ exposes: {
     './remote-simple-button': './src/components/Button.vue',
     './remote-simple-section': './src/components/Section.vue'
 }
+```
+
+* 如果你需要更复杂的配置
+```js
+exposes: {
+    './remote-simple-button': {
+        import: './src/components/Button.vue',
+        name: 'customChunkName',
+        dontAppendStylesToHead: true
+    },
+}
+```
+`import` 属性是模块的地址。如果你需要为模块指定自定义的 chunk 名称，可以使用 `name` 属性。
+
+`dontAppendStylesToHead` 属性用于控制插件是否自动将暴露组件的所有样式添加到 `<head>` 元素中，这是默认行为。如果你的组件使用了 ShadowDOM，全局样式不会影响到它，这个属性就很有用。插件会将 CSS 文件的地址暴露在全局 `window` 对象中，这样你暴露的组件就可以在 ShadowDOM 内部自己添加样式。在 `window` 对象中用于样式的键值将是 `css__{应用名称}__{暴露组件的键值}`。在上面的例子中，假设全局 `name` 选项（不是暴露组件配置下的那个）是 `App`，那么键值就是 `css__App__./remote-simple-button`。这个键值下的值是一个字符串数组，包含了 CSS 文件的地址。在你暴露的组件中，你可以遍历这个数组，手动创建带有 `href` 属性的 `<link>` 元素，如下所示：
+```js
+const styleContainer = document.createElement("div");
+const hrefs = window["css__App__./remote-simple-button"];
+
+hrefs.forEach((href: string) => {
+    const link = document.createElement('link')
+    link.href = href
+    link.rel = 'stylesheet'
+    styleContainer.appendChild(link);
+});
 ```
 
 ----
@@ -371,6 +397,191 @@ shared: {
 }
 ```
 
+## 使用 `virtual:__federation__` 运行时添加远程模块
+有时无法在 `vite.config` 中预先定义远程应用的列表。某些应用可能在用户访问网站时异步加载这些远程模块的列表。在这种情况下，你可以使用 `virtual:__federation__` API。
+
+> 注意：这是一个虚拟模块，要深入了解 Vite 中的虚拟模块，请参阅：https://vite.dev/guide/api-plugin#virtual-modules-convention
+
+### API `virtual:__federation__`
+
+使用 `virtual:__federation__` 模块中的方法，你可以实现远程应用的动态加载。
+
+```ts
+import {
+  __federation_method_getRemote as getRemote,
+  __federation_method_setRemote as setRemote,
+  __federation_method_unwrapDefault as unwrapModule,
+  type IRemoteConfig,
+} from "virtual:__federation__";
+
+const renderComponent = () => {
+  throw Error("Not implemented");
+}
+
+const loadCrmPlugins = async () => {
+  try {
+    const pluginsResponse = await fetch("some-backed.com/plugins");
+    const pluginsJson = await pluginsResponse.json();
+    
+    const unresolvedPlugins = pluginsJson.map(async (plugin) => {
+      setRemote(plugin.name, {
+        ...commonRemoteConfig,
+        url: plugin.entry,
+      });
+
+      const remoteModule = await getRemote(plugin.name, plugin.component);
+      const remoteComponent = await unwrapModule(remoteModule);
+      renderComponent(plugin.name, remoteComponent);
+    });
+
+    await Promise.all(unresolvedPlugins);
+  } catch (e) {
+    console.error(e);
+  }
+};
+```
+
+可用的方法：
+
+<details>
+<summary><strong>__federation_method_setRemote</strong></summary>
+
+**语法**
+
+```ts
+/**
+ * 向页面上所有远程模块的共享映射中添加新的远程模块。
+ * @param {string} name - 远程模块的名称。
+ * @param {IRemoteConfig} config - 远程模块的配置。
+ */
+function __federation_method_setRemote(name: string, config: IRemoteConfig): void;
+```
+
+**类型**
+
+```ts
+interface IRemoteConfig {
+    url: (() => Promise<string>) | string; 
+    format: "esm" | "systemjs" | "var";   
+    from: "vite" | "webpack";
+}
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_getRemote</strong></summary>
+
+**语法**
+
+```ts
+/**
+ * 从远程模块返回一个组件。
+ * @param {string} remoteName - 远程模块的名称。
+ * @param {string} componentName - 要检索的组件的名称。
+ * @returns {Promise<unknown>} - 检索到的组件。
+ */
+function __federation_method_getRemote(remoteName: string, componentName: string): Promise<unknown>;
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_unwrapDefault</strong></summary>
+
+**语法**
+
+```ts
+/**
+ * 解包模块并返回其默认导出或模块本身。
+ * @param {unknown} module - 要解包的模块。
+ * @returns {unknown} - 默认导出或模块本身。
+ */
+function __federation_method_unwrapDefault(module: unknown): unknown;
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_wrapDefault</strong></summary>
+
+**语法**
+
+```ts
+/**
+ * 检查默认导出并在必要时创建包装器。
+ * @param {unknown} module - 要处理的模块。
+ * @param {boolean} need - 指示是否创建包装器的标志。
+ * @returns {Promise<unknown>} - 包装的模块或原始模块。
+ */
+function __federation_method_wrapDefault(module: unknown, need: boolean): Promise<unknown>;
+```
+
+</details>
+
+<details>
+<summary><strong>__federation_method_ensure</strong></summary>
+
+**语法**
+
+```ts
+/**
+ * 检查模块是否已初始化，如有必要则进行初始化。
+ * @param {string} remoteName - 远程模块的名称。
+ * @returns {Promise<unknown>} - 初始化的远程模块。
+ */
+async function __federation_method_ensure(remoteName: string): Promise<unknown>;
+```
+</details>
+
+--- 
+
+### 在 TypeScript 中使用 `virtual:__federation__`
+
+如果你使用 TypeScript，请使用 `declare module` 定义模块类型。
+
+<details>
+<summary>declare module 示例</summary>
+
+为了确保在 TypeScript 环境中的正确功能，在 `*.d.ts` 文件中描述模块：
+
+```ts
+declare module "virtual:__federation__" {
+  interface IRemoteConfig {
+    url: (() => Promise<string>) | string;
+    format: "esm" | "systemjs" | "var";
+    from: "vite" | "webpack";
+  }
+
+  export function __federation_method_setRemote(
+    name: string,
+    config: IRemoteConfig,
+  ): void;
+
+  export function __federation_method_getRemote(
+    name: string,
+    exposedPath: string,
+  ): Promise<unknown>;
+
+  export function __federation_method_unwrapDefault(
+    unwrappedModule: unknown,
+  ): Promise<unknown>;
+  
+  export function __federation_method_ensure(
+    remoteName: string,
+  ): Promise<unknown>;
+  
+  export function __federation_method_wrapDefault(
+    module: unknown,
+    need: boolean,
+  ): Promise<unknown>;
+}
+```
+</details>
+
+现在你可以加载远程应用，而无需在 `vite.config` 中预定义它们。
+- [示例 vue3-demo-esm](https://github.com/originjs/vite-plugin-federation/blob/main/packages/examples/vue3-demo-esm/layout/src/Layout.vue)
+
 ## 添加其他的Example工程？
 
 首先需要判断测试适用于`dev`模式还是`build&serve`模式，或者两者都需要。
@@ -489,6 +700,12 @@ export default defineConfig({
   },
   cacheDir: "node_modules/.cacheDir",
 }
+```
+
+### error TS2307: Cannot find module
+在 d.ts 文件中添加声明，如下所示：
+```ts
+declare module "router-remote/*"{}
 ```
 ## Star History
 
