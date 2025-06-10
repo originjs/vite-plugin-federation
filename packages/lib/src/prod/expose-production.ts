@@ -101,16 +101,17 @@ export function prodExposePlugin(
            const isAbsoluteUrl = (url) => url.startsWith('http') || url.startsWith('//');
 
            const cleanBaseUrl = trimmer.trailing(baseUrl);
+           const cleanAssetsDir = trimmer.leading(assetsDir);
            const cleanCssPath = trimmer.leading(cssPath);
            const cleanCurUrl = trimmer.trailing(curUrl);
 
            if (isAbsoluteUrl(baseUrl)) {
-             href = [cleanBaseUrl, cleanCssPath].filter(Boolean).join('/');
+             href = [cleanBaseUrl, cleanAssetsDir, cleanCssPath].filter(Boolean).join('/');
            } else {
             if (cleanCurUrl.includes(cleanBaseUrl)) {
-              href = [cleanCurUrl, cleanCssPath].filter(Boolean).join('/');
+              href = [cleanCurUrl, cleanAssetsDir, cleanCssPath].filter(Boolean).join('/');
             } else {
-              href = [cleanCurUrl + cleanBaseUrl, cleanCssPath].filter(Boolean).join('/');
+              href = [cleanCurUrl + cleanBaseUrl, cleanAssetsDir, cleanCssPath].filter(Boolean).join('/');
             }
            }
          } else {
@@ -197,7 +198,7 @@ export function prodExposePlugin(
           )
           .replace(
             '__VITE_ASSETS_DIR_PLACEHOLDER__',
-            `'${viteConfigResolved.config?.build?.assetsDir || ''}'`
+            `'${viteConfigResolved.config?.build?.assetsDir || 'assets'}'`
           )
 
         const filepathMap = new Map()
