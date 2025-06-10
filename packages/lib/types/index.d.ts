@@ -227,6 +227,11 @@ declare interface RemotesConfig {
   external: string
 
   /**
+   * Name by which the remote is exposed.
+   */
+  externalName?: string
+
+  /**
    * The format of the specified external
    */
   externalType: 'url' | 'promise'

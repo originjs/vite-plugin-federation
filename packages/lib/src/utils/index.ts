@@ -110,19 +110,21 @@ export function parseRemoteOptions(
 ): (string | ConfigTypeSet)[] {
   return parseOptions(
     options.remotes ? options.remotes : {},
-    (item) => ({
+    (item, key) => ({
       external: Array.isArray(item) ? item : [item],
       shareScope: options.shareScope || 'default',
       format: 'esm',
       from: 'vite',
-      externalType: 'url'
+      externalType: 'url',
+      externalName: key
     }),
-    (item) => ({
+    (item, key) => ({
       external: Array.isArray(item.external) ? item.external : [item.external],
       shareScope: item.shareScope || options.shareScope || 'default',
       format: item.format || 'esm',
       from: item.from ?? 'vite',
-      externalType: item.externalType || 'url'
+      externalType: item.externalType || 'url',
+      externalName: item.externalName ?? key
     })
   )
 }
@@ -228,16 +230,18 @@ export function createRemotesMap(remotes: Remote[]): string {
       return `'${external}'`
     }
   }
+
+  const createRemote = (remote: Remote) =>
+    `'${remote.id}': {
+        url: ${createUrl(remote)},
+        format: '${remote.config.format}',
+        from: '${remote.config.from}',
+        id: '${remote.config.externalName}',
+      }`
+
   return `const remotesMap = {
-${remotes
-  .map(
-    (remote) =>
-      `'${remote.id}':{url:${createUrl(remote)},format:'${
-        remote.config.format
-      }',from:'${remote.config.from}'}`
-  )
-  .join(',\n  ')}
-};`
+    ${remotes.map(createRemote).join(',\n  ')}
+  };`
 }
 
 /**
