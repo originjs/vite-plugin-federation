@@ -100,7 +100,7 @@ export function prodExposePlugin(
            }
            const isAbsoluteUrl = (url) => url.startsWith('http') || url.startsWith('//');
 
-           const cleanBaseUrl = trimmer.trailing(baseUrl);
+           const cleanBaseUrl = trimmer.trailing(baseUrl).replace('.', '');
            const cleanAssetsDir = trimmer.leading(assetsDir);
            const cleanCssPath = trimmer.leading(cssPath);
            const cleanCurUrl = trimmer.trailing(curUrl);
