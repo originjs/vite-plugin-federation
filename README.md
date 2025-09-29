@@ -466,7 +466,7 @@ function __federation_method_setRemote(name: string, config: IRemoteConfig): voi
 interface IRemoteConfig {
     url: (() => Promise<string>) | string; 
     format: "esm" | "systemjs" | "var";   
-    from: "vite" | "webpack;
+    from: "vite" | "webpack";
 }
 ```
 

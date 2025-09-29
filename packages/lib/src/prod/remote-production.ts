@@ -129,7 +129,7 @@ export function prodRemotePlugin(
 
                 function get(name, ${REMOTE_FROM_PARAMETER}) {
                     return __federation_import(name).then(module => () => {
-                        if (${REMOTE_FROM_PARAMETER} === 'webpack') {
+                        if ((globalThis.__federation_shared_remote_from__ ?? ${REMOTE_FROM_PARAMETER}) === 'webpack') {
                             return Object.prototype.toString.call(module).indexOf('Module') > -1 && module.default ? module.default : module
                         }
                         return module
@@ -147,11 +147,12 @@ export function prodRemotePlugin(
                 }
 
                 const wrapShareModule = ${REMOTE_FROM_PARAMETER} => {
+                  globalThis.__federation_shared_remote_from__ = ${REMOTE_FROM_PARAMETER};
                   return merge({
                     ${getModuleMarker('shareScope')}
                   }, (globalThis.__federation_shared__ || {})['${shareScope}'] || {});
                 }
-
+                
                 async function __federation_import(name) {
                     currentImports[name] ??= import(name)
                     return currentImports[name]
@@ -168,7 +169,7 @@ export function prodRemotePlugin(
                                 const callback = () => {
                                     if (!remote.inited) {
                                         remote.lib = window[remoteId];
-                                        remote.lib.init(wrapShareModule(remote.from))
+                                        remote.lib.init(wrapShareModule(remote.from));
                                         remote.inited = true;
                                     }
                                     resolve(remote.lib);
@@ -291,7 +292,7 @@ export function prodRemotePlugin(
             let str = ''
             if (typeof obj === 'object') {
               const fileUrl = `import.meta.ROLLUP_FILE_URL_${obj.emitFile}`
-              str += `get:()=>get(${fileUrl}, ${REMOTE_FROM_PARAMETER}), loaded:1`
+              str += `get:() => get(${fileUrl}, ${REMOTE_FROM_PARAMETER}), loaded:1`
               res.push(`'${arr[0]}':{'${obj.version}':{${str}}}`)
             }
           })
