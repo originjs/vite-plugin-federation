@@ -139,7 +139,7 @@ export function prodRemotePlugin(
                 function merge(obj1, obj2) {
                   const mergedObj = Object.assign(obj1, obj2);
                   for (const key of Object.keys(mergedObj)) {
-                    if (typeof mergedObj[key] === 'object' && typeof obj2[key] === 'object') {
+                    if (mergedObj[key] !== null && typeof mergedObj[key] === 'object' && typeof obj2[key] === 'object') {
                       mergedObj[key] = merge(mergedObj[key], obj2[key]);
                     }
                   }
