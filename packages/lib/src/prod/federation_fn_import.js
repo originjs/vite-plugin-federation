@@ -30,8 +30,9 @@ async function getSharedFromRuntime(name, shareScope) {
         module = await (await versionValue.get())()
       } else {
         console.log(
-          `provider support ${name}(${versionKey}) is not satisfied requiredVersion(\${moduleMap[name].requiredVersion})`
+          `provider support ${name} is not satisfied requiredVersion(${moduleMap[name].requiredVersion}). Debug logging will show available modules and versions.`
         )
+        console.debug(moduleMap);
       }
     } else {
       const versionKey = Object.keys(versionObj)[0]
