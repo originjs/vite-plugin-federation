@@ -26,6 +26,18 @@ export let viteTestUrl = ''
 
 const DIR = join(os.tmpdir(), 'vitest_playwright_global_setup')
 
+const waitForServer = async (url: string, timeout = 30000) => {
+  const start = Date.now()
+  while (Date.now() - start < timeout) {
+    try {
+      const res = await fetch(url)
+      if (res.ok) return
+    } catch {}
+    await new Promise(r => setTimeout(r, 500))
+  }
+  throw new Error(`Server at ${url} not ready after ${timeout}ms`)
+}
+
 let err: Error
 let skipError: boolean
 
@@ -81,9 +93,16 @@ beforeAll(async (s) => {
       execa('pnpm', ['run', 'serve'], { cwd: testDir, stdio: 'inherit' })
       await execa('pnpm', ['run', 'build'], { cwd: testDir, stdio: 'inherit' })
 
-      const port = 5000
+      const portMap: Record<string, number> = {
+        'webpack-host': 5010,
+        'simple-react-systemjs': 5020,
+        'basic-host-remote': 5030,
+        'simple-react-webpack': 5040,
+      }
+      const port = portMap[testName] ?? 5000
       // use resolved port/base from server
       viteTestUrl = `http://localhost:${port}`
+      await waitForServer(viteTestUrl)
       await page.goto(viteTestUrl)
     }
   } catch (e) {
@@ -98,7 +117,7 @@ beforeAll(async (s) => {
     // a timeout with an exception that hides the real error in the console.
     await page.close()
   }
-}, 60000)
+}, 120000)
 
 afterAll(async () => {
   await page?.close()

@@ -10,7 +10,7 @@ System.register(['./__federation_shared_react.js', './__federation_shared_react-
     execute: (function() {
 
       const remotesMap = {
-        'remote_app': () => __federation_import('http://localhost:5001/remoteEntry.js')
+        'remote_app': () => __federation_import('http://localhost:5041/remoteEntry.js')
       }
       const processModule = (mod) => {
         if (mod && mod.default) {

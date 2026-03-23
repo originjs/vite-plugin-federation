@@ -5,7 +5,7 @@
   "scripts": {
     "start": "webpack-cli serve",
     "build": "webpack --mode development",
-    "serve": "serve dist -p 5001 --cors='*'",
+    "serve": "serve dist -p 5041 --cors='*'",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "serve": "^14.0.0",
+    "html-webpack-plugin": "^5.5.0",
     "@babel/core": "^7.20.7",
     "@babel/preset-react": "^7.18.6",
     "babel-loader": "^9.1.0",

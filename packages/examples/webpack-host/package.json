@@ -7,7 +7,7 @@
     "build:remotes": "pnpm --filter \"./remote\"  build",
     "serve:remotes": "pnpm --filter \"./remote\"  serve",
     "dev:hosts": "pnpm --filter \"./host\" dev",
-    "stop": "kill-port --port 5000,5001"
+    "stop": "kill-port --port 5010,5011"
   },
   "workspaces": [
     "host",

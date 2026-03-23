@@ -1,6 +1,6 @@
 import federation from "@originjs/vite-plugin-federation";
 
-import pkg from "./package.json" assert { type: "json" };
+import pkg from "./package.json" with { type: "json" };
 
 export default {
   input: "src/index.js",
@@ -8,7 +8,7 @@ export default {
   plugins: [
     federation({
       remotes: {
-        remote_app: "http://localhost:5001/remoteEntry.js",
+        remote_app: "http://localhost:5031/remoteEntry.js",
       }
     }),
   ],

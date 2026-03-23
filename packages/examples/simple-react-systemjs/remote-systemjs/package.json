@@ -5,7 +5,7 @@
   "license": "MulanPSL-2.0",
   "scripts": {
     "build": "rollup -c",
-    "serve": "http-server ./dist -p 5001 --cors='*'"
+    "serve": "http-server ./dist -p 5021 --cors='*'"
   },
   "dependencies": {
     "cross-env": "^7.0.3",

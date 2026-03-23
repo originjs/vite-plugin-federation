@@ -12,7 +12,7 @@ module.exports = {
   output: {
     libraryTarget: 'system',
     libraryExport: 'main',
-    publicPath: 'http://localhost:5001/'
+    publicPath: 'http://localhost:5041/'
   },
   optimization: {
     // minimize: true,
@@ -59,7 +59,7 @@ module.exports = {
     static: {
       directory: path.join(__dirname)
     },
-    port: 5001,
+    port: 5041,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
