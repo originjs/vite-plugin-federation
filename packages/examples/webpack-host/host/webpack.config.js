@@ -46,7 +46,7 @@ module.exports = {
       name: 'webpackHost',
       filename: 'remoteEntry.js',
       remotes: {
-        viteRemote: `promise import("http://localhost:5001/assets/remoteEntry.js")`,
+        viteRemote: `promise import("http://localhost:5011/assets/remoteEntry.js")`,
       },
       shared: {
         react: {
