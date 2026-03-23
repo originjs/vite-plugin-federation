@@ -98,6 +98,9 @@ beforeAll(async (s) => {
 
       const portMap: Record<string, number> = {
         'webpack-host': 5010,
+        'simple-react-systemjs': 5020,
+        'basic-host-remote': 5030,
+        'simple-react-webpack': 5040,
       }
       const port = portMap[testName] ?? 5000
       // use resolved port/base from server

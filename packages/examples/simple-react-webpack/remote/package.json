@@ -5,7 +5,7 @@
   "scripts": {
     "start": "webpack-cli serve",
     "build": "webpack --mode development",
-    "serve": "serve dist -p 5001 --cors='*'",
+    "serve": "serve dist -p 5041 --cors='*'",
     "clean": "rm -rf dist"
   },
   "dependencies": {

@@ -20,7 +20,7 @@ export default {
     federation({
       remotes: {
         remote_app: {
-          external: 'http://localhost:5001/remoteEntry.js',
+          external: 'http://localhost:5021/remoteEntry.js',
           from: 'vite',
           format: 'esm'
         }

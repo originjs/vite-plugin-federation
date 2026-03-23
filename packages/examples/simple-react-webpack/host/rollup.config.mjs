@@ -21,7 +21,7 @@ export default {
     federation({
       remotes: {
         remote_app: {
-          external: 'http://localhost:5001/remoteEntry.js',
+          external: 'http://localhost:5041/remoteEntry.js',
           from: 'webpack'
         }
       },
