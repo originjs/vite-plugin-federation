@@ -541,6 +541,58 @@ export function prodRemotePlugin(
     },
 
     generateBundle(options, bundle) {
+      // ---------------------------------------------------------------
+      // Patch: compiler-runtime chunk (remote builds only)
+      //
+      // react/compiler-runtime is bundled as a separate chunk that
+      // imports React directly (./index-*.js) instead of going through
+      // importShared("react"). In federated mode the host provides
+      // React via the share scope — the local chunk is a DIFFERENT
+      // instance where the hooks dispatcher is never initialised.
+      //
+      // Fix: Rewrite the compiler-runtime chunk to obtain React via
+      // importShared("react") (top-level await), ensuring it uses the
+      // same React instance as the rest of the federation.
+      // ---------------------------------------------------------------
+      if (builderInfo.isRemote) {
+        let federationImportFileName: string | null = null
+        let importSharedExportName: string | null = null
+
+        // First pass: find the federation import chunk
+        for (const fileName in bundle) {
+          const chunk = bundle[fileName]
+          if (chunk.type !== 'chunk') continue
+          if (fileName.includes('__federation_fn_import')) {
+            federationImportFileName = fileName
+            importSharedExportName = findImportSharedExportName(chunk.code)
+          }
+        }
+
+        // Second pass: patch compiler-runtime chunks
+        if (federationImportFileName && importSharedExportName) {
+          for (const fileName in bundle) {
+            const chunk = bundle[fileName]
+            if (chunk.type !== 'chunk') continue
+            if (
+              fileName.includes('compiler-runtime') &&
+              chunk.code.includes(
+                '__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE'
+              )
+            ) {
+              const patched = patchCompilerRuntime(
+                chunk.code,
+                federationImportFileName,
+                fileName,
+                importSharedExportName
+              )
+              if (patched !== chunk.code) {
+                chunk.code = patched
+              }
+            }
+          }
+        }
+      }
+
       const preloadSharedReg = parsedOptions.prodShared
         .filter((shareInfo) => shareInfo[1].modulePreload)
         .map(
@@ -632,6 +684,104 @@ export function prodRemotePlugin(
       })
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// compiler-runtime patch helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Rewrites the compiler-runtime chunk to obtain React through
+ * importShared("react") instead of a direct bundled import.
+ */
+function patchCompilerRuntime(
+  code: string,
+  federationImportFile: string,
+  runtimeFile: string,
+  importSharedName: string
+): string {
+  if (!code.includes('useMemoCache') || !code.includes('export{')) {
+    return code
+  }
+
+  const relPath = computeRelativePath(runtimeFile, federationImportFile)
+
+  return [
+    `import{${importSharedName} as __s}from"${relPath}";`,
+    `var __react=await __s("react");`,
+    `var __internals=__react.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;`,
+    `var __obj={c:function(n){return __internals.H.useMemoCache(n)}};`,
+    `export{__obj as c};`
+  ].join('')
+}
+
+/**
+ * Finds the exported name for importShared in the federation import chunk.
+ * Handles both unminified (`export{... as importShared}`) and minified forms.
+ */
+function findImportSharedExportName(code: string): string | null {
+  // Unminified: export{... as importShared ...}
+  const unminifiedExport = /export\s*\{[^}]*\bas\s+importShared\b[^}]*\}/
+  if (unminifiedExport.test(code)) {
+    return 'importShared'
+  }
+
+  // Minified: find the async function that accesses moduleCache/Promise,
+  // then look up its export alias.
+  const asyncFnRe = /async\s+function\s+(\w+)\s*\(\s*(\w+)/g
+  let fnMatch: RegExpExecArray | null
+
+  while ((fnMatch = asyncFnRe.exec(code)) !== null) {
+    const window = code.substring(
+      fnMatch.index,
+      Math.min(fnMatch.index + 300, code.length)
+    )
+    if (window.includes('moduleCache') || window.includes('Promise')) {
+      const internalName = fnMatch[1]!
+
+      const exportRe = new RegExp(
+        `export\\s*\\{[^}]*\\b${internalName}\\s+as\\s+(\\w+)`
+      )
+      const exportMatch = exportRe.exec(code)
+      if (exportMatch) {
+        return exportMatch[1]!
+      }
+
+      const directExportRe = new RegExp(
+        `export\\s*\\{[^}]*\\b${internalName}\\b`
+      )
+      if (directExportRe.test(code)) {
+        return internalName
+      }
+    }
+  }
+
+  return null
+}
+
+/**
+ * Computes the relative import path between two bundle file names.
+ */
+function computeRelativePath(from: string, to: string): string {
+  const fromParts = from.split('/')
+  const toParts = to.split('/')
+
+  fromParts.pop()
+
+  let common = 0
+  while (
+    common < fromParts.length &&
+    common < toParts.length &&
+    fromParts[common] === toParts[common]
+  ) {
+    common++
+  }
+
+  const ups = fromParts.length - common
+  const remaining = toParts.slice(common)
+  const prefix = ups > 0 ? '../'.repeat(ups) : './'
+
+  return prefix + remaining.join('/')
 }
 
 export { sharedFileName2Prop }
