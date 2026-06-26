@@ -1,14 +1,22 @@
 {
-  "include": ["."],
-  "exclude": ["**/dist/**"],
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "**/dist/**"
+  ],
   "compilerOptions": {
-    "target": "es2019",
+    "target": "esnext",
     "outDir": "dist",
     "allowJs": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "baseUrl": ".",
     "jsx": "preserve",
-    "types": ["vite/client", "vitest/globals", "node"]
+    "types": [
+      "vite/client",
+      "vitest/globals",
+      "node"
+    ]
   }
 }

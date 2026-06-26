@@ -79,9 +79,9 @@ beforeAll(async (s) => {
           stdio: 'inherit'
         })
       }
-      execa('pnpm', ['run', 'dev:hosts'], {cwd: testDir, stdio: 'inherit'})
-      execa('pnpm', ['run', 'serve:remotes'], {cwd: testDir, stdio: 'inherit'})
       await execa('pnpm', ['run', 'build:remotes'], {cwd: testDir, stdio: 'inherit'})
+      execa('pnpm', ['run', 'serve:remotes'], {cwd: testDir, stdio: 'inherit'})
+      execa('pnpm', ['run', 'dev:hosts'], {cwd: testDir, stdio: 'inherit'})
 
 
       const port = 5000

@@ -5,6 +5,9 @@
 import { RenderedChunk } from 'rollup'
 
 export default function federation(options: VitePluginFederationOptions): Plugin
+export function nuxtFederationVitePlugin(
+  options: NuxtVitePluginFederationOptions
+): Plugin
 
 declare interface VitePluginFederationOptions {
   /**
@@ -82,6 +85,22 @@ declare interface VitePluginFederationOptions {
    * Current operating mode
    */
   mode?: string
+
+  /**
+   * asyncRemoteModule, when remote module use like vitePluginTopLevelAwait plugin, module need await some promise to load
+   */
+  asyncRemoteModule?:
+    | false
+    | {
+        awaitEffect: string
+      }
+}
+declare interface NuxtVitePluginFederationOptions
+  extends VitePluginFederationOptions {
+  /**
+   * nuxt resolve module path
+   */
+  nuxtResolve?: (module: string, opts?: any) => Promise<string> | string
 }
 
 type Exposes = (string | ExposesObject)[] | ExposesObject

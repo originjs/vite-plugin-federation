@@ -78,8 +78,12 @@ beforeAll(async (s) => {
           stdio: 'inherit'
         })
       }
-      execa('pnpm', ['run', 'serve'], { cwd: testDir, stdio: 'inherit' })
       await execa('pnpm', ['run', 'build'], { cwd: testDir, stdio: 'inherit' })
+      execa('pnpm', ['run', 'serve'], { cwd: testDir, stdio: 'inherit' })
+      if (testName === 'vite-nuxt3-vue3-demo') {
+        // nuxt serve wait
+        await new Promise(resolve => setTimeout(resolve, 5000))
+      }
 
       const port = 5000
       // use resolved port/base from server

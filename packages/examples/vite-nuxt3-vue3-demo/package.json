@@ -1,0 +1,22 @@
+{
+  "name": "vite-nuxt3-vue3-demo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "nuxt3-host",
+    "vite-vue3-remote"
+  ],
+  "scripts": {
+    "build": "pnpm --parallel --filter \"./**\" build",
+    "build:remotes": "pnpm --filter \"./vite-vue3-remote\" build",
+    "serve:remotes": "pnpm --filter \"./vite-vue3-remote\" serve",
+    "dev": "pnpm --filter \"./nuxt3-host\" dev",
+    "dev:hosts": "pnpm --filter \"./nuxt3-host\" dev",
+    "serve": "pnpm --parallel --filter \"./**\" serve",
+    "stop": "kill-port --port 5000,5001"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "workspace:*",
+    "kill-port": "^2.0.1"
+  }
+}
