@@ -13,9 +13,11 @@
 // SPDX-License-Identifier: MulanPSL-2.0
 // *****************************************************************************
 
+import { exports as resolveExports } from 'resolve.exports'
 import type {
   ConfigTypeSet,
   Exposes,
+  NuxtVitePluginFederationOptions,
   Remotes,
   RemotesConfig,
   Shared,
@@ -253,3 +255,55 @@ export function getFileExtname(url: string): string {
 
 export const REMOTE_FROM_PARAMETER = 'remoteFrom'
 export const NAME_CHAR_REG = new RegExp('[0-9a-zA-Z@_-]+')
+
+export async function resolveModuleJsonPath(
+  this: PluginContext,
+  nuxtResolve: NuxtVitePluginFederationOptions['nuxtResolve'],
+  moduleId: string
+) {
+  let packageJsonPath = ''
+  let path: string | undefined = ''
+  if (nuxtResolve) {
+    path = await nuxtResolve(moduleId)
+  } else {
+    path = (await this.resolve(moduleId))?.id
+  }
+  if (path) {
+    const packagePath = 'node_modules/' + moduleId
+    const nodeModulesIndex = path.lastIndexOf(packagePath)
+    if (nodeModulesIndex !== -1) {
+      packageJsonPath =
+        path.substring(0, nodeModulesIndex + packagePath.length) +
+        '/package.json'
+    }
+  }
+  return packageJsonPath
+}
+
+export async function resolveModule(
+  this: PluginContext,
+  nuxtResolve: NuxtVitePluginFederationOptions['nuxtResolve'],
+  moduleId: string
+) {
+  if (nuxtResolve) {
+    const moduleJSONPath = await resolveModuleJsonPath.call(
+      this,
+      nuxtResolve,
+      moduleId
+    )
+    const packageJson = JSON.parse(
+      readFileSync(moduleJSONPath, { encoding: 'utf-8' })
+    )
+    const resolveRes = resolveExports(packageJson, moduleId, {
+      unsafe: false,
+      browser: true
+    })
+    if (resolveRes) {
+      return path.join(
+        moduleJSONPath.slice(0, -'package.json'.length),
+        resolveRes[0]
+      )
+    }
+  }
+  return (await this.resolve(moduleId))?.id
+}

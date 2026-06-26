@@ -1,0 +1,21 @@
+{
+  "name": "@vite-nuxt3-vue3-demo/nuxt3-host",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "module": "nodenext",
+  "scripts": {
+    "dev": "nuxt dev --port 5000",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "serve": "nuxt preview --port 5000"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^4.4.8",
+    "@pinia/nuxt": "^0.11.3",
+    "nuxt": "^3.5.0",
+    "pinia": "^3.0.4",
+    "vue": "^3.3.4"
+  }
+}

@@ -1,40 +1,29 @@
-// *****************************************************************************
-// Copyright (C) 2022 Origin.js and others.
-//
-// This program and the accompanying materials are licensed under Mulan PSL v2.
-// You can use this software according to the terms and conditions of the Mulan PSL v2.
-// You may obtain a copy of Mulan PSL v2 at:
-//          http://license.coscl.org.cn/MulanPSL2
-// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-// EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-// MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-// See the Mulan PSL v2 for more details.
-//
-// SPDX-License-Identifier: MulanPSL-2.0
-// *****************************************************************************
-
-import type { UserConfig } from 'vite'
-import type { ConfigTypeSet, VitePluginFederationOptions } from 'types'
 import { walk } from 'estree-walker'
-import MagicString from 'magic-string'
 import { readFileSync } from 'fs'
+import MagicString from 'magic-string'
 import { posix } from 'path'
 import type { AcornNode, TransformPluginContext } from 'rollup'
-import type { ViteDevServer } from '../../types/viteDevServer'
+import { builderInfo, devRemotes, parsedOptions } from '../public'
 import {
   createRemotesMap,
   getFileExtname,
   getModuleMarker,
   normalizePath,
   parseRemoteOptions,
-  REMOTE_FROM_PARAMETER
+  REMOTE_FROM_PARAMETER,
+  resolveModuleJsonPath
 } from '../utils'
-import { builderInfo, parsedOptions, devRemotes } from '../public'
+import type {
+  ConfigTypeSet,
+  NuxtVitePluginFederationOptions
+} from '../../types'
 import type { PluginHooks } from '../../types/pluginHooks'
+import type { ViteDevServer } from '../../types/viteDevServer'
+import type { UserConfig } from 'vite'
 
-export function devRemotePlugin(
-  options: VitePluginFederationOptions
-): PluginHooks {
+export const devNuxtRemotePlugin = (
+  options: NuxtVitePluginFederationOptions
+): PluginHooks => {
   parsedOptions.devRemote = parseRemoteOptions(options)
   // const remotes: { id: string; regexp: RegExp; config: RemotesConfig }[] = []
   for (const item of parsedOptions.devRemote) {
@@ -189,9 +178,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       if (builderInfo.isHost && !builderInfo.isRemote) {
         for (const arr of parsedOptions.devShared) {
           if (!arr[1].version && !arr[1].manuallyPackagePathSetting) {
-            const packageJsonPath = (
-              await this.resolve(`${arr[0]}/package.json`)
-            )?.id
+            const packageJsonPath = await resolveModuleJsonPath.call(
+              this,
+              options.nuxtResolve,
+              arr[0]
+            )
             if (!packageJsonPath) {
               this.error(
                 `No description file or no version in description file (usually package.json) of ${arr[0]}(${packageJsonPath}). Add version to description file, or manually specify version in shared config.`
@@ -217,6 +208,11 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
       // ignore some not need to handle file types
       const fileExtname = getFileExtname(id)
       if (!transformFileTypeSet.has((fileExtname ?? '').toLowerCase())) {
+        return
+      }
+
+      // Skip Vue file's style section (type=style)
+      if (fileExtname === '.vue' && id.includes('type=style')) {
         return
       }
 
@@ -393,7 +389,6 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
   ): Promise<string[]> {
     const res: string[] = []
     if (shared.length) {
-      const serverConfiguration = viteDevServer.config.server
       const base = viteDevServer.config.base
       const cwdPath = normalizePath(process.cwd())
 
@@ -416,12 +411,15 @@ export {__federation_method_ensure, __federation_method_getRemote , __federation
         const obj = item[1]
         let str = ''
         if (typeof obj === 'object') {
-          const origin = serverConfiguration.origin
           const pathname = relativePath ?? `/@fs/${moduleInfo.id}`
-          const url = origin
-            ? `'${origin}${pathname}'`
-            : `window.location.origin+'${pathname}'`
-          str += `get:()=> get(${url}, ${REMOTE_FROM_PARAMETER})`
+          // /* @vite-ignore */ not work, will replace to __vite__injectQuery(${rawUrl}, 'import') by vite
+          // add ?import args can't keep source identity
+          str += `get:()=> import('${pathname}').then(module => ()=> {
+            if (${REMOTE_FROM_PARAMETER} === 'webpack') {
+              return Object.prototype.toString.call(module).indexOf('Module') > -1 && module.default ? module.default : module
+            }
+            return module
+          })`
           res.push(`'${sharedName}':{'${obj.version}':{${str}}}`)
         }
       }
