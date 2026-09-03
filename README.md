@@ -316,7 +316,7 @@ remotes: {
       },
 },
     
-// or from networke
+// or from network
 remotes: {
     remote-simple: {
         external: `fetch('your url').then(response=>response.json()).then(data=>data.url)`,
